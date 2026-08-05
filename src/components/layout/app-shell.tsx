@@ -56,13 +56,13 @@ export function AppShell({
         </div>
         <Sidebar role={role} onNavigate={() => setOpen(false)} />
         <div className="border-t border-white/10 px-3 py-4">
-          <div className="mb-2 px-3 text-xs text-slate-400">
-            <p className="font-medium text-slate-200">{userName}</p>
-            <p>{roleLabel}</p>
+          <div className="mb-2 px-3 text-xs">
+            <p className="font-medium text-slate-100">{userName}</p>
+            <p className="text-slate-400">{roleLabel}</p>
           </div>
           <Link
             href="/cambiar-contrasena"
-            className="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-brand-navy-light hover:text-white"
+            className="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-brand-navy-light hover:text-white"
           >
             <KeyRound className="h-4 w-4" />
             Cambiar contraseña
@@ -71,41 +71,40 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#d9e4f0]">
-        {/* Atmósfera con orbes visibles: el blur del glass necesita contraste detrás. */}
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#c5d4e6]">
+        {/* Atmósfera: más navy/azul de marca, amarillo solo como acento suave */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(165deg,#e4edf6_0%,#d5e3f0_40%,#cfdceb_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(165deg,#d2deec_0%,#c4d3e6_38%,#b7c8de_100%)]" />
           <div
-            className="glass-orb -left-24 top-[-8%] h-[420px] w-[420px] opacity-90"
+            className="glass-orb -left-28 top-[-12%] h-[480px] w-[480px] opacity-95"
             style={{
               background:
-                "radial-gradient(circle, rgba(0,124,186,0.45) 0%, rgba(0,124,186,0.12) 45%, transparent 70%)",
+                "radial-gradient(circle, rgba(10,34,64,0.28) 0%, rgba(0,124,186,0.22) 40%, transparent 70%)",
             }}
           />
           <div
-            className="glass-orb -right-16 top-[4%] h-[380px] w-[380px] opacity-95"
+            className="glass-orb -right-20 top-[2%] h-[360px] w-[360px] opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(245,234,97,0.55) 0%, rgba(245,234,97,0.18) 40%, transparent 68%)",
+                "radial-gradient(circle, rgba(245,234,97,0.22) 0%, rgba(245,234,97,0.06) 42%, transparent 68%)",
             }}
           />
           <div
-            className="glass-orb bottom-[-10%] left-[28%] h-[460px] w-[460px] opacity-80"
+            className="glass-orb bottom-[-12%] left-[22%] h-[500px] w-[500px] opacity-85"
             style={{
               background:
-                "radial-gradient(circle, rgba(18,51,95,0.22) 0%, rgba(0,124,186,0.12) 40%, transparent 70%)",
+                "radial-gradient(circle, rgba(18,51,95,0.28) 0%, rgba(0,124,186,0.14) 42%, transparent 70%)",
             }}
           />
           <div
-            className="glass-orb right-[18%] top-[48%] h-[280px] w-[280px] opacity-70"
+            className="glass-orb right-[12%] top-[52%] h-[300px] w-[300px] opacity-75"
             style={{
               background:
-                "radial-gradient(circle, rgba(0,124,186,0.28) 0%, transparent 65%)",
+                "radial-gradient(circle, rgba(0,124,186,0.32) 0%, transparent 65%)",
             }}
           />
-          {/* Textura suave para que el “frost” se lea mejor */}
           <div
-            className="absolute inset-0 opacity-[0.35] mix-blend-overlay"
+            className="absolute inset-0 opacity-[0.28] mix-blend-overlay"
             style={{
               backgroundImage:
                 "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")",
@@ -126,7 +125,7 @@ export function AppShell({
           {pendingSignatures !== null && (
             <Link
               href="/jefa/controles"
-              className="relative rounded-full border border-white/60 bg-white/35 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] transition-colors hover:bg-white/55 hover:text-brand-navy"
+              className="relative rounded-full border border-white/40 bg-white/25 p-2 text-brand-navy/70 shadow-[0_1px_0_rgba(255,255,255,0.55)_inset] transition-colors hover:bg-white/40 hover:text-brand-navy"
               aria-label={
                 pendingSignatures > 0
                   ? `${pendingSignatures} controles horarios pendientes de firmar`

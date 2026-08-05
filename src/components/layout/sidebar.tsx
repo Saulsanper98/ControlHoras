@@ -22,7 +22,7 @@ function NavLink({
       className={cn(
         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
         active
-          ? "bg-brand-yellow text-brand-navy"
+          ? "bg-brand-yellow/90 text-brand-navy shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_4px_14px_rgba(0,0,0,0.18)] ring-1 ring-brand-yellow/40"
           : "text-slate-200 hover:bg-brand-navy-light hover:text-white"
       )}
     >

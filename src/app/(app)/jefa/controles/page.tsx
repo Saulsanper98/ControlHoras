@@ -71,7 +71,7 @@ export default async function ControlesPage({
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Controles horarios</h1>
-        <p className="text-slate-500">Revisa, firma y descarga los controles horarios de los empleados.</p>
+        <p className="text-brand-navy/55">Revisa, firma y descarga los controles horarios de los empleados.</p>
       </div>
 
       <Card>

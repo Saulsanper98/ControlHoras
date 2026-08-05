@@ -29,7 +29,7 @@ export default async function HorarioPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Mi horario</h1>
-        <p className="text-slate-500">Consulta el horario de trabajo asignado por tu responsable.</p>
+        <p className="text-brand-navy/55">Consulta el horario de trabajo asignado por tu responsable.</p>
       </div>
 
       {schedule ? (

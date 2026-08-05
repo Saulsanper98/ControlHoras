@@ -20,7 +20,7 @@ export default async function JefaNoticiasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Noticias</h1>
-        <p className="text-slate-500">Publica y gestiona las noticias de la empresa.</p>
+        <p className="text-brand-navy/55">Publica y gestiona las noticias de la empresa.</p>
       </div>
 
       <NewsCreateForm />

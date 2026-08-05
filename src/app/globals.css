@@ -29,33 +29,36 @@ body {
   color: var(--foreground);
 }
 
-/* Glassmorphism — paneles “vidrio esmerilado” sobre fondos con atmósfera */
+/* Glassmorphism — paneles con tint navy/azul de marca */
 .glass-panel {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.62) 0%,
-    rgba(255, 255, 255, 0.38) 100%
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(232, 240, 248, 0.42) 55%,
+    rgba(18, 51, 95, 0.06) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 -1px 0 rgba(10, 34, 64, 0.04) inset,
-    0 10px 40px rgba(10, 34, 64, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 -1px 0 rgba(10, 34, 64, 0.05) inset,
+    0 10px 40px rgba(10, 34, 64, 0.09),
     0 2px 8px rgba(10, 34, 64, 0.04);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
 }
 
+/* Header puente: tint navy semitransparente hacia el sidebar */
 .glass-panel-header {
   background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.32) 100%
+    105deg,
+    rgba(10, 34, 64, 0.22) 0%,
+    rgba(0, 124, 186, 0.12) 42%,
+    rgba(255, 255, 255, 0.38) 100%
   );
-  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  border-bottom: 1px solid rgba(10, 34, 64, 0.12);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    0 8px 24px rgba(10, 34, 64, 0.04);
+    0 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 8px 24px rgba(10, 34, 64, 0.06);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }

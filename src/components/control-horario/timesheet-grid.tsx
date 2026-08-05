@@ -53,7 +53,7 @@ export function TimeSheetGrid({
                 weekday: "short",
               });
               return (
-                <tr key={entry.day} className="border-b border-slate-100 last:border-0">
+                <tr key={entry.day} className="border-b border-white/40 last:border-0">
                   <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
                     {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
                   </td>

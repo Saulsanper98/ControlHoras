@@ -28,7 +28,7 @@ export default async function JefaVacacionesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
-        <p className="text-slate-500">
+        <p className="text-brand-navy/55">
           Gestiona los saldos de vacaciones ({year}) y la bolsa de horas de cada empleado.
         </p>
       </div>

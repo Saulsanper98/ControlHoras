@@ -15,7 +15,7 @@ export default async function NoticiasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Noticias</h1>
-        <p className="text-slate-500">Todas las noticias y comunicados de la empresa.</p>
+        <p className="text-brand-navy/55">Todas las noticias y comunicados de la empresa.</p>
       </div>
 
       <div className="space-y-3">

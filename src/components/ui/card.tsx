@@ -29,10 +29,10 @@ export function StatCard({
     <Card className="flex items-start justify-between">
       <div>
         <p className="text-sm text-slate-500">{label}</p>
-        <p className="mt-1 text-2xl font-semibold text-brand-navy">{value}</p>
-        {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+        <p className="mt-1 text-2xl font-semibold tracking-tight text-brand-navy">{value}</p>
+        {hint && <p className="mt-1 text-xs text-brand-navy/45">{hint}</p>}
       </div>
-      <div className="rounded-xl border border-white/70 bg-brand-blue/10 p-2.5 text-brand-blue shadow-[0_1px_0_rgba(255,255,255,0.8)_inset]">
+      <div className="rounded-xl border border-white/60 bg-brand-blue/12 p-2.5 text-brand-blue shadow-[0_1px_0_rgba(255,255,255,0.7)_inset]">
         <Icon className="h-5 w-5" />
       </div>
     </Card>

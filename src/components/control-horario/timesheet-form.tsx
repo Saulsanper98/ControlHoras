@@ -307,7 +307,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.checkIn}
                       onChange={(e) => updateEntry(entry.day, { checkIn: e.target.value })}
-                      className="w-28 rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
+                      className="w-28 rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
                     />
                   </td>
                   <td className="px-3 py-1.5">
@@ -316,7 +316,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.checkOut}
                       onChange={(e) => updateEntry(entry.day, { checkOut: e.target.value })}
-                      className="w-28 rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
+                      className="w-28 rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
                     />
                   </td>
                   <td className="px-3 py-1.5 text-slate-600">{hours.totalHours.toFixed(2)}</td>
@@ -329,7 +329,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.notes}
                       onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
-                      className="w-full min-w-[120px] rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
+                      className="w-full min-w-[120px] rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
                     />
                   </td>
                 </tr>
@@ -361,7 +361,7 @@ export function TimeSheetForm({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100"
+          className="mt-1 w-full rounded-md border border-white/70 bg-white/55 px-3 py-2 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
         />
       </Card>
 
@@ -375,7 +375,7 @@ export function TimeSheetForm({
           {attachments.map((a) => (
             <div
               key={a.id}
-              className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-md border border-white/60 bg-white/40 px-3 py-2 text-sm"
             >
               <a
                 href={`/api/uploads/${a.filePath}`}
@@ -431,7 +431,7 @@ export function TimeSheetForm({
                 <img
                   src={`/api/uploads/${employeeSignaturePath}`}
                   alt="Firma del empleado"
-                  className="h-16 rounded-md border border-slate-200 bg-white p-2"
+                  className="h-16 rounded-md border border-white/60 bg-white/50 p-2"
                 />
               </div>
             )}
@@ -441,7 +441,7 @@ export function TimeSheetForm({
                 <img
                   src={`/api/uploads/${responsableSignaturePath}`}
                   alt="Firma de la responsable"
-                  className="h-16 rounded-md border border-slate-200 bg-white p-2"
+                  className="h-16 rounded-md border border-white/60 bg-white/50 p-2"
                 />
               </div>
             )}
@@ -455,7 +455,7 @@ export function TimeSheetForm({
             type="button"
             onClick={handleSave}
             disabled={pending}
-            className="flex items-center gap-2 rounded-md bg-white border border-brand-blue px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
+            className="flex items-center gap-2 rounded-md border border-white/70 bg-white/45 px-4 py-2 text-sm font-semibold text-brand-blue shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] hover:bg-white/60 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             Guardar borrador

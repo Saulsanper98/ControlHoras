@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             👋
           </span>
         </h1>
-        <p className="text-slate-500">
+        <p className="text-brand-navy/55">
           {role === "JEFA"
             ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
             : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
@@ -97,7 +97,7 @@ export default async function DashboardPage() {
       {showManagement && (
         <div className="animate-fade-slide-up" style={{ animationDelay: "90ms" }}>
           {showPersonal && (
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
               Resumen de gestión
             </h2>
           )}
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
       {showPersonal && (
         <div className="animate-fade-slide-up" style={{ animationDelay: "170ms" }}>
           {showManagement && (
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
               Mi resumen personal
             </h2>
           )}
@@ -169,7 +169,7 @@ function NewsSection({
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Newspaper className="h-4 w-4 text-brand-blue" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
             Últimas noticias
           </h2>
         </div>

@@ -44,7 +44,7 @@ export default async function EmpleadosPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Empleados</h1>
-        <p className="text-slate-500">
+        <p className="text-brand-navy/55">
           {activeCount} activos de {users.length} en total, agrupados por departamento.
         </p>
       </div>
@@ -54,7 +54,7 @@ export default async function EmpleadosPage() {
         if (list.length === 0) return null;
         return (
           <section key={dept.id}>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
               {dept.name} ({list.length})
             </h2>
             <div className="space-y-2">

@@ -22,7 +22,7 @@ export default async function HorariosPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Horarios</h1>
-        <p className="text-slate-500">
+        <p className="text-brand-navy/55">
           Sube el horario de trabajo por departamento (PDF o Excel). Todos los empleados del departamento verán el mismo archivo.
         </p>
       </div>
