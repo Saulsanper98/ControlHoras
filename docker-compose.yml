@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portal
+      # Sin valor por defecto a propósito: fuerza a definir POSTGRES_PASSWORD
+      # (p. ej. en un .env junto a este fichero) en vez de arrastrar la
+      # contraseña de desarrollo a producción.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD (ver .env.example)}
+      POSTGRES_DB: portal_empleado
+      TZ: Europe/Madrid
+    ports:
+      # Solo accesible desde el propio host (p. ej. para "npm run dev" en
+      # local o depuración con psql), nunca expuesto a la red/internet.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal -d portal_empleado"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://portal:${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD (ver .env.example)}@db:5432/portal_empleado?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      UPLOADS_DIR: /app/uploads
+      TZ: Europe/Madrid
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  pgdata:
+  uploads:

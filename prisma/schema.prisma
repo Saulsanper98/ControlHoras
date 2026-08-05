@@ -1,0 +1,195 @@
+// Prisma schema — Portal del Empleado
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLEADO
+  JEFA
+  ADMIN
+}
+
+enum EstadoControlHorario {
+  BORRADOR
+  FIRMADO_EMPLEADO
+  FIRMADO_RESPONSABLE
+  RECHAZADO
+}
+
+enum RolFirmante {
+  EMPLEADO
+  RESPONSABLE
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  users     User[]
+
+  @@map("departments")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(EMPLEADO)
+  active       Boolean  @default(true)
+  mustChangePassword Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  timeSheets        TimeSheet[]        @relation("EmployeeTimeSheets")
+  signatures        Signature[]
+  attachments       Attachment[]
+  schedulesReceived Schedule[]         @relation("EmployeeSchedules")
+  schedulesUploaded Schedule[]         @relation("UploadedSchedules")
+  vacationBalances  VacationBalance[]
+  hourAdjustments   HourAdjustment[]   @relation("EmployeeHourAdjustments")
+  hourAdjustmentsCreated HourAdjustment[] @relation("CreatedHourAdjustments")
+  newsPublished     News[]
+
+  @@map("users")
+}
+
+model TimeSheet {
+  id        String               @id @default(cuid())
+  userId    String
+  user      User                 @relation("EmployeeTimeSheets", fields: [userId], references: [id])
+  month     Int
+  year      Int
+  status    EstadoControlHorario @default(BORRADOR)
+  notes     String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  submittedAt DateTime?
+  approvedAt  DateTime?
+
+  entries     TimeEntry[]
+  signatures  Signature[]
+  attachments Attachment[]
+
+  @@unique([userId, month, year])
+  @@index([status])
+  @@index([month, year])
+  @@map("time_sheets")
+}
+
+model TimeEntry {
+  id             String    @id @default(cuid())
+  timeSheetId    String
+  timeSheet      TimeSheet @relation(fields: [timeSheetId], references: [id], onDelete: Cascade)
+  day            Int
+  checkIn        String?
+  checkOut       String?
+  totalHours     Decimal   @default(0) @db.Decimal(5, 2)
+  normalHours    Decimal   @default(0) @db.Decimal(5, 2)
+  overtimeHours  Decimal   @default(0) @db.Decimal(5, 2)
+  nightHours     Decimal   @default(0) @db.Decimal(5, 2)
+  notes          String?
+
+  @@unique([timeSheetId, day])
+  @@map("time_entries")
+}
+
+model Signature {
+  id          String      @id @default(cuid())
+  timeSheetId String
+  timeSheet   TimeSheet   @relation(fields: [timeSheetId], references: [id], onDelete: Cascade)
+  signerRole  RolFirmante
+  signerId    String
+  signer      User        @relation(fields: [signerId], references: [id])
+  imagePath   String
+  signedAt    DateTime    @default(now())
+  ipAddress   String?
+
+  @@unique([timeSheetId, signerRole])
+  @@map("signatures")
+}
+
+model Attachment {
+  id          String     @id @default(cuid())
+  timeSheetId String?
+  timeSheet   TimeSheet? @relation(fields: [timeSheetId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  fileName    String
+  filePath    String
+  mimeType    String
+  uploadedAt  DateTime   @default(now())
+
+  @@index([timeSheetId])
+  @@index([userId])
+  @@map("attachments")
+}
+
+model Schedule {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("EmployeeSchedules", fields: [userId], references: [id])
+  fileName     String
+  filePath     String
+  mimeType     String
+  uploadedById String
+  uploadedBy   User     @relation("UploadedSchedules", fields: [uploadedById], references: [id])
+  validFrom    DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("schedules")
+}
+
+model VacationBalance {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id])
+  year       Int
+  totalDays  Decimal @db.Decimal(5, 2)
+  usedDays   Decimal @default(0) @db.Decimal(5, 2)
+  notes      String?
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, year])
+  @@map("vacation_balances")
+}
+
+model HourAdjustment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("EmployeeHourAdjustments", fields: [userId], references: [id])
+  hours       Decimal  @db.Decimal(6, 2)
+  reason      String
+  createdById String
+  createdBy   User     @relation("CreatedHourAdjustments", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("hour_adjustments")
+}
+
+model News {
+  id            String   @id @default(cuid())
+  title         String
+  body          String
+  imagePath     String?
+  pinned        Boolean  @default(false)
+  publishedById String
+  publishedBy   User     @relation(fields: [publishedById], references: [id])
+  publishedAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([pinned, publishedAt])
+  @@map("news")
+}
