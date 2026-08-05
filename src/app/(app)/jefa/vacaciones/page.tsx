@@ -1,9 +1,14 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Umbrella } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { requireManagerSession } from "@/lib/auth-helpers";
 
 export default async function JefaVacacionesPage() {
+  const session = await requireManagerSession();
+  if (!session) redirect("/");
+
   const year = new Date().getFullYear();
 
   const [employees, balances, adjustmentSums] = await Promise.all([

@@ -1,15 +1,25 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { ScheduleUploadRow } from "@/components/jefa/schedule-upload-row";
+import { requireManagerSession } from "@/lib/auth-helpers";
 
 export default async function HorariosPage() {
+  const session = await requireManagerSession();
+  if (!session) redirect("/");
+
   const [employees, schedules] = await Promise.all([
     prisma.user.findMany({
       where: { role: { in: ["EMPLEADO", "ADMIN"] }, active: true },
       include: { department: true },
       orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
     }),
-    prisma.schedule.findMany({ orderBy: { createdAt: "desc" } }),
+    // distinct a nivel de BD: solo el horario más reciente por empleado,
+    // en lugar de traer el historial completo y filtrar en memoria.
+    prisma.schedule.findMany({
+      distinct: ["userId"],
+      orderBy: [{ userId: "asc" }, { createdAt: "desc" }],
+    }),
   ]);
 
   const latestByUser = new Map<string, (typeof schedules)[number]>();

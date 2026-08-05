@@ -1,11 +1,19 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { NewsCreateForm } from "@/components/jefa/news-create-form";
 import { NewsItem } from "@/components/jefa/news-item";
+import { requireManagerSession } from "@/lib/auth-helpers";
+
+const NEWS_LIMIT = 100;
 
 export default async function JefaNoticiasPage() {
+  const session = await requireManagerSession();
+  if (!session) redirect("/");
+
   const news = await prisma.news.findMany({
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
+    take: NEWS_LIMIT,
   });
 
   return (
@@ -18,6 +26,11 @@ export default async function JefaNoticiasPage() {
       <NewsCreateForm />
 
       <div className="space-y-3">
+        {news.length === NEWS_LIMIT && (
+          <p className="text-xs text-slate-400">
+            Mostrando las {NEWS_LIMIT} más recientes.
+          </p>
+        )}
         {news.length === 0 ? (
           <Card className="text-sm text-slate-400">Todavía no hay noticias publicadas.</Card>
         ) : (

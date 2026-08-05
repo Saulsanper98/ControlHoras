@@ -2,10 +2,13 @@ import { Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 
+const NEWS_LIMIT = 100;
+
 export default async function NoticiasPage() {
   const news = await prisma.news.findMany({
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
     include: { publishedBy: true },
+    take: NEWS_LIMIT,
   });
 
   return (

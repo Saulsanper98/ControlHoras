@@ -14,6 +14,9 @@ type EmployeeRowUser = {
 };
 
 export default async function EmpleadosPage() {
+  const session = await requireManagerSession();
+  if (!session) redirect("/");
+
   const [departments, users] = await Promise.all([
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.user.findMany({

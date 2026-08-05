@@ -17,6 +17,14 @@ export const metadata: Metadata = {
   description: "Control horario, horarios, vacaciones y noticias",
 };
 
+// Toda la app es un portal interno autenticado: cada página depende de la
+// sesión del usuario y de datos en vivo (saldo de vacaciones, controles
+// pendientes, noticias, etc.). Forzamos renderizado dinámico en toda la
+// aplicación para evitar que Next.js intente pre-renderizar estáticamente
+// en build-time cualquier página (lo que "congelaría" datos del momento del
+// build y además requeriría BD accesible durante `next build`).
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html

@@ -1,12 +1,16 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { VacationEditor } from "@/components/jefa/vacation-editor";
+import { requireManagerSession } from "@/lib/auth-helpers";
 
 export default async function VacationDetailPage({
   params,
 }: {
   params: Promise<{ userId: string }>;
 }) {
+  const session = await requireManagerSession();
+  if (!session) redirect("/");
+
   const { userId } = await params;
   const year = new Date().getFullYear();
 
