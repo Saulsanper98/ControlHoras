@@ -178,7 +178,7 @@ function NewsSection({
         </Link>
       </div>
       {news.length === 0 ? (
-        <Card className="text-sm text-slate-400">
+        <Card className="text-sm text-slate-500">
           Todavía no hay noticias publicadas.
         </Card>
       ) : (

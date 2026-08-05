@@ -20,7 +20,7 @@ export default async function NoticiasPage() {
 
       <div className="space-y-3">
         {news.length === 0 ? (
-          <Card className="text-sm text-slate-400">Todavía no hay noticias publicadas.</Card>
+          <Card className="text-sm text-slate-500">Todavía no hay noticias publicadas.</Card>
         ) : (
           news.map((n) => (
             <Card key={n.id}>
@@ -36,7 +36,7 @@ export default async function NoticiasPage() {
                   className="mt-2 max-h-64 rounded-md border border-slate-200"
                 />
               )}
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-slate-500">
                 {n.publishedAt.toLocaleDateString("es-ES")} · {n.publishedBy.name}
               </p>
             </Card>

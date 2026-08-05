@@ -2,34 +2,31 @@
 
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
-import { checkLoginRateLimit, recordLoginFailure } from "@/lib/login-rate-limit";
 
 export async function loginAction(
-  _prevState: { error: string | null },
+  _prevState: { error: string | null; redirectTo?: string | null },
   formData: FormData
-): Promise<{ error: string | null }> {
+): Promise<{ error: string | null; redirectTo?: string | null }> {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const callbackUrl = String(formData.get("callbackUrl") ?? "/");
 
-  const rateLimit = checkLoginRateLimit(email);
-  if (rateLimit.blocked) {
-    return {
-      error: `Demasiados intentos fallidos. Inténtalo de nuevo en ${rateLimit.retryAfterMinutes} minuto(s).`,
-    };
-  }
-
   try {
-    await signIn("credentials", {
+    // Sin redirect automático: el cliente anima la salida y navega después.
+    const result = await signIn("credentials", {
       email,
       password,
-      redirectTo: callbackUrl,
+      redirect: false,
     });
-    return { error: null };
+
+    if (result?.error) {
+      return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
+    }
+
+    return { error: null, redirectTo: callbackUrl || "/" };
   } catch (error) {
     if (error instanceof AuthError) {
-      recordLoginFailure(email);
-      return { error: "Usuario o contraseña incorrectos." };
+      return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
     }
     throw error;
   }

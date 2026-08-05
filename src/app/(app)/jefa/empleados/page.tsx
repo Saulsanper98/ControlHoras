@@ -80,7 +80,7 @@ export default async function EmpleadosPage() {
       )}
 
       {users.length === 0 && (
-        <Card className="text-sm text-slate-400">No hay empleados dados de alta.</Card>
+        <Card className="text-sm text-slate-500">No hay empleados dados de alta.</Card>
       )}
     </div>
   );

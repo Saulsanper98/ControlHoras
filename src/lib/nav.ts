@@ -6,7 +6,6 @@ import {
   Umbrella,
   Newspaper,
   Users,
-  FolderCog,
 } from "lucide-react";
 
 export type NavItem = {
@@ -34,7 +33,7 @@ export const jefaNav: NavItem[] = [
   { href: "/jefa/empleados", label: "Empleados", icon: Users },
   { href: "/jefa/horarios", label: "Horarios", icon: CalendarClock },
   { href: "/jefa/vacaciones", label: "Vacaciones y horas", icon: Umbrella },
-  { href: "/jefa/noticias", label: "Noticias", icon: FolderCog },
+  { href: "/jefa/noticias", label: "Noticias", icon: Newspaper },
 ];
 
 // ADMIN combina la gestión de la responsable con su propio flujo de empleado
@@ -58,7 +57,7 @@ export const adminNavSections: NavSection[] = [
       { href: "/jefa/empleados", label: "Empleados", icon: Users },
       { href: "/jefa/horarios", label: "Horarios", icon: CalendarClock },
       { href: "/jefa/vacaciones", label: "Vacaciones y horas", icon: Umbrella },
-      { href: "/jefa/noticias", label: "Noticias", icon: FolderCog },
+      { href: "/jefa/noticias", label: "Noticias", icon: Newspaper },
     ],
   },
 ];

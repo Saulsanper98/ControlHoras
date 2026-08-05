@@ -9,35 +9,38 @@ import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/hor
 type Schedule = { id: string; fileName: string; filePath: string; createdAt: string };
 
 export function ScheduleUploadRow({
-  userId,
-  name,
+  departmentId,
   departmentName,
   schedule,
 }: {
-  userId: string;
-  name: string;
+  departmentId: string;
   departmentName: string;
   schedule: Schedule | null;
 }) {
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function handleFile(file: File) {
     setMessage(null);
     const formData = new FormData();
     formData.set("file", file);
     startTransition(async () => {
-      const result = await uploadScheduleAction(userId, formData);
-      setMessage(result.ok ? "Horario subido." : result.error ?? "Error al subir el archivo.");
+      const result = await uploadScheduleAction(departmentId, formData);
+      setMessage(
+        result.ok
+          ? { type: "success", text: "Horario subido." }
+          : { type: "error", text: result.error ?? "Error al subir el archivo." }
+      );
     });
   }
 
   function handleDelete() {
     if (!schedule) return;
+    if (!window.confirm("¿Eliminar este horario? Esta acción no se puede deshacer.")) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteScheduleAction(schedule.id);
-      if (!result.ok) setMessage(result.error ?? "Error al eliminar el horario.");
+      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el horario." });
     });
   }
 
@@ -46,8 +49,8 @@ export function ScheduleUploadRow({
       <div className="flex items-center gap-3">
         <CalendarClock className="h-5 w-5 text-brand-blue" />
         <div>
-          <p className="font-medium text-brand-navy">{name}</p>
-          <p className="text-sm text-slate-500">{departmentName}</p>
+          <p className="font-medium text-brand-navy">{departmentName}</p>
+          <p className="text-sm text-slate-500">Horario compartido del departamento</p>
         </div>
       </div>
 
@@ -62,20 +65,21 @@ export function ScheduleUploadRow({
             >
               {schedule.fileName}
             </a>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               {new Date(schedule.createdAt).toLocaleDateString("es-ES")}
             </span>
             <button
               type="button"
               onClick={handleDelete}
               disabled={pending}
+              aria-label="Eliminar horario"
               className="text-slate-400 hover:text-red-600 disabled:opacity-60"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
         ) : (
-          <span className="text-sm text-slate-400">Sin horario asignado</span>
+          <span className="text-sm text-slate-500">Sin horario asignado</span>
         )}
 
         <FileDropzone
@@ -88,7 +92,15 @@ export function ScheduleUploadRow({
         />
       </div>
 
-      {message && <p className="w-full text-xs text-brand-blue sm:w-auto">{message}</p>}
+      {message && (
+        <p
+          className={`w-full text-xs sm:w-auto ${
+            message.type === "success" ? "text-emerald-700" : "text-red-600"
+          }`}
+        >
+          {message.text}
+        </p>
+      )}
     </Card>
   );
 }

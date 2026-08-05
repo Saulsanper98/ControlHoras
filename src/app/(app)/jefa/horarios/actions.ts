@@ -8,7 +8,7 @@ import { requireManagerSession } from "@/lib/auth-helpers";
 const SCHEDULE_EXTENSIONS = [".pdf", ".xlsx", ".xls"];
 
 export async function uploadScheduleAction(
-  userId: string,
+  departmentId: string,
   formData: FormData
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
@@ -19,12 +19,12 @@ export async function uploadScheduleAction(
     return { ok: false, error: "Selecciona un archivo." };
   }
 
-  const employee = await prisma.user.findUnique({ where: { id: userId } });
-  if (!employee) return { ok: false, error: "Empleado no encontrado." };
+  const department = await prisma.department.findUnique({ where: { id: departmentId } });
+  if (!department) return { ok: false, error: "Departamento no encontrado." };
 
   let saved;
   try {
-    saved = await saveUploadedFile(file, `schedules/${userId}`, {
+    saved = await saveUploadedFile(file, `schedules/${departmentId}`, {
       allowedExtensions: SCHEDULE_EXTENSIONS,
     });
   } catch (err) {
@@ -34,7 +34,7 @@ export async function uploadScheduleAction(
 
   await prisma.schedule.create({
     data: {
-      userId,
+      departmentId,
       fileName: saved.fileName,
       filePath: saved.filePath,
       mimeType: saved.mimeType,

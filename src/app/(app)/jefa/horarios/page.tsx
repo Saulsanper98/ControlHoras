@@ -8,41 +8,33 @@ export default async function HorariosPage() {
   const session = await requireManagerSession();
   if (!session) redirect("/");
 
-  const [employees, schedules] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: { in: ["EMPLEADO", "ADMIN"] }, active: true },
-      include: { department: true },
-      orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
-    }),
-    // distinct a nivel de BD: solo el horario más reciente por empleado,
-    // en lugar de traer el historial completo y filtrar en memoria.
+  const [departments, schedules] = await Promise.all([
+    prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.schedule.findMany({
-      distinct: ["userId"],
-      orderBy: [{ userId: "asc" }, { createdAt: "desc" }],
+      distinct: ["departmentId"],
+      orderBy: [{ departmentId: "asc" }, { createdAt: "desc" }],
     }),
   ]);
 
-  const latestByUser = new Map<string, (typeof schedules)[number]>();
-  for (const s of schedules) {
-    if (!latestByUser.has(s.userId)) latestByUser.set(s.userId, s);
-  }
+  const latestByDept = new Map(schedules.map((s) => [s.departmentId, s]));
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Horarios</h1>
-        <p className="text-slate-500">Sube el horario de trabajo asignado a cada empleado (PDF o Excel).</p>
+        <p className="text-slate-500">
+          Sube el horario de trabajo por departamento (PDF o Excel). Todos los empleados del departamento verán el mismo archivo.
+        </p>
       </div>
 
       <div className="space-y-2">
-        {employees.map((e) => {
-          const s = latestByUser.get(e.id);
+        {departments.map((dept) => {
+          const s = latestByDept.get(dept.id);
           return (
             <ScheduleUploadRow
-              key={e.id}
-              userId={e.id}
-              name={e.name}
-              departmentName={e.department?.name ?? "—"}
+              key={dept.id}
+              departmentId={dept.id}
+              departmentName={dept.name}
               schedule={
                 s
                   ? {
@@ -56,8 +48,8 @@ export default async function HorariosPage() {
             />
           );
         })}
-        {employees.length === 0 && (
-          <Card className="text-sm text-slate-400">No hay empleados dados de alta.</Card>
+        {departments.length === 0 && (
+          <Card className="text-sm text-slate-500">No hay departamentos configurados.</Card>
         )}
       </div>
     </div>

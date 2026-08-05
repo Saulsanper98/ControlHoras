@@ -85,7 +85,7 @@ export function TimeSheetForm({
   });
   const [notes, setNotes] = useState(initialNotes);
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showSignPad, setShowSignPad] = useState(false);
   const [bulkShift, setBulkShift] = useState<keyof typeof SHIFTS>("M");
   const [weekdaysOnly, setWeekdaysOnly] = useState(true);
@@ -123,7 +123,11 @@ export function TimeSheetForm({
     setMessage(null);
     startTransition(async () => {
       const result = await saveDraftAction(month, year, entries, notes);
-      setMessage(result.ok ? "Borrador guardado." : result.error ?? "Error al guardar.");
+      setMessage(
+        result.ok
+          ? { type: "success", text: "Borrador guardado." }
+          : { type: "error", text: result.error ?? "Error al guardar." }
+      );
     });
   }
 
@@ -131,15 +135,20 @@ export function TimeSheetForm({
     setMessage(null);
     startTransition(async () => {
       const result = await uploadAttachmentAction(month, year, formData);
-      setMessage(result.ok ? "Archivo adjuntado." : result.error ?? "Error al subir el archivo.");
+      setMessage(
+        result.ok
+          ? { type: "success", text: "Archivo adjuntado." }
+          : { type: "error", text: result.error ?? "Error al subir el archivo." }
+      );
     });
   }
 
   function handleDeleteAttachment(id: string) {
+    if (!window.confirm("¿Eliminar este adjunto? Esta acción no se puede deshacer.")) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteAttachmentAction(id);
-      if (!result.ok) setMessage(result.error ?? "Error al eliminar el adjunto.");
+      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
     });
   }
 
@@ -150,7 +159,7 @@ export function TimeSheetForm({
       if (result.ok) {
         setShowSignPad(false);
       } else {
-        setMessage(result.error ?? "Error al firmar.");
+        setMessage({ type: "error", text: result.error ?? "Error al firmar." });
       }
     });
   }
@@ -160,11 +169,11 @@ export function TimeSheetForm({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <Card className="flex flex-wrap items-center justify-between gap-3 py-3">
         <div className="flex items-center gap-2">
           <Link
             href={`/control-horario?month=${prev.month}&year=${prev.year}`}
-            className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
+            className="rounded-lg border border-white/70 bg-white/40 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
           >
             <ChevronLeft className="h-4 w-4" />
           </Link>
@@ -173,7 +182,7 @@ export function TimeSheetForm({
           </span>
           <Link
             href={`/control-horario?month=${next.month}&year=${next.year}`}
-            className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
+            className="rounded-lg border border-white/70 bg-white/40 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
           >
             <ChevronRight className="h-4 w-4" />
           </Link>
@@ -185,7 +194,7 @@ export function TimeSheetForm({
               href={`/api/timesheets/${timeSheetId}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              className="flex items-center gap-2 rounded-md border border-white/70 bg-white/40 px-3 py-1.5 text-sm font-medium text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
             >
               <Download className="h-4 w-4" />
               Descargar PDF
@@ -195,10 +204,18 @@ export function TimeSheetForm({
             {STATUS_LABEL[status]}
           </span>
         </div>
-      </div>
+      </Card>
 
       {message && (
-        <p className="rounded-md bg-brand-blue/10 px-3 py-2 text-sm text-brand-blue">{message}</p>
+        <p
+          className={`rounded-md px-3 py-2 text-sm ${
+            message.type === "success"
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-red-50 text-red-600"
+          }`}
+        >
+          {message.text}
+        </p>
       )}
 
       {editable && (
@@ -242,7 +259,7 @@ export function TimeSheetForm({
       <Card className="overflow-x-auto p-0">
         <table className="w-full min-w-[920px] text-sm">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <tr className="border-b border-white/50 bg-white/35 text-left text-xs uppercase tracking-wide text-slate-500">
               <th className="px-3 py-2">Día</th>
               <th className="px-3 py-2">Turno</th>
               <th className="px-3 py-2">Entrada</th>
@@ -265,10 +282,10 @@ export function TimeSheetForm({
               return (
                 <tr
                   key={entry.day}
-                  className={`border-b border-slate-100 last:border-0 ${isWeekend ? "bg-slate-50/60" : ""}`}
+                  className={`border-b border-white/40 last:border-0 ${isWeekend ? "bg-brand-navy/[0.04]" : ""}`}
                 >
                   <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
-                    {entry.day} <span className="text-xs text-slate-400">{weekday}</span>
+                    {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
                   </td>
                   <td className="px-3 py-1.5">
                     <Select
@@ -320,7 +337,7 @@ export function TimeSheetForm({
             })}
           </tbody>
           <tfoot>
-            <tr className="bg-slate-50 font-semibold text-brand-navy">
+            <tr className="bg-white/40 font-semibold text-brand-navy">
               <td className="px-3 py-2" colSpan={4}>
                 Totales
               </td>
@@ -372,6 +389,7 @@ export function TimeSheetForm({
                 <button
                   type="button"
                   onClick={() => handleDeleteAttachment(a.id)}
+                  aria-label="Eliminar adjunto"
                   className="text-slate-400 hover:text-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -409,7 +427,7 @@ export function TimeSheetForm({
           <div className="flex flex-wrap gap-6">
             {employeeSignaturePath && (
               <div>
-                <p className="mb-1 text-xs text-slate-400">Empleado</p>
+                <p className="mb-1 text-xs text-slate-500">Empleado</p>
                 <img
                   src={`/api/uploads/${employeeSignaturePath}`}
                   alt="Firma del empleado"
@@ -419,7 +437,7 @@ export function TimeSheetForm({
             )}
             {responsableSignaturePath && (
               <div>
-                <p className="mb-1 text-xs text-slate-400">Responsable</p>
+                <p className="mb-1 text-xs text-slate-500">Responsable</p>
                 <img
                   src={`/api/uploads/${responsableSignaturePath}`}
                   alt="Firma de la responsable"

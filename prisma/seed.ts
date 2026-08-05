@@ -11,11 +11,12 @@ type SeedUser = {
   role?: Role; // por defecto EMPLEADO
 };
 
-// Roster real de la empresa, agrupado por departamento. Saúl es ADMIN (permisos
-// de jefa + su propio control horario como empleado de Sistemas).
+// Roster real de la empresa, agrupado por departamento. Saúl es el
+// propietario/desarrollador de la app, pero de cara al portal es un empleado
+// más de Sistemas: NO debe ver las opciones de gestión de la jefa.
 const ROSTER: Record<string, SeedUser[]> = {
   Sistemas: [
-    { email: "Saul@movilidadgc.org", name: "Saúl", role: "ADMIN" },
+    { email: "Saul@movilidadgc.org", name: "Saúl" },
     { email: "Sergio@movilidadgc.org", name: "Sergio" },
     { email: "Clemente@movilidadgc.org", name: "Clemente" },
     { email: "Mendoza@movilidadgc.org", name: "Mendoza" },
@@ -75,14 +76,14 @@ async function main() {
   );
   const departmentIdByName = new Map(departments.map((d) => [d.name, d.id]));
 
-  // La jefa (responsable) sigue teniendo su propia cuenta genérica, ya que no
-  // se ha proporcionado un email real para ella.
+  // La jefa (responsable de operaciones) tiene su propia cuenta real, sin
+  // departamento asignado y sin control horario propio.
   await prisma.user.upsert({
-    where: { email: "jefa@portal.local" },
-    update: {},
+    where: { email: "responsableoperaciones@movilidadgc.org" },
+    update: { name: "Responsable de Operaciones", role: "JEFA" },
     create: {
-      name: "Jefa de Personal",
-      email: "jefa@portal.local",
+      name: "Responsable de Operaciones",
+      email: "responsableoperaciones@movilidadgc.org",
       passwordHash,
       role: "JEFA",
       // Solo en creación: no queremos forzar el cambio de contraseña de
@@ -125,9 +126,9 @@ async function main() {
   });
 
   console.log("Seed completada. Contraseña temporal para todos los usuarios nuevos: %s", DEFAULT_PASSWORD);
-  console.log("  jefa@portal.local (JEFA)");
+  console.log("  responsableoperaciones@movilidadgc.org (JEFA)");
   console.log(`  ${created} cuentas creadas/actualizadas a partir del roster real.`);
-  console.log("  Saul@movilidadgc.org -> ADMIN (Sistemas)");
+  console.log("  Saul@movilidadgc.org -> EMPLEADO (Sistemas), sin acceso a las opciones de la jefa.");
   console.log(`  Cuentas antiguas desactivadas: ${LEGACY_EMPLOYEE_EMAILS.join(", ")}`);
 }
 

@@ -11,7 +11,7 @@ export function ChangePasswordForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label htmlFor="currentPassword" className="block text-sm font-medium text-brand-navy">
+        <label htmlFor="currentPassword" className="block text-sm font-medium text-white/90">
           Contraseña actual
         </label>
         <input
@@ -20,13 +20,13 @@ export function ChangePasswordForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+          className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40"
           placeholder="••••••••"
         />
       </div>
 
       <div>
-        <label htmlFor="newPassword" className="block text-sm font-medium text-brand-navy">
+        <label htmlFor="newPassword" className="block text-sm font-medium text-white/90">
           Nueva contraseña
         </label>
         <input
@@ -36,13 +36,13 @@ export function ChangePasswordForm() {
           required
           minLength={8}
           autoComplete="new-password"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+          className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40"
           placeholder="Al menos 8 caracteres"
         />
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-brand-navy">
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/90">
           Repite la nueva contraseña
         </label>
         <input
@@ -52,19 +52,21 @@ export function ChangePasswordForm() {
           required
           minLength={8}
           autoComplete="new-password"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+          className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40"
           placeholder="••••••••"
         />
       </div>
 
       {state.error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{state.error}</p>
+        <p className="rounded-md border border-red-400/30 bg-red-500/20 px-3 py-2 text-sm text-red-100 backdrop-blur-sm">
+          {state.error}
+        </p>
       )}
 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-dark disabled:opacity-60"
+        className="w-full rounded-md bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-navy transition hover:bg-brand-yellow/90 disabled:opacity-60"
       >
         {pending ? "Guardando..." : "Cambiar contraseña"}
       </button>

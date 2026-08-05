@@ -71,8 +71,48 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col bg-slate-50">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#d9e4f0]">
+        {/* Atmósfera con orbes visibles: el blur del glass necesita contraste detrás. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(165deg,#e4edf6_0%,#d5e3f0_40%,#cfdceb_100%)]" />
+          <div
+            className="glass-orb -left-24 top-[-8%] h-[420px] w-[420px] opacity-90"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(0,124,186,0.45) 0%, rgba(0,124,186,0.12) 45%, transparent 70%)",
+            }}
+          />
+          <div
+            className="glass-orb -right-16 top-[4%] h-[380px] w-[380px] opacity-95"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(245,234,97,0.55) 0%, rgba(245,234,97,0.18) 40%, transparent 68%)",
+            }}
+          />
+          <div
+            className="glass-orb bottom-[-10%] left-[28%] h-[460px] w-[460px] opacity-80"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(18,51,95,0.22) 0%, rgba(0,124,186,0.12) 40%, transparent 70%)",
+            }}
+          />
+          <div
+            className="glass-orb right-[18%] top-[48%] h-[280px] w-[280px] opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(0,124,186,0.28) 0%, transparent 65%)",
+            }}
+          />
+          {/* Textura suave para que el “frost” se lea mejor */}
+          <div
+            className="absolute inset-0 opacity-[0.35] mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")",
+            }}
+          />
+        </div>
+        <header className="glass-panel-header relative z-10 flex items-center gap-3 px-4 py-3">
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -86,7 +126,7 @@ export function AppShell({
           {pendingSignatures !== null && (
             <Link
               href="/jefa/controles"
-              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-navy"
+              className="relative rounded-full border border-white/60 bg-white/35 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] transition-colors hover:bg-white/55 hover:text-brand-navy"
               aria-label={
                 pendingSignatures > 0
                   ? `${pendingSignatures} controles horarios pendientes de firmar`
@@ -107,7 +147,7 @@ export function AppShell({
             </Link>
           )}
         </header>
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">{children}</main>
+        <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">{children}</main>
       </div>
     </div>
   );

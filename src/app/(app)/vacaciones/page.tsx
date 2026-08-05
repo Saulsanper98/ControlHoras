@@ -52,7 +52,7 @@ export default async function VacacionesPage() {
       <Card>
         <p className="mb-3 text-sm font-medium text-brand-navy">Historial de ajustes de horas</p>
         {adjustments.length === 0 ? (
-          <p className="text-sm text-slate-400">Sin ajustes registrados.</p>
+          <p className="text-sm text-slate-500">Sin ajustes registrados.</p>
         ) : (
           <div className="space-y-2">
             {adjustments.map((a) => (
@@ -69,7 +69,7 @@ export default async function VacacionesPage() {
                   </span>
                   <span className="ml-2 text-slate-500">{a.reason}</span>
                 </div>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   {a.createdAt.toLocaleDateString("es-ES")} · {a.createdBy.name}
                 </span>
               </div>

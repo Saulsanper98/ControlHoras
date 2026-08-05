@@ -137,7 +137,7 @@ export default async function ControlesPage({
           Pendientes de firma ({pending.length})
         </h2>
         {pending.length === 0 ? (
-          <Card className="text-sm text-slate-400">No hay controles pendientes.</Card>
+          <Card className="text-sm text-slate-500">No hay controles pendientes.</Card>
         ) : (
           <div className="space-y-2">
             {pending.map((t) => (
@@ -153,7 +153,7 @@ export default async function ControlesPage({
             Historial
           </h2>
           {others.length === HISTORY_LIMIT && (
-            <p className="mb-3 text-xs text-slate-400">
+            <p className="mb-3 text-xs text-slate-500">
               Mostrando los {HISTORY_LIMIT} más recientes. Usa los filtros para acotar la búsqueda.
             </p>
           )}

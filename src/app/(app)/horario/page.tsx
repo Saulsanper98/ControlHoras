@@ -11,11 +11,14 @@ export default async function HorarioPage() {
   const session = await auth();
   if (!session) return null;
 
-  const schedule = await prisma.schedule.findFirst({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-    include: { uploadedBy: true },
-  });
+  const departmentId = session.user.departmentId;
+  const schedule = departmentId
+    ? await prisma.schedule.findFirst({
+        where: { departmentId },
+        orderBy: { createdAt: "desc" },
+        include: { uploadedBy: true },
+      })
+    : null;
 
   const ext = schedule
     ? schedule.fileName.slice(schedule.fileName.lastIndexOf(".")).toLowerCase()
@@ -73,7 +76,7 @@ export default async function HorarioPage() {
         </>
       ) : (
         <Card>
-          <p className="text-sm text-slate-400">Todavía no se ha asignado ningún horario.</p>
+          <p className="text-sm text-slate-500">Todavía no se ha asignado ningún horario.</p>
         </Card>
       )}
     </div>

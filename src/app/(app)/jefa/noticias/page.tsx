@@ -27,12 +27,12 @@ export default async function JefaNoticiasPage() {
 
       <div className="space-y-3">
         {news.length === NEWS_LIMIT && (
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Mostrando las {NEWS_LIMIT} más recientes.
           </p>
         )}
         {news.length === 0 ? (
-          <Card className="text-sm text-slate-400">Todavía no hay noticias publicadas.</Card>
+          <Card className="text-sm text-slate-500">Todavía no hay noticias publicadas.</Card>
         ) : (
           news.map((n) => (
             <NewsItem

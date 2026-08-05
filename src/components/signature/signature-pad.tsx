@@ -34,7 +34,12 @@ export function SignatureModal({
       <div className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-brand-navy">{title}</h3>
-          <button onClick={onCancel} className="text-slate-400 hover:text-slate-600">
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label="Cerrar"
+            className="text-slate-400 hover:text-slate-600"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>

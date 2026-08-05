@@ -34,7 +34,7 @@ export function TimeSheetGrid({
     <Card className="overflow-x-auto p-0">
       <table className="w-full min-w-[820px] text-sm">
         <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <tr className="border-b border-white/50 bg-white/35 text-left text-xs uppercase tracking-wide text-slate-500">
             <th className="px-3 py-2">Día</th>
             <th className="px-3 py-2">Entrada</th>
             <th className="px-3 py-2">Salida</th>
@@ -55,7 +55,7 @@ export function TimeSheetGrid({
               return (
                 <tr key={entry.day} className="border-b border-slate-100 last:border-0">
                   <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
-                    {entry.day} <span className="text-xs text-slate-400">{weekday}</span>
+                    {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
                   </td>
                   <td className="px-3 py-1.5 text-slate-600">{entry.checkIn || "—"}</td>
                   <td className="px-3 py-1.5 text-slate-600">{entry.checkOut || "—"}</td>
@@ -69,14 +69,14 @@ export function TimeSheetGrid({
             })}
           {entries.every((e) => !e.checkIn && !e.checkOut && !e.notes) && (
             <tr>
-              <td colSpan={8} className="px-3 py-4 text-center text-slate-400">
+              <td colSpan={8} className="px-3 py-4 text-center text-slate-500">
                 Sin registros diarios (puede que se haya adjuntado un archivo).
               </td>
             </tr>
           )}
         </tbody>
         <tfoot>
-          <tr className="bg-slate-50 font-semibold text-brand-navy">
+          <tr className="bg-white/40 font-semibold text-brand-navy">
             <td className="px-3 py-2" colSpan={3}>
               Totales
             </td>

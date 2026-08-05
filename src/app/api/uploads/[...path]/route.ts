@@ -55,8 +55,17 @@ export async function GET(
       select: { userId: true },
     });
     authorized = !!timeSheet && (timeSheet.userId === session.user.id || isManager);
-  } else if (category === "schedules" && ownerSegment) {
-    authorized = ownerSegment === session.user.id || isManager;
+  } else if (category === "schedules") {
+    // Los horarios viven por departamento; la carpeta en disco puede ser
+    // el departmentId (nuevo) o un userId legado. Autorizamos por el
+    // registro en BD, no por el segmento de ruta.
+    const schedule = await prisma.schedule.findFirst({
+      where: { filePath: relative },
+      select: { departmentId: true },
+    });
+    authorized =
+      !!schedule &&
+      (isManager || schedule.departmentId === session.user.departmentId);
   }
 
   if (!authorized) {

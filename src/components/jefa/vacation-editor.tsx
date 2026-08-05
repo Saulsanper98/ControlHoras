@@ -32,13 +32,17 @@ export function VacationEditor({
   const [hours, setHours] = useState("");
   const [reason, setReason] = useState("");
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function handleSaveBalance() {
     setMessage(null);
     startTransition(async () => {
       const result = await saveVacationBalanceAction(userId, year, totalDays, usedDays, notes);
-      setMessage(result.ok ? "Saldo de vacaciones guardado." : result.error ?? "Error al guardar.");
+      setMessage(
+        result.ok
+          ? { type: "success", text: "Saldo de vacaciones guardado." }
+          : { type: "error", text: result.error ?? "Error al guardar." }
+      );
     });
   }
 
@@ -46,7 +50,7 @@ export function VacationEditor({
     setMessage(null);
     const parsed = Number(hours);
     if (!parsed) {
-      setMessage("Indica un número de horas distinto de cero.");
+      setMessage({ type: "error", text: "Indica un número de horas distinto de cero." });
       return;
     }
     startTransition(async () => {
@@ -55,16 +59,17 @@ export function VacationEditor({
         setHours("");
         setReason("");
       } else {
-        setMessage(result.error ?? "Error al añadir el ajuste.");
+        setMessage({ type: "error", text: result.error ?? "Error al añadir el ajuste." });
       }
     });
   }
 
   function handleDeleteAdjustment(id: string) {
+    if (!window.confirm("¿Eliminar este ajuste de horas? Esta acción no se puede deshacer.")) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteHourAdjustmentAction(id, userId);
-      if (!result.ok) setMessage(result.error ?? "Error al eliminar el ajuste.");
+      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el ajuste." });
     });
   }
 
@@ -73,7 +78,15 @@ export function VacationEditor({
   return (
     <div className="space-y-6">
       {message && (
-        <p className="rounded-md bg-brand-blue/10 px-3 py-2 text-sm text-brand-blue">{message}</p>
+        <p
+          className={`rounded-md px-3 py-2 text-sm ${
+            message.type === "success"
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-red-50 text-red-600"
+          }`}
+        >
+          {message.text}
+        </p>
       )}
 
       <Card>
@@ -180,7 +193,7 @@ export function VacationEditor({
 
         <div className="space-y-2">
           {adjustments.length === 0 && (
-            <p className="text-sm text-slate-400">Sin ajustes registrados.</p>
+            <p className="text-sm text-slate-500">Sin ajustes registrados.</p>
           )}
           {adjustments.map((a) => (
             <div
@@ -193,7 +206,7 @@ export function VacationEditor({
                   {a.hours.toFixed(1)} h
                 </span>
                 <span className="ml-2 text-slate-500">{a.reason}</span>
-                <span className="ml-2 text-xs text-slate-400">
+                <span className="ml-2 text-xs text-slate-500">
                   {new Date(a.createdAt).toLocaleDateString("es-ES")} · {a.createdByName}
                 </span>
               </div>
@@ -201,6 +214,7 @@ export function VacationEditor({
                 type="button"
                 onClick={() => handleDeleteAdjustment(a.id)}
                 disabled={pending}
+                aria-label="Eliminar ajuste"
                 className="text-slate-400 hover:text-red-600 disabled:opacity-60"
               >
                 <Trash2 className="h-4 w-4" />

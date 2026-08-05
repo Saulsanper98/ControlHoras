@@ -8,7 +8,7 @@ import { createNewsAction } from "@/app/(app)/jefa/noticias/actions";
 export function NewsCreateForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function handleSubmit(formData: FormData) {
     setMessage(null);
@@ -16,9 +16,9 @@ export function NewsCreateForm() {
       const result = await createNewsAction(formData);
       if (result.ok) {
         formRef.current?.reset();
-        setMessage("Noticia publicada.");
+        setMessage({ type: "success", text: "Noticia publicada." });
       } else {
-        setMessage(result.error ?? "Error al publicar.");
+        setMessage({ type: "error", text: result.error ?? "Error al publicar." });
       }
     });
   }
@@ -58,7 +58,11 @@ export function NewsCreateForm() {
             Publicar
           </button>
         </div>
-        {message && <p className="text-sm text-brand-blue">{message}</p>}
+        {message && (
+          <p className={`text-sm ${message.type === "success" ? "text-emerald-700" : "text-red-600"}`}>
+            {message.text}
+          </p>
+        )}
       </form>
     </Card>
   );

@@ -12,7 +12,6 @@ datasource db {
 enum Role {
   EMPLEADO
   JEFA
-  ADMIN
 }
 
 enum EstadoControlHorario {
@@ -33,6 +32,7 @@ model Department {
   createdAt DateTime @default(now())
 
   users     User[]
+  schedules Schedule[]
 
   @@map("departments")
 }
@@ -54,7 +54,6 @@ model User {
   timeSheets        TimeSheet[]        @relation("EmployeeTimeSheets")
   signatures        Signature[]
   attachments       Attachment[]
-  schedulesReceived Schedule[]         @relation("EmployeeSchedules")
   schedulesUploaded Schedule[]         @relation("UploadedSchedules")
   vacationBalances  VacationBalance[]
   hourAdjustments   HourAdjustment[]   @relation("EmployeeHourAdjustments")
@@ -135,19 +134,21 @@ model Attachment {
   @@map("attachments")
 }
 
+// El horario asignado es por departamento (Sistemas, Redes, Sala, Operadores),
+// no personal: todos los empleados de un departamento ven el mismo horario.
 model Schedule {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation("EmployeeSchedules", fields: [userId], references: [id])
+  id           String     @id @default(cuid())
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
   fileName     String
   filePath     String
   mimeType     String
   uploadedById String
-  uploadedBy   User     @relation("UploadedSchedules", fields: [uploadedById], references: [id])
-  validFrom    DateTime @default(now())
-  createdAt    DateTime @default(now())
+  uploadedBy   User       @relation("UploadedSchedules", fields: [uploadedById], references: [id])
+  validFrom    DateTime   @default(now())
+  createdAt    DateTime   @default(now())
 
-  @@index([userId, createdAt])
+  @@index([departmentId, createdAt])
   @@map("schedules")
 }
 

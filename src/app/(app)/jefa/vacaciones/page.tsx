@@ -52,13 +52,13 @@ export default async function JefaVacacionesPage() {
                 </div>
                 <div className="flex gap-6 text-right text-sm">
                   <div>
-                    <p className="text-slate-400">Vacaciones</p>
+                    <p className="text-slate-500">Vacaciones</p>
                     <p className="font-medium text-brand-navy">
                       {remaining !== null ? `${remaining} días` : "Sin datos"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-400">Bolsa de horas</p>
+                    <p className="text-slate-500">Bolsa de horas</p>
                     <p className="font-medium text-brand-navy">{hours.toFixed(1)} h</p>
                   </div>
                 </div>
@@ -67,7 +67,7 @@ export default async function JefaVacacionesPage() {
           );
         })}
         {employees.length === 0 && (
-          <Card className="text-sm text-slate-400">No hay empleados dados de alta.</Card>
+          <Card className="text-sm text-slate-500">No hay empleados dados de alta.</Card>
         )}
       </div>
     </div>

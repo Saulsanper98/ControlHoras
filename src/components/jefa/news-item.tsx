@@ -37,6 +37,7 @@ export function NewsItem({
   }
 
   function handleDelete() {
+    if (!window.confirm("¿Eliminar esta noticia? Esta acción no se puede deshacer.")) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteNewsAction(id);
@@ -110,7 +111,7 @@ export function NewsItem({
               className="mt-2 max-h-48 rounded-md border border-slate-200"
             />
           )}
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-slate-500">
             {new Date(publishedAt).toLocaleDateString("es-ES")}
           </p>
         </div>
@@ -118,6 +119,7 @@ export function NewsItem({
           <button
             type="button"
             onClick={() => setEditing(true)}
+            aria-label="Editar noticia"
             className="text-slate-400 hover:text-brand-blue"
           >
             <Pencil className="h-4 w-4" />
@@ -126,6 +128,7 @@ export function NewsItem({
             type="button"
             onClick={handleDelete}
             disabled={pending}
+            aria-label="Eliminar noticia"
             className="text-slate-400 hover:text-red-600 disabled:opacity-60"
           >
             <Trash2 className="h-4 w-4" />

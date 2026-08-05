@@ -106,7 +106,7 @@ export default async function ControlDetailPage({
         <div className="flex flex-wrap gap-6">
           {employeeSignature && (
             <div>
-              <p className="mb-1 text-xs text-slate-400">Firma del empleado</p>
+              <p className="mb-1 text-xs text-slate-500">Firma del empleado</p>
               <img
                 src={`/api/uploads/${employeeSignature.imagePath}`}
                 alt="Firma del empleado"
@@ -116,7 +116,7 @@ export default async function ControlDetailPage({
           )}
           {responsableSignature && (
             <div>
-              <p className="mb-1 text-xs text-slate-400">Firma de la responsable</p>
+              <p className="mb-1 text-xs text-slate-500">Firma de la responsable</p>
               <img
                 src={`/api/uploads/${responsableSignature.imagePath}`}
                 alt="Firma de la responsable"
