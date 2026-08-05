@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { LoginShell } from "./login-shell";
+import { LoginShell } from "@/components/auth/login-shell";
 
 export default async function LoginPage({
   searchParams,
