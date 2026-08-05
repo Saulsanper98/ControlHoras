@@ -173,7 +173,7 @@ export function TimeSheetForm({
         <div className="flex items-center gap-2">
           <Link
             href={`/control-horario?month=${prev.month}&year=${prev.year}`}
-            className="rounded-lg border border-white/70 bg-white/40 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
+            className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
           >
             <ChevronLeft className="h-4 w-4" />
           </Link>
@@ -182,7 +182,7 @@ export function TimeSheetForm({
           </span>
           <Link
             href={`/control-horario?month=${next.month}&year=${next.year}`}
-            className="rounded-lg border border-white/70 bg-white/40 p-2 text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
+            className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
           >
             <ChevronRight className="h-4 w-4" />
           </Link>
@@ -194,7 +194,7 @@ export function TimeSheetForm({
               href={`/api/timesheets/${timeSheetId}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-md border border-white/70 bg-white/40 px-3 py-1.5 text-sm font-medium text-slate-600 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset] hover:bg-white/60"
+              className="flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
               <Download className="h-4 w-4" />
               Descargar PDF
@@ -259,7 +259,7 @@ export function TimeSheetForm({
       <Card className="overflow-x-auto p-0">
         <table className="w-full min-w-[920px] text-sm">
           <thead>
-            <tr className="border-b border-white/50 bg-white/35 text-left text-xs uppercase tracking-wide text-slate-500">
+            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
               <th className="px-3 py-2">Día</th>
               <th className="px-3 py-2">Turno</th>
               <th className="px-3 py-2">Entrada</th>
@@ -282,7 +282,7 @@ export function TimeSheetForm({
               return (
                 <tr
                   key={entry.day}
-                  className={`border-b border-white/40 last:border-0 ${isWeekend ? "bg-brand-navy/[0.04]" : ""}`}
+                  className={`border-b border-slate-100 last:border-0 ${isWeekend ? "bg-slate-50/60" : ""}`}
                 >
                   <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
                     {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
@@ -307,7 +307,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.checkIn}
                       onChange={(e) => updateEntry(entry.day, { checkIn: e.target.value })}
-                      className="w-28 rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
+                      className="w-28 rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
                     />
                   </td>
                   <td className="px-3 py-1.5">
@@ -316,7 +316,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.checkOut}
                       onChange={(e) => updateEntry(entry.day, { checkOut: e.target.value })}
-                      className="w-28 rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
+                      className="w-28 rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
                     />
                   </td>
                   <td className="px-3 py-1.5 text-slate-600">{hours.totalHours.toFixed(2)}</td>
@@ -329,7 +329,7 @@ export function TimeSheetForm({
                       disabled={!editable}
                       value={entry.notes}
                       onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
-                      className="w-full min-w-[120px] rounded-md border border-white/70 bg-white/55 px-2 py-1 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
+                      className="w-full min-w-[120px] rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
                     />
                   </td>
                 </tr>
@@ -337,7 +337,7 @@ export function TimeSheetForm({
             })}
           </tbody>
           <tfoot>
-            <tr className="bg-white/40 font-semibold text-brand-navy">
+            <tr className="bg-slate-50 font-semibold text-brand-navy">
               <td className="px-3 py-2" colSpan={4}>
                 Totales
               </td>
@@ -361,7 +361,7 @@ export function TimeSheetForm({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
-          className="mt-1 w-full rounded-md border border-white/70 bg-white/55 px-3 py-2 text-sm shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] disabled:bg-white/30 disabled:text-slate-400"
+          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100"
         />
       </Card>
 
@@ -375,7 +375,7 @@ export function TimeSheetForm({
           {attachments.map((a) => (
             <div
               key={a.id}
-              className="flex items-center justify-between rounded-md border border-white/60 bg-white/40 px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm"
             >
               <a
                 href={`/api/uploads/${a.filePath}`}
@@ -431,7 +431,7 @@ export function TimeSheetForm({
                 <img
                   src={`/api/uploads/${employeeSignaturePath}`}
                   alt="Firma del empleado"
-                  className="h-16 rounded-md border border-white/60 bg-white/50 p-2"
+                  className="h-16 rounded-md border border-slate-200 bg-white p-2"
                 />
               </div>
             )}
@@ -441,7 +441,7 @@ export function TimeSheetForm({
                 <img
                   src={`/api/uploads/${responsableSignaturePath}`}
                   alt="Firma de la responsable"
-                  className="h-16 rounded-md border border-white/60 bg-white/50 p-2"
+                  className="h-16 rounded-md border border-slate-200 bg-white p-2"
                 />
               </div>
             )}
@@ -455,7 +455,7 @@ export function TimeSheetForm({
             type="button"
             onClick={handleSave}
             disabled={pending}
-            className="flex items-center gap-2 rounded-md border border-white/70 bg-white/45 px-4 py-2 text-sm font-semibold text-brand-blue shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] hover:bg-white/60 disabled:opacity-60"
+            className="flex items-center gap-2 rounded-md border border-brand-blue bg-white px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             Guardar borrador

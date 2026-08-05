@@ -8,7 +8,12 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("glass-panel rounded-2xl p-5", className)}>
+    <div
+      className={cn(
+        "rounded-xl border border-slate-200 bg-white p-5 shadow-sm",
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -32,7 +37,7 @@ export function StatCard({
         <p className="mt-1 text-2xl font-semibold tracking-tight text-brand-navy">{value}</p>
         {hint && <p className="mt-1 text-xs text-brand-navy/45">{hint}</p>}
       </div>
-      <div className="rounded-xl border border-white/60 bg-brand-blue/12 p-2.5 text-brand-blue shadow-[0_1px_0_rgba(255,255,255,0.7)_inset]">
+      <div className="rounded-lg bg-brand-blue/10 p-2.5 text-brand-blue">
         <Icon className="h-5 w-5" />
       </div>
     </Card>

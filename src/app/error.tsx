@@ -17,7 +17,7 @@ export default function Error({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
-      <div className="w-full max-w-sm glass-panel rounded-2xl p-8 text-center">
+      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
           <AlertTriangle className="h-6 w-6" />
         </div>

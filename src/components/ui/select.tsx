@@ -16,9 +16,9 @@ export function Select({
       <select
         {...props}
         className={cn(
-          "w-full appearance-none rounded-md border border-white/70 bg-white/55 px-3 py-1.5 pr-8 text-sm text-slate-700 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] transition-colors",
+          "w-full appearance-none rounded-md border border-slate-300 bg-white px-3 py-1.5 pr-8 text-sm text-slate-700 transition-colors",
           "focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20",
-          "disabled:cursor-not-allowed disabled:bg-white/30 disabled:text-slate-400",
+          "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400",
           className
         )}
       >
