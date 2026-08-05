@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ChangePasswordForm } from "./change-password-form";
-import { LoginVideoBackground } from "@/components/auth/login-video-background";
+import { LoginVideoBackground } from "@/app/login/login-video-background";
 
 export default async function CambiarContrasenaPage() {
   const session = await auth();
