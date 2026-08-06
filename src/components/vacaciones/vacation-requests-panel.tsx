@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarPlus, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
+import { countVacationDays } from "@/lib/holidays";
 import {
   cancelVacationRequestAction,
   createVacationRequestAction,
@@ -85,6 +86,13 @@ export function VacationRequestsPanel({
   }
 
   const yearRequests = requests.filter((r) => new Date(r.startDate).getFullYear() === year);
+
+  const estimatedDays = useMemo(() => {
+    if (!startDate || !endDate || endDate < startDate) return null;
+    const [ys, ms, ds] = startDate.split("-").map(Number);
+    const [ye, me, de] = endDate.split("-").map(Number);
+    return countVacationDays(new Date(ys, ms - 1, ds), new Date(ye, me - 1, de));
+  }, [startDate, endDate]);
 
   return (
     <>
@@ -168,15 +176,27 @@ export function VacationRequestsPanel({
               id="vac-start"
               label="Desde"
               value={startDate}
-              onChange={setStartDate}
+              onChange={(v) => {
+                setStartDate(v);
+                if (endDate && v > endDate) setEndDate("");
+              }}
             />
             <DateField
               id="vac-end"
               label="Hasta"
               value={endDate}
+              min={startDate || undefined}
               onChange={setEndDate}
             />
           </div>
+
+          {estimatedDays !== null && (
+            <p className="rounded-lg bg-brand-blue/8 px-3 py-2 text-sm text-brand-navy">
+              <span className="font-semibold tabular-nums">{estimatedDays}</span>{" "}
+              día{estimatedDays === 1 ? "" : "s"} laborable{estimatedDays === 1 ? "" : "s"}
+              <span className="text-slate-500"> · sin fines de semana ni festivos</span>
+            </p>
+          )}
 
           <div>
             <label htmlFor="vac-request-notes" className="mb-1.5 block text-xs font-medium text-slate-500">
@@ -191,10 +211,6 @@ export function VacationRequestsPanel({
               className="field-control w-full resize-none px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400"
             />
           </div>
-
-          <p className="text-xs leading-relaxed text-slate-500">
-            Se cuentan solo días laborables (L–V), excluyendo festivos oficiales.
-          </p>
 
           <div className="flex justify-end gap-2 pt-1">
             <button

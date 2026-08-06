@@ -1,7 +1,49 @@
 "use client";
 
-import { Calendar } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { holidaysInMonth } from "@/lib/holidays";
+
+const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
+const MONTH_NAMES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+function parseISODate(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [y, m, d] = value.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+  return date;
+}
+
+function toISODate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function formatDisplay(value: string): string {
+  const date = parseISODate(value);
+  if (!date) return "";
+  return date.toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function startOfCalendarGrid(year: number, month: number): Date {
+  const first = new Date(year, month - 1, 1);
+  // Monday-first: getDay() Sun=0 → shift so Monday=0
+  const dow = (first.getDay() + 6) % 7;
+  const start = new Date(first);
+  start.setDate(first.getDate() - dow);
+  return start;
+}
 
 export function DateField({
   value,
@@ -10,6 +52,8 @@ export function DateField({
   className,
   id,
   label,
+  min,
+  max,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -17,25 +61,194 @@ export function DateField({
   className?: string;
   id?: string;
   label?: string;
+  min?: string;
+  max?: string;
 }) {
+  const autoId = useId();
+  const triggerId = id ?? autoId;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
+  const selected = parseISODate(value);
+  const initialView = selected ?? new Date();
+  const [viewYear, setViewYear] = useState(initialView.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialView.getMonth() + 1);
+
+  useEffect(() => {
+    if (!open) return;
+    if (selected) {
+      setViewYear(selected.getFullYear());
+      setViewMonth(selected.getMonth() + 1);
+    }
+  }, [open, selected]);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  const holidays = useMemo(
+    () => holidaysInMonth(viewMonth, viewYear),
+    [viewMonth, viewYear]
+  );
+
+  const cells = useMemo(() => {
+    const start = startOfCalendarGrid(viewYear, viewMonth);
+    return Array.from({ length: 42 }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      return date;
+    });
+  }, [viewYear, viewMonth]);
+
+  const minDate = min ? parseISODate(min) : null;
+  const maxDate = max ? parseISODate(max) : null;
+
+  function shiftMonth(delta: number) {
+    const d = new Date(viewYear, viewMonth - 1 + delta, 1);
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth() + 1);
+  }
+
+  function isDisabled(date: Date): boolean {
+    if (minDate && date < minDate) return true;
+    if (maxDate && date > maxDate) return true;
+    return false;
+  }
+
   return (
-    <div className={className}>
+    <div ref={rootRef} className={cn("relative", className)}>
       {label && (
-        <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-slate-500">
+        <label htmlFor={triggerId} className="mb-1.5 block text-xs font-medium text-slate-500">
           {label}
         </label>
       )}
-      <div className="relative">
-        <input
-          id={id}
-          type="date"
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          className="field-control field-date w-full min-h-10 pr-10 pl-3 py-2 text-sm font-medium text-brand-navy disabled:opacity-50"
-        />
-        <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-      </div>
+      <button
+        id={triggerId}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => !disabled && setOpen((v) => !v)}
+        className={cn(
+          "field-control flex w-full min-h-10 items-center justify-between gap-2 px-3 py-2 text-left text-sm font-medium transition",
+          "hover:border-brand-blue/40 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          value ? "text-brand-navy" : "text-slate-400"
+        )}
+      >
+        <span className="truncate">{value ? formatDisplay(value) : "Seleccionar fecha"}</span>
+        <Calendar className="h-4 w-4 shrink-0 text-slate-400" />
+      </button>
+
+      {open && (
+        <div
+          role="dialog"
+          aria-label={label ?? "Calendario"}
+          className="absolute z-50 mt-2 w-[17.5rem] rounded-xl border border-brand-navy/12 bg-[#eef4fa] p-3 shadow-xl ring-1 ring-brand-navy/5 animate-fade-slide-up"
+        >
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => shiftMonth(-1)}
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+              aria-label="Mes anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <p className="text-sm font-semibold capitalize text-brand-navy">
+              {MONTH_NAMES[viewMonth - 1]} {viewYear}
+            </p>
+            <button
+              type="button"
+              onClick={() => shiftMonth(1)}
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+              aria-label="Mes siguiente"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mb-1 grid grid-cols-7 gap-0.5">
+            {WEEKDAYS.map((d) => (
+              <div
+                key={d}
+                className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400"
+              >
+                {d}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-0.5">
+            {cells.map((date) => {
+              const inMonth = date.getMonth() + 1 === viewMonth;
+              const iso = toISODate(date);
+              const isSelected = value === iso;
+              const isToday = toISODate(new Date()) === iso;
+              const dow = date.getDay();
+              const isWeekend = dow === 0 || dow === 6;
+              const holidayName = inMonth ? holidays.get(date.getDate()) : undefined;
+              const disabledDay = isDisabled(date);
+
+              return (
+                <button
+                  key={iso}
+                  type="button"
+                  disabled={disabledDay}
+                  title={holidayName}
+                  onClick={() => {
+                    onChange(iso);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "relative flex h-8 items-center justify-center rounded-lg text-sm transition",
+                    !inMonth && "text-slate-300",
+                    inMonth && !isSelected && !holidayName && !isWeekend && "text-brand-navy hover:bg-brand-navy/8",
+                    inMonth && isWeekend && !isSelected && !holidayName && "text-slate-500 hover:bg-slate-500/10",
+                    inMonth && holidayName && !isSelected && "font-medium text-amber-800 hover:bg-amber-500/15",
+                    isToday && !isSelected && "ring-1 ring-brand-blue/40",
+                    isSelected && "bg-brand-blue font-semibold text-white shadow-sm hover:bg-brand-blue",
+                    disabledDay && "cursor-not-allowed opacity-30 hover:bg-transparent"
+                  )}
+                >
+                  {date.getDate()}
+                  {holidayName && inMonth && !isSelected && (
+                    <span className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-amber-500" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between border-t border-brand-navy/8 pt-2 text-[10px] text-slate-500">
+            <span className="inline-flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Festivo
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                onChange(toISODate(new Date()));
+                setOpen(false);
+              }}
+              className="font-medium text-brand-blue hover:underline"
+            >
+              Hoy
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

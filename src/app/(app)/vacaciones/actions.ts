@@ -10,6 +10,14 @@ function revalidateVacationPaths() {
   revalidatePath("/jefa/vacaciones");
 }
 
+function parseLocalDate(iso: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+  return date;
+}
+
 export async function createVacationRequestAction(
   startDate: string,
   endDate: string,
@@ -18,9 +26,9 @@ export async function createVacationRequestAction(
   const session = await requireEmployeeSession();
   if (!session) return { ok: false, error: "No autorizado." };
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
+  if (!start || !end) {
     return { ok: false, error: "Fechas inválidas." };
   }
   if (end < start) {
