@@ -8,12 +8,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-xl border border-slate-200 bg-white p-5 shadow-sm",
-        className
-      )}
-    >
+    <div className={cn("glass-panel rounded-2xl p-5", className)}>
       {children}
     </div>
   );

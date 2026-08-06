@@ -72,8 +72,26 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col bg-slate-50">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#e8eef5]">
+        {/* Atmósfera suave: dos orbes discretos */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#eef3f8_0%,#e4ebf3_100%)]" />
+          <div
+            className="glass-orb -left-24 top-[-12%] h-[420px] w-[420px] opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(0,124,186,0.18) 0%, transparent 68%)",
+            }}
+          />
+          <div
+            className="glass-orb -right-20 top-[6%] h-[340px] w-[340px] opacity-55"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(245,234,97,0.16) 0%, transparent 70%)",
+            }}
+          />
+        </div>
+        <header className="glass-panel-header relative z-10 flex items-center gap-3 px-4 py-3">
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -87,7 +105,7 @@ export function AppShell({
           {pendingSignatures !== null && (
             <Link
               href="/jefa/controles"
-              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-navy"
+              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-white/50 hover:text-brand-navy"
               aria-label={
                 pendingSignatures > 0
                   ? `${pendingSignatures} controles horarios pendientes de firmar`
@@ -108,7 +126,7 @@ export function AppShell({
             </Link>
           )}
         </header>
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">{children}</main>
+        <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">{children}</main>
       </div>
     </div>
   );

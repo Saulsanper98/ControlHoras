@@ -29,6 +29,31 @@ body {
   color: var(--foreground);
 }
 
+/* Glass suave — presente pero legible (menos agresivo que la 1ª versión) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 8px 28px rgba(10, 34, 64, 0.06);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+.glass-panel-header {
+  background: rgba(255, 255, 255, 0.62);
+  border-bottom: 1px solid rgba(10, 34, 64, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+.glass-orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
 /* Animación de entrada de bienvenida (dashboard) */
 @keyframes fade-slide-up {
   from {
