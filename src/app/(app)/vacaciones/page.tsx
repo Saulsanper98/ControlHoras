@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Umbrella, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card, StatCard } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { VacationRequestsPanel } from "@/components/vacaciones/vacation-requests-panel";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
@@ -53,11 +53,11 @@ export default async function VacacionesPage({
         <div>
           <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
           <p className="text-brand-navy/55">
-            Consulta tus días de vacaciones restantes y tu bolsa de horas acumuladas.
+            Consulta tu saldo, solicita vacaciones y revisa tu bolsa de horas.
           </p>
         </div>
         <form method="get" className="flex items-end gap-2">
-          <div>
+          <div className="w-28">
             <label htmlFor="vac-year" className="mb-1 block text-xs font-medium text-slate-500">
               Año
             </label>
@@ -71,76 +71,99 @@ export default async function VacacionesPage({
           </div>
           <button
             type="submit"
-            className="rounded-md bg-brand-blue px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-dark"
+            className="rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
           >
             Ver
           </button>
         </form>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Vacaciones restantes"
-          value={remaining !== null ? `${remaining} días` : "Sin datos"}
-          hint={`${usedDays} de ${totalDays} usados · ${year}`}
-          icon={Umbrella}
-        />
-        <StatCard
-          label="Bolsa de horas"
-          value={`${totalHours.toFixed(1)} h`}
-          hint="Ajustes acumulados"
-          icon={Clock}
-        />
-      </div>
+      <Card className="overflow-hidden p-0">
+        {/* Resumen en una sola franja, sin tarjetas anidadas */}
+        <div className="grid grid-cols-1 divide-y divide-brand-navy/8 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <div className="flex items-center gap-4 px-5 py-5">
+            <div className="rounded-xl bg-brand-blue/10 p-3 text-brand-blue">
+              <Umbrella className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Vacaciones restantes</p>
+              <p className="text-2xl font-semibold tabular-nums text-brand-navy">
+                {remaining !== null ? `${remaining} días` : "Sin datos"}
+              </p>
+              <p className="text-xs text-slate-500">
+                {usedDays} de {totalDays} usados · {year}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 px-5 py-5">
+            <div className="rounded-xl bg-brand-blue/10 p-3 text-brand-blue">
+              <Clock className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Bolsa de horas</p>
+              <p className="text-2xl font-semibold tabular-nums text-brand-navy">
+                {totalHours.toFixed(1)} h
+              </p>
+              <p className="text-xs text-slate-500">Ajustes acumulados</p>
+            </div>
+          </div>
+        </div>
 
-      {balance?.notes && (
-        <Card>
-          <p className="text-sm font-medium text-brand-navy">Notas de la responsable</p>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{balance.notes}</p>
-        </Card>
-      )}
-
-      <VacationRequestsPanel
-        year={year}
-        requests={vacationRequests.map((r) => ({
-          id: r.id,
-          startDate: r.startDate.toISOString(),
-          endDate: r.endDate.toISOString(),
-          days: Number(r.days),
-          status: r.status,
-          employeeNotes: r.employeeNotes,
-          rejectionReason: r.rejectionReason,
-          createdAt: r.createdAt.toISOString(),
-        }))}
-      />
-
-      <Card>
-        <p className="mb-3 text-sm font-medium text-brand-navy">Historial de ajustes de horas</p>
-        {adjustments.length === 0 ? (
-          <p className="text-sm text-slate-500">Sin ajustes registrados.</p>
-        ) : (
-          <div className="space-y-2">
-            {adjustments.map((a) => (
-              <div
-                key={a.id}
-                className="surface-muted flex items-center justify-between rounded-md border border-brand-navy/10 px-3 py-2 text-sm"
-              >
-                <div>
-                  <span
-                    className={`font-medium ${Number(a.hours) >= 0 ? "text-emerald-600" : "text-red-600"}`}
-                  >
-                    {Number(a.hours) >= 0 ? "+" : ""}
-                    {Number(a.hours).toFixed(1)} h
-                  </span>
-                  <span className="ml-2 text-slate-500">{a.reason}</span>
-                </div>
-                <span className="text-xs text-slate-500">
-                  {a.createdAt.toLocaleDateString("es-ES")} · {a.createdBy.name}
-                </span>
-              </div>
-            ))}
+        {balance?.notes && (
+          <div className="border-t border-brand-navy/10 px-5 py-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              Notas de la responsable
+            </p>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-brand-navy">{balance.notes}</p>
           </div>
         )}
+
+        <div className="border-t border-brand-navy/10 px-5 py-5">
+          <VacationRequestsPanel
+            year={year}
+            requests={vacationRequests.map((r) => ({
+              id: r.id,
+              startDate: r.startDate.toISOString(),
+              endDate: r.endDate.toISOString(),
+              days: Number(r.days),
+              status: r.status,
+              employeeNotes: r.employeeNotes,
+              rejectionReason: r.rejectionReason,
+              createdAt: r.createdAt.toISOString(),
+            }))}
+          />
+        </div>
+
+        <div className="border-t border-brand-navy/10 px-5 py-5">
+          <h2 className="text-sm font-semibold text-brand-navy">Historial de ajustes de horas</h2>
+          {adjustments.length === 0 ? (
+            <p className="mt-3 text-sm text-slate-500">Sin ajustes registrados.</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-brand-navy/8">
+              {adjustments.map((a) => (
+                <li
+                  key={a.id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0"
+                >
+                  <div className="min-w-0">
+                    <span
+                      className={`font-semibold tabular-nums ${
+                        Number(a.hours) >= 0 ? "text-emerald-600" : "text-red-600"
+                      }`}
+                    >
+                      {Number(a.hours) >= 0 ? "+" : ""}
+                      {Number(a.hours).toFixed(1)} h
+                    </span>
+                    <span className="ml-2 text-sm text-slate-600">{a.reason}</span>
+                  </div>
+                  <span className="shrink-0 text-xs text-slate-500">
+                    {a.createdAt.toLocaleDateString("es-ES")} · {a.createdBy.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </Card>
     </div>
   );

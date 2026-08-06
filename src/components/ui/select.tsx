@@ -16,9 +16,9 @@ export function Select({
       <select
         {...props}
         className={cn(
-          "surface-input w-full appearance-none rounded-md px-3 py-1.5 pr-8 text-sm text-slate-700 transition-colors",
+          "field-control w-full appearance-none rounded-lg px-3 py-2 pr-9 text-sm font-medium text-brand-navy transition-colors",
           "focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20",
-          "disabled:cursor-not-allowed disabled:text-slate-400",
+          "disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
       >

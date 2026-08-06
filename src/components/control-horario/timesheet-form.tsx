@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { Paperclip, Trash2, ChevronLeft, ChevronRight, Save, PenLine, Download, Wand2, Copy } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
+import { FieldSelect } from "@/components/ui/field-select";
+import { TimeField } from "@/components/ui/time-field";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
 import { SignatureModal } from "@/components/signature/signature-pad";
@@ -226,51 +227,338 @@ export function TimeSheetForm({
   const prev = month === 1 ? { month: 12, year: year - 1 } : { month: month - 1, year };
   const next = month === 12 ? { month: 1, year: year + 1 } : { month: month + 1, year };
 
+  const shiftOptions = [
+    { value: "LIBRE", label: "Libre" },
+    { value: "M", label: "Mañana" },
+    { value: "T", label: "Tarde" },
+    { value: "N", label: "Noche" },
+  ];
+
+  const bulkShiftOptions = (Object.keys(SHIFTS) as (keyof typeof SHIFTS)[]).map((key) => ({
+    value: key,
+    label: SHIFTS[key].label,
+  }));
+
   return (
-    <div className="space-y-6">
-      <Card className="flex flex-wrap items-center justify-between gap-3 py-3">
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/control-horario?month=${prev.month}&year=${prev.year}`}
-            className="surface-btn rounded-lg p-2 text-slate-500"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Link>
-          <span className="min-w-[10rem] text-center text-sm font-medium text-brand-navy">
-            {monthNames[month - 1]} de {year}
-          </span>
-          <Link
-            href={`/control-horario?month=${next.month}&year=${next.year}`}
-            className="surface-btn rounded-lg p-2 text-slate-500"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Link>
+    <div className="space-y-4">
+      <Card className="overflow-hidden p-0">
+        {/* Cabecera + resumen + herramientas en un solo bloque */}
+        <div className="border-b border-brand-navy/10 px-4 py-4 sm:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/control-horario?month=${prev.month}&year=${prev.year}`}
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Link>
+              <span className="min-w-[10rem] text-center text-sm font-semibold text-brand-navy">
+                {monthNames[month - 1]} de {year}
+              </span>
+              <Link
+                href={`/control-horario?month=${next.month}&year=${next.year}`}
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {timeSheetId && (
+                <a
+                  href={`/api/timesheets/${timeSheetId}/pdf`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6"
+                >
+                  <Download className="h-4 w-4" />
+                  PDF
+                </a>
+              )}
+              <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[status]}`}>
+                {STATUS_LABEL[status]}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Trabajados</p>
+              <p className="text-lg font-semibold tabular-nums text-brand-navy">{summary.workedDays}</p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Libres</p>
+              <p className="text-lg font-semibold tabular-nums text-brand-navy">{summary.freeDays}</p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Festivos</p>
+              <p className="text-lg font-semibold tabular-nums text-amber-700">{summary.holidayCount}</p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Horas</p>
+              <p className="text-lg font-semibold tabular-nums text-brand-navy">{totals.totalHours.toFixed(1)} h</p>
+            </div>
+          </div>
+
+          {monthHolidays.size > 0 && (
+            <p className="mt-3 text-xs text-slate-500">
+              {[...monthHolidays.entries()]
+                .map(([day, name]) => (
+                  <span key={day} className="mr-3 inline-flex items-center gap-1">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+                    {day} · {name}
+                  </span>
+                ))}
+            </p>
+          )}
+
+          {editable && (
+            <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-brand-navy/8 pt-4">
+              <div className="w-full min-w-[10rem] sm:w-52">
+                <label htmlFor="bulk-shift" className="mb-1 block text-xs font-medium text-slate-500">
+                  Turno a aplicar
+                </label>
+                <FieldSelect
+                  id="bulk-shift"
+                  value={bulkShift}
+                  onChange={(v) => setBulkShift(v as keyof typeof SHIFTS)}
+                  options={bulkShiftOptions}
+                />
+              </div>
+              <label className="flex items-center gap-2 pb-2 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={weekdaysOnly}
+                  onChange={(e) => setWeekdaysOnly(e.target.checked)}
+                  className="h-4 w-4 rounded border-brand-navy/25 text-brand-blue focus:ring-brand-blue"
+                />
+                Solo L–V
+              </label>
+              <button
+                type="button"
+                onClick={applyBulkShift}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-blue/10 px-3 py-2 text-sm font-medium text-brand-blue transition hover:bg-brand-blue/18"
+              >
+                <Wand2 className="h-4 w-4" />
+                Aplicar
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyPreviousMonth}
+                disabled={pending}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-50"
+              >
+                <Copy className="h-4 w-4" />
+                Copiar mes anterior
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {timeSheetId && (
-            <a
-              href={`/api/timesheets/${timeSheetId}/pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="surface-btn flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600"
-            >
-              <Download className="h-4 w-4" />
-              Descargar PDF
-            </a>
-          )}
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[status]}`}>
-            {STATUS_LABEL[status]}
-          </span>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead>
+              <tr className="border-b border-brand-navy/10 bg-brand-navy/[0.04] text-left text-[11px] uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2.5">Día</th>
+                <th className="px-3 py-2.5">Turno</th>
+                <th className="px-3 py-2.5">Entrada</th>
+                <th className="px-3 py-2.5">Salida</th>
+                <th className="px-3 py-2.5">Total</th>
+                <th className="px-3 py-2.5">Norm.</th>
+                <th className="px-3 py-2.5">Extra</th>
+                <th className="px-3 py-2.5">Noct.</th>
+                <th className="px-3 py-2.5">Obs.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry) => {
+                const hours = calculateDayHours(entry.checkIn, entry.checkOut);
+                const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
+                  weekday: "short",
+                });
+                const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
+                const holidayName = monthHolidays.get(entry.day);
+                const shiftKey = shiftKeyForEntry(entry);
+                const rowOptions =
+                  shiftKey === ""
+                    ? [{ value: "", label: "Personalizado" }, ...shiftOptions]
+                    : shiftOptions;
+
+                return (
+                  <tr
+                    key={entry.day}
+                    className={`border-b border-brand-navy/5 last:border-0 ${
+                      holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
+                    }`}
+                  >
+                    <td className="px-3 py-1.5 whitespace-nowrap">
+                      <span className="font-medium text-brand-navy">{entry.day}</span>{" "}
+                      <span className="text-xs text-slate-500">{weekday}</span>
+                      {holidayName && (
+                        <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wide text-amber-700">
+                          {holidayName}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <FieldSelect
+                        disabled={!editable}
+                        value={shiftKey}
+                        onChange={(v) => applyShiftToEntry(entry.day, v as ShiftKey)}
+                        options={rowOptions}
+                        size="sm"
+                        className="w-28"
+                      />
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <TimeField
+                        disabled={!editable}
+                        value={entry.checkIn}
+                        onChange={(v) => updateEntry(entry.day, { checkIn: v })}
+                        className="w-28"
+                      />
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <TimeField
+                        disabled={!editable}
+                        value={entry.checkOut}
+                        onChange={(v) => updateEntry(entry.day, { checkOut: v })}
+                        className="w-28"
+                      />
+                    </td>
+                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.totalHours.toFixed(2)}</td>
+                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.normalHours.toFixed(2)}</td>
+                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.overtimeHours.toFixed(2)}</td>
+                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.nightHours.toFixed(2)}</td>
+                    <td className="px-3 py-1.5">
+                      <input
+                        type="text"
+                        disabled={!editable}
+                        value={entry.notes}
+                        onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
+                        className="field-control w-full min-w-[100px] px-2 py-1 text-sm"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-brand-navy/10 bg-brand-navy/[0.04] font-semibold text-brand-navy">
+                <td className="px-3 py-2.5" colSpan={4}>
+                  Totales
+                </td>
+                <td className="px-3 py-2.5 tabular-nums">{totals.totalHours.toFixed(2)}</td>
+                <td className="px-3 py-2.5 tabular-nums">{totals.normalHours.toFixed(2)}</td>
+                <td className="px-3 py-2.5 tabular-nums">{totals.overtimeHours.toFixed(2)}</td>
+                <td className="px-3 py-2.5 tabular-nums">{totals.nightHours.toFixed(2)}</td>
+                <td className="px-3 py-2.5" />
+              </tr>
+            </tfoot>
+          </table>
         </div>
+
+        <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+          <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
+            Notas del mes
+          </label>
+          <textarea
+            id="monthly-notes"
+            disabled={!editable}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
+            className="field-control mt-2 w-full resize-none px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+          <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
+            <Paperclip className="h-4 w-4" />
+            Adjuntos (PDF/Excel)
+          </p>
+
+          {attachments.length > 0 && (
+            <ul className="mb-3 divide-y divide-brand-navy/8">
+              {attachments.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-2 py-2 first:pt-0">
+                  <a
+                    href={`/api/uploads/${a.filePath}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate text-sm text-brand-blue hover:underline"
+                  >
+                    {a.fileName}
+                  </a>
+                  {editable && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAttachment(a.id)}
+                      aria-label="Eliminar adjunto"
+                      className="shrink-0 rounded p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {editable && (
+            <form action={handleUpload} className="flex flex-wrap items-center gap-2">
+              <input
+                type="file"
+                name="file"
+                accept=".pdf,.xlsx,.xls"
+                className="min-w-0 flex-1 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-blue/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-blue"
+              />
+              <button
+                type="submit"
+                disabled={pending}
+                className="rounded-lg bg-brand-blue/10 px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/18 disabled:opacity-50"
+              >
+                Subir
+              </button>
+            </form>
+          )}
+        </div>
+
+        {(employeeSignaturePath || responsableSignaturePath) && (
+          <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+            <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
+            <div className="flex flex-wrap gap-6">
+              {employeeSignaturePath && (
+                <div>
+                  <p className="mb-1 text-xs text-slate-500">Empleado</p>
+                  <img
+                    src={`/api/uploads/${employeeSignaturePath}`}
+                    alt="Firma del empleado"
+                    className="h-16 rounded-lg border border-brand-navy/10 bg-white/50 p-2"
+                  />
+                </div>
+              )}
+              {responsableSignaturePath && (
+                <div>
+                  <p className="mb-1 text-xs text-slate-500">Responsable</p>
+                  <img
+                    src={`/api/uploads/${responsableSignaturePath}`}
+                    alt="Firma de la responsable"
+                    className="h-16 rounded-lg border border-brand-navy/10 bg-white/50 p-2"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </Card>
 
       {message && (
         <p
-          className={`rounded-md px-3 py-2 text-sm ${
+          className={`rounded-lg px-3 py-2 text-sm ${
             message.type === "success"
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-red-50 text-red-600"
+              ? "bg-emerald-500/12 text-emerald-800"
+              : "bg-red-500/12 text-red-700"
           }`}
         >
           {message.text}
@@ -278,296 +566,19 @@ export function TimeSheetForm({
       )}
 
       {status === "RECHAZADO" && rejectionReason && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-lg border border-red-200/80 bg-red-500/10 px-4 py-3 text-sm text-red-800">
           <p className="font-medium">Motivo del rechazo</p>
           <p className="mt-1 whitespace-pre-wrap">{rejectionReason}</p>
         </div>
       )}
 
-      <Card className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div>
-          <p className="text-xs text-slate-500">Días trabajados</p>
-          <p className="text-lg font-semibold text-brand-navy">{summary.workedDays}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500">Días libres</p>
-          <p className="text-lg font-semibold text-brand-navy">{summary.freeDays}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500">Festivos en el mes</p>
-          <p className="text-lg font-semibold text-brand-navy">{summary.holidayCount}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500">Horas totales</p>
-          <p className="text-lg font-semibold text-brand-navy">{totals.totalHours.toFixed(1)} h</p>
-        </div>
-      </Card>
-
-      {monthHolidays.size > 0 && (
-        <p className="text-xs text-slate-500">
-          Festivos:{" "}
-          {[...monthHolidays.entries()]
-            .map(([day, name]) => `${day} (${name})`)
-            .join(" · ")}
-        </p>
-      )}
-
       {editable && (
-        <Card className="flex flex-wrap items-end gap-3">
-          <div className="w-44">
-            <label htmlFor="bulk-shift" className="mb-1 block text-xs font-medium text-slate-500">
-              Turno a aplicar
-            </label>
-            <Select
-              id="bulk-shift"
-              value={bulkShift}
-              onChange={(e) => setBulkShift(e.target.value as keyof typeof SHIFTS)}
-            >
-              {(Object.keys(SHIFTS) as (keyof typeof SHIFTS)[]).map((key) => (
-                <option key={key} value={key}>
-                  {SHIFTS[key].label}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <label className="flex items-center gap-2 pb-2 text-sm text-slate-600">
-            <input
-              type="checkbox"
-              checked={weekdaysOnly}
-              onChange={(e) => setWeekdaysOnly(e.target.checked)}
-              className="h-4 w-4 rounded border-brand-navy/25 text-brand-blue focus:ring-brand-blue"
-            />
-            Solo días laborables (L–V)
-          </label>
-          <button
-            type="button"
-            onClick={applyBulkShift}
-            className="flex items-center gap-2 rounded-md border border-brand-blue px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
-          >
-            <Wand2 className="h-4 w-4" />
-            Aplicar turno
-          </button>
-          <button
-            type="button"
-            onClick={handleCopyPreviousMonth}
-            disabled={pending}
-            className="flex items-center gap-2 rounded-md border border-brand-navy/20 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-brand-navy/5 disabled:opacity-60"
-          >
-            <Copy className="h-4 w-4" />
-            Copiar mes anterior
-          </button>
-        </Card>
-      )}
-
-      <Card className="overflow-x-auto p-0 -mx-1 sm:mx-0">
-        <table className="w-full min-w-[720px] text-sm sm:min-w-[920px]">
-          <thead>
-            <tr className="surface-muted border-b border-brand-navy/10 text-left text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-3 py-2">Día</th>
-              <th className="px-3 py-2">Turno</th>
-              <th className="px-3 py-2">Entrada</th>
-              <th className="px-3 py-2">Salida</th>
-              <th className="px-3 py-2">Total</th>
-              <th className="px-3 py-2">Normales</th>
-              <th className="px-3 py-2">Extra</th>
-              <th className="px-3 py-2">Nocturnas</th>
-              <th className="px-3 py-2">Observaciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((entry) => {
-              const hours = calculateDayHours(entry.checkIn, entry.checkOut);
-              const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
-                weekday: "short",
-              });
-              const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
-              const holidayName = monthHolidays.get(entry.day);
-              const shiftKey = shiftKeyForEntry(entry);
-              return (
-                <tr
-                  key={entry.day}
-                  className={`border-b border-brand-navy/5 last:border-0 ${
-                    isWeekend || holidayName ? "surface-row bg-amber-500/5" : ""
-                  }`}
-                >
-                  <td className="px-2 py-1.5 whitespace-nowrap text-slate-600 sm:px-3">
-                    {entry.day}{" "}
-                    <span className="text-xs text-slate-500">{weekday}</span>
-                    {holidayName && (
-                      <span className="ml-1 text-xs text-amber-700" title={holidayName}>
-                        ★
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-3 py-1.5">
-                    <Select
-                      disabled={!editable}
-                      value={shiftKey}
-                      onChange={(e) => applyShiftToEntry(entry.day, e.target.value as ShiftKey)}
-                      className="w-32"
-                    >
-                      {shiftKey === "" && <option value="">Personalizado</option>}
-                      <option value="LIBRE">Libre</option>
-                      <option value="M">Mañana</option>
-                      <option value="T">Tarde</option>
-                      <option value="N">Noche</option>
-                    </Select>
-                  </td>
-                  <td className="px-3 py-1.5">
-                    <input
-                      type="time"
-                      disabled={!editable}
-                      value={entry.checkIn}
-                      onChange={(e) => updateEntry(entry.day, { checkIn: e.target.value })}
-                      className="surface-input w-28 rounded-md px-2 py-1 text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-1.5">
-                    <input
-                      type="time"
-                      disabled={!editable}
-                      value={entry.checkOut}
-                      onChange={(e) => updateEntry(entry.day, { checkOut: e.target.value })}
-                      className="surface-input w-28 rounded-md px-2 py-1 text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-1.5 text-slate-600">{hours.totalHours.toFixed(2)}</td>
-                  <td className="px-3 py-1.5 text-slate-600">{hours.normalHours.toFixed(2)}</td>
-                  <td className="px-3 py-1.5 text-slate-600">{hours.overtimeHours.toFixed(2)}</td>
-                  <td className="px-3 py-1.5 text-slate-600">{hours.nightHours.toFixed(2)}</td>
-                  <td className="px-3 py-1.5">
-                    <input
-                      type="text"
-                      disabled={!editable}
-                      value={entry.notes}
-                      onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
-                      className="surface-input w-full min-w-[120px] rounded-md px-2 py-1 text-sm"
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-          <tfoot>
-            <tr className="surface-muted font-semibold text-brand-navy">
-              <td className="px-3 py-2" colSpan={4}>
-                Totales
-              </td>
-              <td className="px-3 py-2">{totals.totalHours.toFixed(2)}</td>
-              <td className="px-3 py-2">{totals.normalHours.toFixed(2)}</td>
-              <td className="px-3 py-2">{totals.overtimeHours.toFixed(2)}</td>
-              <td className="px-3 py-2">{totals.nightHours.toFixed(2)}</td>
-              <td className="px-3 py-2"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </Card>
-
-      <Card>
-        <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
-          Notas del mes
-        </label>
-        <textarea
-          id="monthly-notes"
-          disabled={!editable}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={2}
-          className="surface-input mt-1 w-full rounded-md px-3 py-2 text-sm"
-        />
-      </Card>
-
-      <Card>
-        <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
-          <Paperclip className="h-4 w-4" />
-          Adjuntar control horario en PDF/Excel (alternativa al formulario)
-        </p>
-
-        <div className="space-y-2">
-          {attachments.map((a) => (
-            <div
-              key={a.id}
-              className="surface-muted flex items-center justify-between rounded-md border border-brand-navy/10 px-3 py-2 text-sm"
-            >
-              <a
-                href={`/api/uploads/${a.filePath}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-brand-blue hover:underline"
-              >
-                {a.fileName}
-              </a>
-              {editable && (
-                <button
-                  type="button"
-                  onClick={() => handleDeleteAttachment(a.id)}
-                  aria-label="Eliminar adjunto"
-                  className="text-slate-400 hover:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {editable && (
-          <form
-            action={handleUpload}
-            className="mt-3 flex items-center gap-2"
-          >
-            <input
-              type="file"
-              name="file"
-              accept=".pdf,.xlsx,.xls"
-              className="flex-1 text-sm text-slate-500"
-            />
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded-md border border-brand-blue px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
-            >
-              Subir
-            </button>
-          </form>
-        )}
-      </Card>
-
-      {(employeeSignaturePath || responsableSignaturePath) && (
-        <Card>
-          <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
-          <div className="flex flex-wrap gap-6">
-            {employeeSignaturePath && (
-              <div>
-                <p className="mb-1 text-xs text-slate-500">Empleado</p>
-                <img
-                  src={`/api/uploads/${employeeSignaturePath}`}
-                  alt="Firma del empleado"
-                  className="surface-input h-16 rounded-md p-2"
-                />
-              </div>
-            )}
-            {responsableSignaturePath && (
-              <div>
-                <p className="mb-1 text-xs text-slate-500">Responsable</p>
-                <img
-                  src={`/api/uploads/${responsableSignaturePath}`}
-                  alt="Firma de la responsable"
-                  className="surface-input h-16 rounded-md p-2"
-                />
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
-
-      {editable && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={handleSave}
             disabled={pending}
-            className="flex items-center gap-2 rounded-md border border-brand-blue bg-brand-blue/5 px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg border border-brand-blue/30 bg-brand-blue/8 px-4 py-2 text-sm font-semibold text-brand-blue transition hover:bg-brand-blue/14 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             Guardar borrador
@@ -576,7 +587,7 @@ export function TimeSheetForm({
             type="button"
             onClick={() => setShowSignPad(true)}
             disabled={pending}
-            className="flex items-center gap-2 rounded-md bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-dark disabled:opacity-50"
           >
             <PenLine className="h-4 w-4" />
             Firmar y enviar
