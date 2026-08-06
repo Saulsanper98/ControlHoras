@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canManage } from "@/lib/roles";
 import { AppShell } from "@/components/layout/app-shell";
-import { ToastProvider } from "@/components/ui/toast";
+import { AppProviders } from "@/components/providers/app-providers";
 
 export default async function AppLayout({
   children,
@@ -17,8 +17,12 @@ export default async function AppLayout({
     ? await prisma.timeSheet.count({ where: { status: "FIRMADO_EMPLEADO" } })
     : null;
 
+  const pendingVacations = canManage(session.user.role)
+    ? await prisma.vacationRequest.count({ where: { status: "PENDIENTE" } })
+    : 0;
+
   return (
-    <ToastProvider>
+    <AppProviders>
       <AppShell
         role={session.user.role}
         userName={session.user.name ?? ""}
@@ -28,9 +32,10 @@ export default async function AppLayout({
             : session.user.departmentName ?? "Empleado"
         }
         pendingSignatures={pendingSignatures}
+        pendingVacations={pendingVacations}
       >
         {children}
       </AppShell>
-    </ToastProvider>
+    </AppProviders>
   );
 }

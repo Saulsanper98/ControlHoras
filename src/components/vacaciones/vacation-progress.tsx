@@ -1,0 +1,100 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+
+export function VacationProgressBar({
+  total,
+  used,
+  pending,
+}: {
+  total: number;
+  used: number;
+  pending: number;
+}) {
+  if (total <= 0) return null;
+  const usedPct = Math.min(100, (used / total) * 100);
+  const pendingPct = Math.min(100 - usedPct, (pending / total) * 100);
+  const remaining = Math.max(0, total - used - pending);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex h-2.5 overflow-hidden rounded-full bg-brand-navy/8">
+        <div
+          className="bg-brand-blue transition-all duration-500"
+          style={{ width: `${usedPct}%` }}
+          title={`${used} días usados`}
+        />
+        <div
+          className="bg-amber-400 transition-all duration-500"
+          style={{ width: `${pendingPct}%` }}
+          title={`${pending} días pendientes`}
+        />
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-brand-blue" />
+          Usados: <strong className="tabular-nums text-brand-navy">{used}</strong>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-amber-400" />
+          Pendientes: <strong className="tabular-nums text-brand-navy">{pending}</strong>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-brand-navy/15" />
+          Disponibles: <strong className="tabular-nums text-brand-navy">{remaining}</strong>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function VacationTimeline({
+  requests,
+  year,
+}: {
+  requests: { startDate: string; endDate: string; status: string; days: number }[];
+  year: number;
+}) {
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const byMonth = months.map((m) =>
+    requests.filter((r) => {
+      const s = new Date(r.startDate);
+      return s.getFullYear() === year && (s.getMonth() + 1 === m || new Date(r.endDate).getMonth() + 1 === m);
+    })
+  );
+
+  if (requests.length === 0) return null;
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+        Línea temporal {year}
+      </p>
+      <div className="grid grid-cols-12 gap-1">
+        {months.map((m, i) => {
+          const count = byMonth[i].length;
+          const hasApproved = byMonth[i].some((r) => r.status === "APROBADA");
+          const hasPending = byMonth[i].some((r) => r.status === "PENDIENTE");
+          return (
+            <div key={m} className="text-center">
+              <div
+                className={cn(
+                  "mx-auto mb-1 flex h-8 w-full max-w-[2rem] items-center justify-center rounded-md text-[10px] font-semibold tabular-nums transition",
+                  hasApproved && "bg-emerald-500/20 text-emerald-800",
+                  !hasApproved && hasPending && "bg-amber-500/20 text-amber-800",
+                  count === 0 && "bg-brand-navy/5 text-slate-400"
+                )}
+                title={`${count} solicitud${count === 1 ? "" : "es"}`}
+              >
+                {count || "·"}
+              </div>
+              <span className="text-[9px] uppercase text-slate-400">
+                {["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

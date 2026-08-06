@@ -3,6 +3,9 @@ import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lu
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, StatCard } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Stagger } from "@/components/ui/stagger";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 
 const MONTH_NAMES = [
@@ -42,7 +45,8 @@ export default async function DashboardPage() {
   const showManagement = canManage(role);
   const showPersonal = hasOwnEmployeeData(role);
 
-  const [managementStats, personalStats, nextPending, pendingVacations] = await Promise.all([
+  const [managementStats, personalStats, nextPending, pendingVacations, nextVacationRequests] =
+    await Promise.all([
     showManagement
       ? Promise.all([
           prisma.timeSheet.count({ where: { status: "FIRMADO_EMPLEADO" } }),
@@ -74,6 +78,14 @@ export default async function DashboardPage() {
     showManagement
       ? prisma.vacationRequest.count({ where: { status: "PENDIENTE" } })
       : 0,
+    showManagement
+      ? prisma.vacationRequest.findMany({
+          where: { status: "PENDIENTE" },
+          include: { user: true },
+          orderBy: { createdAt: "asc" },
+          take: 3,
+        })
+      : [],
   ]);
 
   const [pendientes, empleados, controlesDelMes] = managementStats ?? [0, 0, 0];
@@ -90,19 +102,36 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="animate-fade-slide-up">
-        <h1 className="text-2xl font-semibold text-brand-navy">
-          {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}{" "}
-          <span className="animate-wave" aria-hidden="true">
-            👋
-          </span>
-        </h1>
-        <p className="text-brand-navy/55">
-          {role === "JEFA"
-            ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
-            : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
-        </p>
-      </div>
+      <Stagger>
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-brand-navy sm:text-3xl">
+            {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}{" "}
+            <span className="animate-wave" aria-hidden="true">
+              👋
+            </span>
+          </h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <p className="text-brand-navy/55">
+              {role === "JEFA"
+                ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
+                : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
+            </p>
+            {showPersonal && timeSheet?.status === "FIRMADO_EMPLEADO" && (
+              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800">
+                Control enviado
+              </span>
+            )}
+            {showPersonal && !timeSheet && (
+              <Link
+                href="/control-horario"
+                className="rounded-full bg-brand-blue/12 px-2 py-0.5 text-xs font-medium text-brand-blue hover:underline"
+              >
+                Empieza tu control de {MONTH_NAMES[month - 1]}
+              </Link>
+            )}
+          </div>
+        </div>
+      </Stagger>
 
       {showManagement && (
         <div className="animate-fade-slide-up" style={{ animationDelay: "90ms" }}>
@@ -113,7 +142,7 @@ export default async function DashboardPage() {
           )}
           {nextPending && (
             <Link href={`/jefa/controles/${nextPending.id}`} className="mb-4 block">
-              <Card className="flex items-center justify-between gap-3 border-brand-blue/30 bg-brand-blue/5 transition hover:border-brand-blue">
+              <Card className="glass-panel-lift flex items-center justify-between gap-3 border-brand-blue/30 bg-brand-blue/5">
                 <div>
                   <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
                   <p className="font-semibold text-brand-navy">
@@ -128,18 +157,22 @@ export default async function DashboardPage() {
               </Card>
             </Link>
           )}
-          {!nextPending && pendingVacations > 0 && (
-            <Link href="/jefa/vacaciones" className="mb-4 block">
-              <Card className="flex items-center justify-between gap-3 border-amber-300/50 bg-amber-500/10 transition hover:border-amber-400">
-                <div>
-                  <p className="text-sm font-medium text-amber-800">Solicitudes de vacaciones</p>
-                  <p className="font-semibold text-brand-navy">
-                    {pendingVacations} pendiente{pendingVacations === 1 ? "" : "s"} de revisión
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
-              </Card>
-            </Link>
+          {nextVacationRequests.length > 0 && (
+            <div className="mb-4 space-y-2">
+              {nextVacationRequests.map((r) => (
+                <Link key={r.id} href="/jefa/vacaciones" className="block">
+                  <Card className="glass-panel-lift flex items-center justify-between gap-3 border-amber-300/40 bg-amber-500/8">
+                    <div>
+                      <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
+                      <p className="font-semibold text-brand-navy">
+                        {r.user.name} · {Number(r.days)} días
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
+                  </Card>
+                </Link>
+              ))}
+            </div>
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
@@ -224,15 +257,24 @@ function NewsSection({
         </Link>
       </div>
       {news.length === 0 ? (
-        <Card className="text-sm text-slate-500">
-          Todavía no hay noticias publicadas.
+        <Card>
+          <EmptyState
+            icon={Newspaper}
+            title="Sin noticias todavía"
+            description="Cuando la responsable publique novedades, aparecerán aquí."
+          />
         </Card>
       ) : (
         <div className="space-y-3">
           {news.map((item) => (
-            <Card key={item.id}>
-              <p className="font-medium text-brand-navy">{item.title}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+            <Card key={item.id} className="glass-panel-lift group">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-medium text-brand-navy">{item.title}</p>
+                <span className="shrink-0 text-xs text-slate-400">
+                  {formatRelativeTime(item.publishedAt)}
+                </span>
+              </div>
+              <p className="mt-1 line-clamp-2 text-sm text-slate-500 transition group-hover:line-clamp-none">
                 {item.body}
               </p>
             </Card>

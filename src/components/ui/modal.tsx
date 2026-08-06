@@ -37,7 +37,7 @@ export function Modal({
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 bg-brand-navy/40 backdrop-blur-[2px]"
+        className="absolute inset-0 animate-modal-backdrop bg-brand-navy/45 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
@@ -45,18 +45,19 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative w-full max-w-md rounded-2xl bg-[#e8f0f8] p-6 shadow-2xl ring-1 ring-brand-navy/10",
+          "animate-modal-panel relative w-full max-w-md rounded-2xl bg-[#e8f0f8] p-6 ring-1 ring-brand-navy/10",
           className
         )}
+        style={{ boxShadow: "var(--shadow-modal)" }}
       >
         <div className="mb-5 flex items-start justify-between gap-3">
-          <h2 id="modal-title" className="text-lg font-semibold text-brand-navy">
+          <h2 id="modal-title" className="font-display text-lg font-semibold text-brand-navy">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+            className="btn-press rounded-lg p-1 text-slate-400 transition hover:bg-brand-navy/8 hover:text-brand-navy"
           >
             <X className="h-5 w-5" />
           </button>

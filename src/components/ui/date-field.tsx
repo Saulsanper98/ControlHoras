@@ -54,6 +54,8 @@ export function DateField({
   label,
   min,
   max,
+  rangeStart,
+  rangeEnd,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -63,6 +65,8 @@ export function DateField({
   label?: string;
   min?: string;
   max?: string;
+  rangeStart?: string;
+  rangeEnd?: string;
 }) {
   const autoId = useId();
   const triggerId = id ?? autoId;
@@ -197,6 +201,15 @@ export function DateField({
               const iso = toISODate(date);
               const isSelected = value === iso;
               const isToday = toISODate(new Date()) === iso;
+              const inRange =
+                rangeStart &&
+                rangeEnd &&
+                rangeStart <= rangeEnd &&
+                iso >= rangeStart &&
+                iso <= rangeEnd &&
+                iso !== rangeStart &&
+                iso !== rangeEnd;
+              const isRangeEdge = iso === rangeStart || iso === rangeEnd;
               const dow = date.getDay();
               const isWeekend = dow === 0 || dow === 6;
               const holidayName = inMonth ? holidays.get(date.getDate()) : undefined;
@@ -215,11 +228,12 @@ export function DateField({
                   className={cn(
                     "relative flex h-8 items-center justify-center rounded-lg text-sm transition",
                     !inMonth && "text-slate-300",
-                    inMonth && !isSelected && !holidayName && !isWeekend && "text-brand-navy hover:bg-brand-navy/8",
-                    inMonth && isWeekend && !isSelected && !holidayName && "text-slate-500 hover:bg-slate-500/10",
-                    inMonth && holidayName && !isSelected && "font-medium text-amber-800 hover:bg-amber-500/15",
-                    isToday && !isSelected && "ring-1 ring-brand-blue/40",
-                    isSelected && "bg-brand-blue font-semibold text-white shadow-sm hover:bg-brand-blue",
+                    inRange && "bg-brand-blue/15 text-brand-navy",
+                    inMonth && !isSelected && !inRange && !holidayName && !isWeekend && "text-brand-navy hover:bg-brand-navy/8",
+                    inMonth && isWeekend && !isSelected && !inRange && !holidayName && "text-slate-500 hover:bg-slate-500/10",
+                    inMonth && holidayName && !isSelected && !inRange && "font-medium text-amber-800 hover:bg-amber-500/15",
+                    isToday && !isSelected && !inRange && "ring-1 ring-brand-blue/40",
+                    (isSelected || isRangeEdge) && "bg-brand-blue font-semibold text-white shadow-sm hover:bg-brand-blue",
                     disabledDay && "cursor-not-allowed opacity-30 hover:bg-transparent"
                   )}
                 >

@@ -21,6 +21,17 @@
   --surface-input-border: rgba(10, 34, 64, 0.14);
   --surface-muted: rgba(10, 34, 64, 0.05);
   --surface-row: rgba(10, 34, 64, 0.035);
+
+  /* Tipografía */
+  --text-display: 1.875rem;
+  --text-h2: 1.125rem;
+  --text-body: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Elevación */
+  --shadow-rest: 0 1px 0 var(--glass-highlight) inset, 0 8px 28px rgba(10, 34, 64, 0.07);
+  --shadow-hover: 0 1px 0 var(--glass-highlight) inset, 0 12px 36px rgba(10, 34, 64, 0.11);
+  --shadow-modal: 0 24px 64px rgba(10, 34, 64, 0.18);
 }
 
 @theme inline {
@@ -33,6 +44,7 @@
   --color-brand-blue-dark: var(--color-brand-blue-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
 }
 
 body {
@@ -40,15 +52,42 @@ body {
   color: var(--foreground);
 }
 
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Textura sutil anti-flat */
+.bg-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* Glass integrado: frost con tint azul-hielo, no blanco llamativo */
 .glass-panel {
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
-  box-shadow:
-    0 1px 0 var(--glass-highlight) inset,
-    0 8px 28px rgba(10, 34, 64, 0.07);
+  box-shadow: var(--shadow-rest);
   backdrop-filter: blur(var(--glass-blur)) saturate(155%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(155%);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.glass-panel-hover:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.glass-panel-lift {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.glass-panel-lift:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
 }
 
 .glass-panel-header {
@@ -102,10 +141,18 @@ body {
   color: var(--foreground);
 }
 
-.field-control:focus {
+.field-control:focus-visible {
   border-color: var(--color-brand-blue);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.2);
+}
+
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 .field-time::-webkit-calendar-picker-indicator,
@@ -171,6 +218,91 @@ body {
 
 .animate-fade-slide-up {
   animation: fade-slide-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-toast-out {
+  animation: toast-out 0.2s ease both;
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modal-backdrop-in 0.2s ease both;
+}
+
+.animate-modal-panel {
+  animation: modal-panel-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(10, 34, 64, 0.06) 0%,
+    rgba(10, 34, 64, 0.12) 50%,
+    rgba(10, 34, 64, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .animate-wave {
@@ -325,8 +457,17 @@ body {
   .animate-fade-slide-up,
   .animate-wave,
   .animate-login-enter,
-  .animate-login-shake {
+  .animate-login-shake,
+  .animate-page-enter,
+  .animate-toast-in,
+  .animate-toast-out,
+  .animate-modal-backdrop,
+  .animate-modal-panel,
+  .animate-shimmer,
+  .glass-panel-lift:hover {
     animation: none;
+    transform: none;
+    transition: none;
   }
 
   .login-pulse-dot {

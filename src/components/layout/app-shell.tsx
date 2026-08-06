@@ -3,28 +3,42 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Bell, KeyRound } from "lucide-react";
+import { Menu, X, KeyRound, Maximize2, Minimize2 } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SignOutButton } from "@/components/layout/sign-out-button";
+import { CommandPalette } from "@/components/layout/command-palette";
+import { NotificationPanel } from "@/components/layout/notification-panel";
+import { PageTransition } from "@/components/ui/page-transition";
+import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
+import { useDensity } from "@/lib/density";
 import type { AppRole } from "@/lib/roles";
+
+function atmosphereForPath(pathname: string) {
+  if (pathname.includes("vacaciones")) return "warm";
+  if (pathname.includes("control")) return "cool";
+  return "default";
+}
 
 export function AppShell({
   role,
   userName,
   roleLabel,
   pendingSignatures,
+  pendingVacations,
   children,
 }: {
   role: AppRole;
   userName: string;
   roleLabel: string;
   pendingSignatures: number | null;
+  pendingVacations: number;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { density, setDensity } = useDensity();
+  const atmosphere = atmosphereForPath(pathname);
 
-  // Close the mobile drawer whenever the route changes.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -73,24 +87,28 @@ export function AppShell({
       </aside>
 
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#c8d5e4]">
-        {/* Atmósfera con color suficiente para que el frost se lea */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div aria-hidden="true" className="bg-atmosphere pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,#d5e2ef_0%,#b8c9db_100%)]" />
           <div
-            className="glass-orb -left-24 top-[-12%] h-[440px] w-[440px] opacity-85"
+            className="glass-orb -left-24 top-[-12%] h-[440px] w-[440px] opacity-85 transition-opacity duration-700"
             style={{
               background:
-                "radial-gradient(circle, rgba(0,124,186,0.30) 0%, transparent 68%)",
+                atmosphere === "warm"
+                  ? "radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 68%)"
+                  : "radial-gradient(circle, rgba(0,124,186,0.30) 0%, transparent 68%)",
             }}
           />
           <div
             className="glass-orb -right-20 top-[6%] h-[360px] w-[360px] opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(245,234,97,0.20) 0%, transparent 70%)",
+                atmosphere === "warm"
+                  ? "radial-gradient(circle, rgba(245,234,97,0.22) 0%, transparent 70%)"
+                  : "radial-gradient(circle, rgba(245,234,97,0.20) 0%, transparent 70%)",
             }}
           />
         </div>
+
         <header className="glass-panel-header relative z-10 flex items-center gap-3 px-4 py-3">
           <button
             type="button"
@@ -101,33 +119,35 @@ export function AppShell({
             <Menu className="h-6 w-6" />
           </button>
           <img src="/brand/logo.svg" alt="Logo de la empresa" className="h-7 w-auto md:hidden" />
+          <CommandPalette role={role} />
           <div className="flex-1" />
+          <button
+            type="button"
+            onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
+            className="hidden rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy md:block"
+            title={density === "compact" ? "Modo cómodo" : "Modo compacto"}
+            aria-label="Cambiar densidad de tablas"
+          >
+            {density === "compact" ? (
+              <Maximize2 className="h-4 w-4" />
+            ) : (
+              <Minimize2 className="h-4 w-4" />
+            )}
+          </button>
           {pendingSignatures !== null && (
-            <Link
-              href="/jefa/controles"
-              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-brand-navy/10 hover:text-brand-navy"
-              aria-label={
-                pendingSignatures > 0
-                  ? `${pendingSignatures} controles horarios pendientes de firmar`
-                  : "Sin controles pendientes"
-              }
-              title={
-                pendingSignatures > 0
-                  ? `${pendingSignatures} control${pendingSignatures === 1 ? "" : "es"} horario${pendingSignatures === 1 ? "" : "s"} pendiente${pendingSignatures === 1 ? "" : "s"} de firmar`
-                  : "Sin controles pendientes"
-              }
-            >
-              <Bell className="h-5 w-5" />
-              {pendingSignatures > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold leading-none text-white">
-                  {pendingSignatures > 99 ? "99+" : pendingSignatures}
-                </span>
-              )}
-            </Link>
+            <NotificationPanel
+              pendingControls={pendingSignatures}
+              pendingVacations={pendingVacations}
+            />
           )}
         </header>
-        <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">{children}</main>
+
+        <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
+
+      {role === "EMPLEADO" && <OnboardingModal />}
     </div>
   );
 }

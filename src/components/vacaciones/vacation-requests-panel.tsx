@@ -6,6 +6,7 @@ import { CalendarPlus, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
 import { countVacationDays } from "@/lib/holidays";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   cancelVacationRequestAction,
   createVacationRequestAction,
@@ -44,6 +45,7 @@ export function VacationRequestsPanel({
   requests: RequestRow[];
 }) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const [pending, startTransition] = useTransition();
   const [showModal, setShowModal] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -73,16 +75,24 @@ export function VacationRequestsPanel({
   }
 
   function handleCancel(id: string) {
-    if (!window.confirm("¿Cancelar esta solicitud?")) return;
-    setMessage(null);
-    startTransition(async () => {
-      const result = await cancelVacationRequestAction(id);
-      if (result.ok) {
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al cancelar." });
-      }
-    });
+    void (async () => {
+      const ok = await confirm({
+        title: "Cancelar solicitud",
+        message: "¿Cancelar esta solicitud de vacaciones?",
+        variant: "danger",
+        confirmLabel: "Cancelar solicitud",
+      });
+      if (!ok) return;
+      setMessage(null);
+      startTransition(async () => {
+        const result = await cancelVacationRequestAction(id);
+        if (result.ok) {
+          router.refresh();
+        } else {
+          setMessage({ type: "error", text: result.error ?? "Error al cancelar." });
+        }
+      });
+    })();
   }
 
   const yearRequests = requests.filter((r) => new Date(r.startDate).getFullYear() === year);
@@ -176,6 +186,8 @@ export function VacationRequestsPanel({
               id="vac-start"
               label="Desde"
               value={startDate}
+              rangeStart={startDate || undefined}
+              rangeEnd={endDate || undefined}
               onChange={(v) => {
                 setStartDate(v);
                 if (endDate && v > endDate) setEndDate("");
@@ -186,6 +198,8 @@ export function VacationRequestsPanel({
               label="Hasta"
               value={endDate}
               min={startDate || undefined}
+              rangeStart={startDate || undefined}
+              rangeEnd={endDate || undefined}
               onChange={setEndDate}
             />
           </div>

@@ -19,15 +19,16 @@ function NavLink({
   return (
     <Link
       href={item.href}
+      prefetch
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
         active
-          ? "bg-brand-yellow text-brand-navy"
-          : "text-slate-200 hover:bg-brand-navy-light hover:text-white"
+          ? "bg-brand-yellow text-brand-navy shadow-sm"
+          : "text-slate-200 hover:bg-brand-navy-light/80 hover:text-white"
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
+      <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 2} />
       {item.label}
     </Link>
   );

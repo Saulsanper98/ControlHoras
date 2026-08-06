@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
+import { PageHeader } from "@/components/ui/page-header";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
+
+const PAGE_SIZE = 20;
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -27,7 +32,7 @@ const STATUS_COLOR: Record<string, string> = {
 export default async function ControlesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ department?: string; month?: string; year?: string }>;
+  searchParams: Promise<{ department?: string; month?: string; year?: string; page?: string }>;
 }) {
   const session = await requireManagerSession();
   if (!session) redirect("/");
@@ -36,8 +41,10 @@ export default async function ControlesPage({
   const departmentId = params.department || undefined;
   const month = params.month ? Number(params.month) : undefined;
   const year = params.year ? Number(params.year) : undefined;
+  const page = Math.max(1, Number(params.page) || 1);
 
-  const HISTORY_LIMIT = 100;
+  const HISTORY_LIMIT = PAGE_SIZE;
+  const historySkip = (page - 1) * PAGE_SIZE;
 
   const baseWhere = {
     ...(departmentId ? { user: { departmentId } } : {}),
@@ -45,7 +52,7 @@ export default async function ControlesPage({
     ...(year ? { year } : {}),
   };
 
-  const [pending, others, departments, years] = await Promise.all([
+  const [pending, others, othersTotal, departments, years] = await Promise.all([
     prisma.timeSheet.findMany({
       where: { status: "FIRMADO_EMPLEADO", ...baseWhere },
       include: { user: { include: { department: true } } },
@@ -56,6 +63,10 @@ export default async function ControlesPage({
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
       take: HISTORY_LIMIT,
+      skip: historySkip,
+    }),
+    prisma.timeSheet.count({
+      where: { status: { in: ["FIRMADO_RESPONSABLE", "RECHAZADO"] }, ...baseWhere },
     }),
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.timeSheet.findMany({
@@ -67,12 +78,22 @@ export default async function ControlesPage({
 
   const hasFilters = Boolean(departmentId || month || year);
 
+  const totalPages = Math.max(1, Math.ceil(othersTotal / PAGE_SIZE));
+
+  const queryBase = new URLSearchParams();
+  if (departmentId) queryBase.set("department", departmentId);
+  if (month) queryBase.set("month", String(month));
+  if (year) queryBase.set("year", String(year));
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Controles horarios</h1>
-        <p className="text-brand-navy/55">Revisa, firma y descarga los controles horarios de los empleados.</p>
-      </div>
+      <Breadcrumbs />
+      <Stagger>
+        <PageHeader
+          title="Controles horarios"
+          description="Revisa, firma y descarga los controles horarios de los empleados."
+        />
+      </Stagger>
 
       <Card>
         <form className="flex flex-wrap items-end gap-3" method="get">
@@ -152,9 +173,9 @@ export default async function ControlesPage({
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
             Historial
           </h2>
-          {others.length === HISTORY_LIMIT && (
+          {others.length === HISTORY_LIMIT && othersTotal > HISTORY_LIMIT && (
             <p className="mb-3 text-xs text-slate-500">
-              Mostrando los {HISTORY_LIMIT} más recientes. Usa los filtros para acotar la búsqueda.
+              Página {page} de {totalPages} · {othersTotal} registros en total
             </p>
           )}
           <div className="space-y-2">
@@ -162,6 +183,26 @@ export default async function ControlesPage({
               <TimeSheetRow key={t.id} t={t} />
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center gap-2">
+              {page > 1 && (
+                <Link
+                  href={`/jefa/controles?${queryBase.toString()}&page=${page - 1}`}
+                  className="rounded-lg px-3 py-1.5 text-sm text-brand-blue hover:bg-brand-blue/10"
+                >
+                  ← Anterior
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link
+                  href={`/jefa/controles?${queryBase.toString()}&page=${page + 1}`}
+                  className="rounded-lg px-3 py-1.5 text-sm text-brand-blue hover:bg-brand-blue/10"
+                >
+                  Siguiente →
+                </Link>
+              )}
+            </div>
+          )}
         </section>
       )}
     </div>
@@ -181,7 +222,7 @@ function TimeSheetRow({
 }) {
   return (
     <Link href={`/jefa/controles/${t.id}`}>
-      <Card className="flex items-center justify-between transition hover:border-brand-blue">
+      <Card className="glass-panel-lift flex items-center justify-between">
         <div>
           <p className="font-medium text-brand-navy">{t.user.name}</p>
           <p className="text-sm text-slate-500">

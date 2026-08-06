@@ -40,6 +40,21 @@ export async function createVacationRequestAction(
     return { ok: false, error: "El periodo seleccionado no incluye días laborables." };
   }
 
+  const overlap = await prisma.vacationRequest.findFirst({
+    where: {
+      userId: session.user.id,
+      status: { in: ["PENDIENTE", "APROBADA"] },
+      startDate: { lte: end },
+      endDate: { gte: start },
+    },
+  });
+  if (overlap) {
+    return {
+      ok: false,
+      error: "Ya tienes una solicitud pendiente o aprobada que se solapa con estas fechas.",
+    };
+  }
+
   const year = start.getFullYear();
   const balance = await prisma.vacationBalance.findUnique({
     where: { userId_year: { userId: session.user.id, year } },

@@ -43,8 +43,10 @@ export function StatCard({
 
   if (href) {
     return (
-      <Link href={href} className="block transition hover:scale-[1.01]">
-        <Card className="flex items-start justify-between hover:border-brand-blue">{content}</Card>
+      <Link href={href} className="block">
+        <Card className="glass-panel-lift flex items-start justify-between hover:border-brand-blue/40">
+          {content}
+        </Card>
       </Link>
     );
   }

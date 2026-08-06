@@ -2,11 +2,27 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
-import { Paperclip, Trash2, ChevronLeft, ChevronRight, Save, PenLine, Download, Wand2, Copy } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  Paperclip,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Save,
+  PenLine,
+  Download,
+  Wand2,
+  Copy,
+  Loader2,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { FieldSelect } from "@/components/ui/field-select";
 import { TimeField } from "@/components/ui/time-field";
+import { ScrollShadow } from "@/components/ui/scroll-shadow";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import { useToast } from "@/components/ui/toast";
+import { useDensity } from "@/lib/density";
+import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
 import { SignatureModal } from "@/components/signature/signature-pad";
@@ -66,6 +82,8 @@ export function TimeSheetForm({
   attachments,
   employeeSignaturePath,
   responsableSignaturePath,
+  employeeSignedAt,
+  responsableSignedAt,
 }: {
   timeSheetId: string | null;
   month: number;
@@ -78,10 +96,22 @@ export function TimeSheetForm({
   attachments: Attachment[];
   employeeSignaturePath: string | null;
   responsableSignaturePath: string | null;
+  employeeSignedAt?: string | null;
+  responsableSignedAt?: string | null;
 }) {
   const router = useRouter();
+  const { confirm } = useConfirm();
+  const { showToast } = useToast();
+  const { tableCell } = useDensity();
   const editable = status === "BORRADOR" || status === "RECHAZADO";
   const days = daysInMonth(month, year);
+  const now = new Date();
+  const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
+  const todayDay = isCurrentMonth ? now.getDate() : null;
+
+  const initialSnapshot = useRef(
+    JSON.stringify({ entries: initialEntries, notes: initialNotes })
+  );
 
   const [entries, setEntries] = useState<Entry[]>(() => {
     const byDay = new Map(initialEntries.map((e) => [e.day, e]));
@@ -96,6 +126,24 @@ export function TimeSheetForm({
   const [showSignPad, setShowSignPad] = useState(false);
   const [bulkShift, setBulkShift] = useState<keyof typeof SHIFTS>("M");
   const [weekdaysOnly, setWeekdaysOnly] = useState(true);
+  const [filter, setFilter] = useState<"all" | "filled" | "empty">("all");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [uploadPending, setUploadPending] = useState(false);
+
+  const isDirty = useMemo(
+    () => JSON.stringify({ entries, notes }) !== initialSnapshot.current,
+    [entries, notes]
+  );
+
+  useEffect(() => {
+    if (!isDirty || !editable) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [isDirty, editable]);
 
   const totals = useMemo(
     () => sumDayHours(entries.map((e) => calculateDayHours(e.checkIn, e.checkOut))),
@@ -114,31 +162,37 @@ export function TimeSheetForm({
     return { workedDays, freeDays, holidayCount: monthHolidays.size };
   }, [entries, monthHolidays.size]);
 
+  const filteredEntries = useMemo(() => {
+    if (filter === "filled") return entries.filter((e) => e.checkIn && e.checkOut);
+    if (filter === "empty") return entries.filter((e) => !e.checkIn && !e.checkOut);
+    return entries;
+  }, [entries, filter]);
+
   function handleCopyPreviousMonth() {
-    if (
-      !window.confirm(
-        "¿Copiar las horas del mes anterior? Se sobrescribirán los días que coincidan."
-      )
-    ) {
-      return;
-    }
-    setMessage(null);
-    startTransition(async () => {
-      const result = await copyFromPreviousMonthAction(month, year);
-      if (result.ok && result.entries) {
-        const byDay = new Map(result.entries.map((e) => [e.day, e]));
-        setEntries((prev) =>
-          prev.map((e) => {
-            const copied = byDay.get(e.day);
-            return copied ?? e;
-          })
-        );
-        setMessage({ type: "success", text: "Horas copiadas del mes anterior." });
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al copiar." });
-      }
-    });
+    void (async () => {
+      const ok = await confirm({
+        title: "Copiar mes anterior",
+        message: "¿Copiar las horas del mes anterior? Se sobrescribirán los días que coincidan.",
+      });
+      if (!ok) return;
+      setMessage(null);
+      startTransition(async () => {
+        const result = await copyFromPreviousMonthAction(month, year);
+        if (result.ok && result.entries) {
+          const byDay = new Map(result.entries.map((e) => [e.day, e]));
+          setEntries((prev) =>
+            prev.map((e) => {
+              const copied = byDay.get(e.day);
+              return copied ?? e;
+            })
+          );
+          showToast("Horas copiadas del mes anterior.");
+          router.refresh();
+        } else {
+          setMessage({ type: "error", text: result.error ?? "Error al copiar." });
+        }
+      });
+    })();
   }
 
   function updateEntry(day: number, patch: Partial<Entry>) {
@@ -155,21 +209,21 @@ export function TimeSheetForm({
   }
 
   function applyBulkShift() {
-    if (
-      !window.confirm(
-        `¿Aplicar turno ${SHIFTS[bulkShift].label} a ${weekdaysOnly ? "todos los días laborables" : "todo el mes"}? Se sobrescribirán las horas actuales.`
-      )
-    ) {
-      return;
-    }
-    setEntries((prev) =>
-      prev.map((e) => {
-        const isWeekend = [0, 6].includes(new Date(year, month - 1, e.day).getDay());
-        if (weekdaysOnly && isWeekend) return e;
-        const s = SHIFTS[bulkShift];
-        return { ...e, checkIn: s.checkIn, checkOut: s.checkOut };
-      })
-    );
+    void (async () => {
+      const ok = await confirm({
+        title: "Aplicar turno",
+        message: `¿Aplicar turno ${SHIFTS[bulkShift].label} a ${weekdaysOnly ? "todos los días laborables" : "todo el mes"}? Se sobrescribirán las horas actuales.`,
+      });
+      if (!ok) return;
+      setEntries((prev) =>
+        prev.map((e) => {
+          const isWeekend = [0, 6].includes(new Date(year, month - 1, e.day).getDay());
+          if (weekdaysOnly && isWeekend) return e;
+          const s = SHIFTS[bulkShift];
+          return { ...e, checkIn: s.checkIn, checkOut: s.checkOut };
+        })
+      );
+    })();
   }
 
   function handleSave() {
@@ -177,7 +231,8 @@ export function TimeSheetForm({
     startTransition(async () => {
       const result = await saveDraftAction(month, year, entries, notes);
       if (result.ok) {
-        setMessage({ type: "success", text: "Borrador guardado." });
+        initialSnapshot.current = JSON.stringify({ entries, notes });
+        showToast("Borrador guardado.");
         router.refresh();
       } else {
         setMessage({ type: "error", text: result.error ?? "Error al guardar." });
@@ -187,28 +242,59 @@ export function TimeSheetForm({
 
   function handleUpload(formData: FormData) {
     setMessage(null);
+    setUploadPending(true);
     startTransition(async () => {
-      const result = await uploadAttachmentAction(month, year, formData);
-      if (result.ok) {
-        setMessage({ type: "success", text: "Archivo adjuntado." });
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
+      try {
+        const result = await uploadAttachmentAction(month, year, formData);
+        if (result.ok) {
+          showToast("Archivo adjuntado.");
+          router.refresh();
+        } else {
+          setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
+        }
+      } finally {
+        setUploadPending(false);
       }
     });
   }
 
+  async function handlePdfDownload() {
+    if (!timeSheetId || pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      const res = await fetch(`/api/timesheets/${timeSheetId}/pdf`);
+      if (!res.ok) throw new Error("Error al generar PDF");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch {
+      showToast("No se pudo generar el PDF.", "error");
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
   function handleDeleteAttachment(id: string) {
-    if (!window.confirm("¿Eliminar este adjunto? Esta acción no se puede deshacer.")) return;
-    setMessage(null);
-    startTransition(async () => {
-      const result = await deleteAttachmentAction(id);
-      if (result.ok) {
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
-      }
-    });
+    void (async () => {
+      const ok = await confirm({
+        title: "Eliminar adjunto",
+        message: "¿Eliminar este adjunto? Esta acción no se puede deshacer.",
+        variant: "danger",
+        confirmLabel: "Eliminar",
+      });
+      if (!ok) return;
+      setMessage(null);
+      startTransition(async () => {
+        const result = await deleteAttachmentAction(id);
+        if (result.ok) {
+          showToast("Adjunto eliminado.");
+          router.refresh();
+        } else {
+          setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
+        }
+      });
+    })();
   }
 
   function handleSign(signatureDataUrl: string) {
@@ -265,19 +351,29 @@ export function TimeSheetForm({
 
             <div className="flex flex-wrap items-center gap-2">
               {timeSheetId && (
-                <a
-                  href={`/api/timesheets/${timeSheetId}/pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6"
+                <button
+                  type="button"
+                  onClick={() => void handlePdfDownload()}
+                  disabled={pdfLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60"
                 >
-                  <Download className="h-4 w-4" />
-                  PDF
-                </a>
+                  {pdfLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  {pdfLoading ? "Generando…" : "PDF"}
+                </button>
               )}
               <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[status]}`}>
                 {STATUS_LABEL[status]}
               </span>
+              {isDirty && editable && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+                  Sin guardar
+                </span>
+              )}
             </div>
           </div>
 
@@ -353,12 +449,55 @@ export function TimeSheetForm({
               </button>
             </div>
           )}
+
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+            <span className="font-medium text-slate-600">Leyenda:</span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-2 w-4 rounded bg-slate-400/20" /> Fin de semana
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-2 w-4 rounded bg-amber-400/30" /> Festivo
+            </span>
+            {todayDay && (
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full ring-2 ring-brand-blue/40" /> Hoy
+              </span>
+            )}
+            <span className="ml-auto flex gap-1">
+              {(["all", "filled", "empty"] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={`rounded-md px-2 py-0.5 font-medium transition ${
+                    filter === f
+                      ? "bg-brand-blue/15 text-brand-blue"
+                      : "hover:bg-brand-navy/6"
+                  }`}
+                >
+                  {f === "all" ? "Todos" : f === "filled" ? "Con horas" : "Vacíos"}
+                </button>
+              ))}
+            </span>
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <TimeSheetMobileDays
+          entries={filteredEntries}
+          month={month}
+          year={year}
+          editable={editable}
+          monthHolidays={monthHolidays}
+          todayDay={todayDay}
+          onUpdate={updateEntry}
+          onApplyShift={applyShiftToEntry}
+          shiftKeyForEntry={shiftKeyForEntry}
+        />
+
+        <ScrollShadow className="hidden md:block">
           <table className="w-full min-w-[720px] text-sm">
-            <thead>
-              <tr className="border-b border-brand-navy/10 bg-brand-navy/[0.04] text-left text-[11px] uppercase tracking-wide text-slate-500">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-brand-navy/10 bg-[#e8f0f8]/95 text-left text-[11px] uppercase tracking-wide text-slate-500 backdrop-blur-sm">
                 <th className="px-3 py-2.5">Día</th>
                 <th className="px-3 py-2.5">Turno</th>
                 <th className="px-3 py-2.5">Entrada</th>
@@ -371,7 +510,7 @@ export function TimeSheetForm({
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry) => {
+              {filteredEntries.map((entry) => {
                 const hours = calculateDayHours(entry.checkIn, entry.checkOut);
                 const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
                   weekday: "short",
@@ -389,9 +528,9 @@ export function TimeSheetForm({
                     key={entry.day}
                     className={`border-b border-brand-navy/5 last:border-0 ${
                       holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
-                    }`}
+                    } ${todayDay === entry.day ? "ring-1 ring-inset ring-brand-blue/25" : ""}`}
                   >
-                    <td className="px-3 py-1.5 whitespace-nowrap">
+                    <td className={`${tableCell} whitespace-nowrap`}>
                       <span className="font-medium text-brand-navy">{entry.day}</span>{" "}
                       <span className="text-xs text-slate-500">{weekday}</span>
                       {holidayName && (
@@ -454,9 +593,17 @@ export function TimeSheetForm({
                 <td className="px-3 py-2.5 tabular-nums">{totals.nightHours.toFixed(2)}</td>
                 <td className="px-3 py-2.5" />
               </tr>
-            </tfoot>
-          </table>
-        </div>
+          </tfoot>
+        </table>
+        </ScrollShadow>
+
+        {editable && (
+          <div className="sticky bottom-0 z-10 border-t border-brand-navy/10 bg-[#e8f0f8]/95 px-4 py-2 backdrop-blur-sm md:hidden">
+            <p className="text-center text-xs tabular-nums text-brand-navy">
+              <strong>{totals.totalHours.toFixed(1)} h</strong> totales · {summary.workedDays} días trabajados
+            </p>
+          </div>
+        )}
 
         <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
           <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
@@ -506,20 +653,28 @@ export function TimeSheetForm({
           )}
 
           {editable && (
-            <form action={handleUpload} className="flex flex-wrap items-center gap-2">
-              <input
-                type="file"
-                name="file"
-                accept=".pdf,.xlsx,.xls"
-                className="min-w-0 flex-1 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-blue/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-blue"
-              />
-              <button
-                type="submit"
-                disabled={pending}
-                className="rounded-lg bg-brand-blue/10 px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/18 disabled:opacity-50"
-              >
-                Subir
-              </button>
+            <form action={handleUpload} className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="file"
+                  name="file"
+                  accept=".pdf,.xlsx,.xls"
+                  disabled={uploadPending}
+                  className="min-w-0 flex-1 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-blue/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-blue disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={pending || uploadPending}
+                  className="rounded-lg bg-brand-blue/10 px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/18 disabled:opacity-50"
+                >
+                  {uploadPending ? "Subiendo…" : "Subir"}
+                </button>
+              </div>
+              {uploadPending && (
+                <div className="h-1 overflow-hidden rounded-full bg-brand-navy/10">
+                  <div className="animate-shimmer h-full w-1/3 rounded-full bg-brand-blue/60" />
+                </div>
+              )}
             </form>
           )}
         </div>
@@ -528,9 +683,16 @@ export function TimeSheetForm({
           <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
             <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
             <div className="flex flex-wrap gap-6">
-              {employeeSignaturePath && (
-                <div>
-                  <p className="mb-1 text-xs text-slate-500">Empleado</p>
+            {employeeSignaturePath && (
+              <div>
+                <p className="mb-1 text-xs text-slate-500">
+                  Empleado
+                  {employeeSignedAt && (
+                    <span className="ml-1 text-slate-400">
+                      · {new Date(employeeSignedAt).toLocaleString("es-ES")}
+                    </span>
+                  )}
+                </p>
                   <img
                     src={`/api/uploads/${employeeSignaturePath}`}
                     alt="Firma del empleado"
@@ -538,9 +700,16 @@ export function TimeSheetForm({
                   />
                 </div>
               )}
-              {responsableSignaturePath && (
-                <div>
-                  <p className="mb-1 text-xs text-slate-500">Responsable</p>
+            {responsableSignaturePath && (
+              <div>
+                <p className="mb-1 text-xs text-slate-500">
+                  Responsable
+                  {responsableSignedAt && (
+                    <span className="ml-1 text-slate-400">
+                      · {new Date(responsableSignedAt).toLocaleString("es-ES")}
+                    </span>
+                  )}
+                </p>
                   <img
                     src={`/api/uploads/${responsableSignaturePath}`}
                     alt="Firma de la responsable"

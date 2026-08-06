@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/ui/page-header";
+import { Stagger } from "@/components/ui/stagger";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { TimeSheetForm } from "@/components/control-horario/timesheet-form";
 
@@ -33,12 +34,12 @@ export default async function ControlHorarioPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Control horario</h1>
-        <p className="text-brand-navy/55">
-          {MONTH_NAMES[month - 1]} de {year}
-        </p>
-      </div>
+      <Stagger>
+        <PageHeader
+          title="Control horario"
+          description={`${MONTH_NAMES[month - 1]} de ${year}`}
+        />
+      </Stagger>
 
       <TimeSheetForm
         timeSheetId={timeSheet?.id ?? null}
@@ -66,8 +67,16 @@ export default async function ControlHorarioPage({
         employeeSignaturePath={
           timeSheet?.signatures.find((s) => s.signerRole === "EMPLEADO")?.imagePath ?? null
         }
+        employeeSignedAt={
+          timeSheet?.signatures.find((s) => s.signerRole === "EMPLEADO")?.signedAt?.toISOString() ??
+          null
+        }
         responsableSignaturePath={
           timeSheet?.signatures.find((s) => s.signerRole === "RESPONSABLE")?.imagePath ?? null
+        }
+        responsableSignedAt={
+          timeSheet?.signatures.find((s) => s.signerRole === "RESPONSABLE")?.signedAt?.toISOString() ??
+          null
         }
       />
     </div>
