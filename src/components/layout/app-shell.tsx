@@ -72,22 +72,22 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#e8eef5]">
-        {/* Atmósfera suave: dos orbes discretos */}
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#c8d5e4]">
+        {/* Atmósfera con color suficiente para que el frost se lea */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,#eef3f8_0%,#e4ebf3_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#d5e2ef_0%,#b8c9db_100%)]" />
           <div
-            className="glass-orb -left-24 top-[-12%] h-[420px] w-[420px] opacity-70"
+            className="glass-orb -left-24 top-[-12%] h-[440px] w-[440px] opacity-85"
             style={{
               background:
-                "radial-gradient(circle, rgba(0,124,186,0.18) 0%, transparent 68%)",
+                "radial-gradient(circle, rgba(0,124,186,0.30) 0%, transparent 68%)",
             }}
           />
           <div
-            className="glass-orb -right-20 top-[6%] h-[340px] w-[340px] opacity-55"
+            className="glass-orb -right-20 top-[6%] h-[360px] w-[360px] opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(245,234,97,0.16) 0%, transparent 70%)",
+                "radial-gradient(circle, rgba(245,234,97,0.20) 0%, transparent 70%)",
             }}
           />
         </div>
@@ -105,7 +105,7 @@ export function AppShell({
           {pendingSignatures !== null && (
             <Link
               href="/jefa/controles"
-              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-white/50 hover:text-brand-navy"
+              className="relative rounded-full p-2 text-slate-500 transition-colors hover:bg-brand-navy/10 hover:text-brand-navy"
               aria-label={
                 pendingSignatures > 0
                   ? `${pendingSignatures} controles horarios pendientes de firmar`

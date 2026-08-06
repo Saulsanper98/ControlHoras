@@ -103,7 +103,7 @@ export function VacationEditor({
               min="0"
               value={totalDays}
               onChange={(e) => setTotalDays(Number(e.target.value))}
-              className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <div>
@@ -117,7 +117,7 @@ export function VacationEditor({
               min="0"
               value={usedDays}
               onChange={(e) => setUsedDays(Number(e.target.value))}
-              className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <div className="min-w-[160px] flex-1">
@@ -129,7 +129,7 @@ export function VacationEditor({
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className="surface-input w-full rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <button
@@ -166,7 +166,7 @@ export function VacationEditor({
               step="0.5"
               value={hours}
               onChange={(e) => setHours(e.target.value)}
-              className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <div className="min-w-[160px] flex-1">
@@ -178,7 +178,7 @@ export function VacationEditor({
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className="surface-input w-full rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <button
@@ -198,7 +198,7 @@ export function VacationEditor({
           {adjustments.map((a) => (
             <div
               key={a.id}
-              className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm"
+              className="surface-muted flex items-center justify-between rounded-md border border-brand-navy/10 px-3 py-2 text-sm"
             >
               <div>
                 <span className={`font-medium ${a.hours >= 0 ? "text-emerald-600" : "text-red-600"}`}>

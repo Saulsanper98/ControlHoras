@@ -33,7 +33,7 @@ export default async function NoticiasPage() {
                 <img
                   src={`/api/uploads/${n.imagePath}`}
                   alt=""
-                  className="mt-2 max-h-64 rounded-md border border-slate-200"
+                  className="mt-2 max-h-64 rounded-md border border-brand-navy/10"
                 />
               )}
               <p className="mt-2 text-xs text-slate-500">

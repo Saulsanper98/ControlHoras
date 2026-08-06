@@ -59,7 +59,7 @@ export default async function VacacionesPage() {
             {adjustments.map((a) => (
               <div
                 key={a.id}
-                className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm"
+                className="surface-muted flex items-center justify-between rounded-md border border-brand-navy/10 px-3 py-2 text-sm"
               >
                 <div>
                   <span

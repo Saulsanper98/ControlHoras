@@ -31,7 +31,7 @@ export function SignatureModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl">
+      <div className="glass-panel w-full max-w-lg rounded-2xl p-5">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-brand-navy">{title}</h3>
           <button
@@ -46,7 +46,7 @@ export function SignatureModal({
 
         <p className="mb-2 text-sm text-slate-500">Firma en el recuadro con el ratón o el dedo.</p>
 
-        <div className="rounded-md border-2 border-dashed border-slate-300 bg-slate-50">
+        <div className="surface-muted rounded-md border-2 border-dashed border-brand-navy/20">
           <SignatureCanvas
             ref={padRef}
             penColor="#0a2240"
@@ -67,7 +67,7 @@ export function SignatureModal({
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              className="surface-btn rounded-md px-4 py-2 text-sm font-medium text-slate-600"
             >
               Cancelar
             </button>

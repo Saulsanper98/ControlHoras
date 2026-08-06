@@ -35,19 +35,19 @@ export function NewsCreateForm() {
           name="title"
           placeholder="Título"
           required
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="surface-input w-full rounded-md px-3 py-2 text-sm"
         />
         <textarea
           name="body"
           placeholder="Contenido"
           rows={4}
           required
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="surface-input w-full rounded-md px-3 py-2 text-sm"
         />
         <div className="flex flex-wrap items-center gap-4">
           <input type="file" name="image" accept="image/*" className="text-xs text-slate-500" />
           <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" name="pinned" className="rounded border-slate-300" />
+            <input type="checkbox" name="pinned" className="rounded border-brand-navy/25" />
             Fijar arriba
           </label>
           <button

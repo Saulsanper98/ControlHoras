@@ -102,7 +102,7 @@ function EmployeeRow({ user }: { user: EmployeeRowUser }) {
       </div>
       <span
         className={`rounded-full px-3 py-1 text-xs font-medium ${
-          user.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
+          user.active ? "bg-emerald-500/15 text-emerald-800" : "bg-brand-navy/8 text-slate-500"
         }`}
       >
         {user.active ? "Activo" : "Inactivo"}

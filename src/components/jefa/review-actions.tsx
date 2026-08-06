@@ -78,20 +78,20 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
 
       {showReject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+          <div className="glass-panel w-full max-w-md rounded-2xl p-5">
             <h3 className="mb-3 text-lg font-semibold text-brand-navy">Rechazar control horario</h3>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Motivo (opcional)"
               rows={3}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="surface-input w-full rounded-md px-3 py-2 text-sm"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowReject(false)}
-                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="surface-btn rounded-md px-4 py-2 text-sm font-medium text-slate-600"
               >
                 Cancelar
               </button>

@@ -56,7 +56,7 @@ export default async function ControlDetailPage({
           href={`/api/timesheets/${timeSheet.id}/pdf`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex shrink-0 items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          className="surface-btn flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600"
         >
           <Download className="h-4 w-4" />
           Descargar PDF
@@ -79,7 +79,7 @@ export default async function ControlDetailPage({
       />
 
       {timeSheet.notes && (
-        <p className="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+        <p className="surface-muted rounded-md px-3 py-2 text-sm text-slate-600">
           <span className="font-medium">Notas: </span>
           {timeSheet.notes}
         </p>
@@ -94,7 +94,7 @@ export default async function ControlDetailPage({
               href={`/api/uploads/${a.filePath}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block rounded-md border border-slate-200 px-3 py-2 text-sm text-brand-blue hover:underline"
+              className="surface-muted block rounded-md border border-brand-navy/10 px-3 py-2 text-sm text-brand-blue hover:underline"
             >
               {a.fileName}
             </a>
@@ -110,7 +110,7 @@ export default async function ControlDetailPage({
               <img
                 src={`/api/uploads/${employeeSignature.imagePath}`}
                 alt="Firma del empleado"
-                className="h-16 rounded-md border border-slate-200 bg-white p-2"
+                className="surface-input h-16 rounded-md p-2"
               />
             </div>
           )}
@@ -120,7 +120,7 @@ export default async function ControlDetailPage({
               <img
                 src={`/api/uploads/${responsableSignature.imagePath}`}
                 alt="Firma de la responsable"
-                className="h-16 rounded-md border border-slate-200 bg-white p-2"
+                className="surface-input h-16 rounded-md p-2"
               />
             </div>
           )}

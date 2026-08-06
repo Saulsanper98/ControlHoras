@@ -18,10 +18,10 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  BORRADOR: "bg-slate-100 text-slate-600",
-  FIRMADO_EMPLEADO: "bg-amber-100 text-amber-700",
-  FIRMADO_RESPONSABLE: "bg-emerald-100 text-emerald-700",
-  RECHAZADO: "bg-red-100 text-red-700",
+  BORRADOR: "bg-brand-navy/8 text-slate-600",
+  FIRMADO_EMPLEADO: "bg-amber-500/15 text-amber-800",
+  FIRMADO_RESPONSABLE: "bg-emerald-500/15 text-emerald-800",
+  RECHAZADO: "bg-red-500/15 text-red-800",
 };
 
 export default async function ControlesPage({

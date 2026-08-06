@@ -52,13 +52,13 @@ export function NewsItem({
           type="text"
           value={titleValue}
           onChange={(e) => setTitleValue(e.target.value)}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="surface-input w-full rounded-md px-3 py-2 text-sm"
         />
         <textarea
           value={bodyValue}
           onChange={(e) => setBodyValue(e.target.value)}
           rows={4}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="surface-input w-full rounded-md px-3 py-2 text-sm"
         />
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-600">
@@ -66,7 +66,7 @@ export function NewsItem({
               type="checkbox"
               checked={pinnedValue}
               onChange={(e) => setPinnedValue(e.target.checked)}
-              className="rounded border-slate-300"
+              className="rounded border-brand-navy/25"
             />
             Fijar arriba
           </label>
@@ -74,7 +74,7 @@ export function NewsItem({
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="flex items-center gap-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              className="surface-btn flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-slate-600"
             >
               <X className="h-4 w-4" />
               Cancelar
@@ -108,7 +108,7 @@ export function NewsItem({
             <img
               src={`/api/uploads/${imagePath}`}
               alt=""
-              className="mt-2 max-h-48 rounded-md border border-slate-200"
+              className="mt-2 max-h-48 rounded-md border border-brand-navy/10"
             />
           )}
           <p className="mt-2 text-xs text-slate-500">

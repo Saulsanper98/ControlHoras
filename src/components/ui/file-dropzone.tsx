@@ -51,11 +51,11 @@ export function FileDropzone({
         if (!disabled) handleFiles(e.dataTransfer.files);
       }}
       className={cn(
-        "flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed px-3 py-2.5 text-center text-xs font-medium text-slate-500 transition-colors",
+        "flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors",
         dragOver
-          ? "border-brand-blue bg-brand-blue/5 text-brand-blue"
-          : "border-slate-300 hover:border-brand-blue/60 hover:bg-slate-50",
-        disabled && "cursor-not-allowed opacity-60 hover:border-slate-300 hover:bg-transparent",
+          ? "border-brand-blue bg-brand-blue/10 text-brand-blue"
+          : "border-brand-navy/20 surface-muted hover:border-brand-blue/50 hover:bg-brand-navy/[0.06]",
+        disabled && "cursor-not-allowed opacity-60 hover:border-brand-navy/20 hover:bg-transparent",
         className
       )}
     >
