@@ -90,7 +90,9 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
                   : ""}
               </p>
-              {r.employeeNotes && <p className="text-xs text-slate-500">{r.employeeNotes}</p>}
+              {r.employeeNotes ? (
+                <p className="text-xs text-slate-500">{r.employeeNotes}</p>
+              ) : null}
             </div>
             <div className="flex gap-2">
               <button
