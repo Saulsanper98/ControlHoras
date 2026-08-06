@@ -19,7 +19,11 @@ export default async function JefaVacacionesPage() {
       orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
     }),
     prisma.vacationBalance.findMany({ where: { year } }),
-    prisma.hourAdjustment.groupBy({ by: ["userId"], _sum: { hours: true } }),
+    prisma.hourAdjustment.groupBy({
+      by: ["userId"],
+      where: { year },
+      _sum: { hours: true },
+    }),
     prisma.vacationRequest.findMany({
       where: { status: "PENDIENTE" },
       include: { user: { include: { department: true } } },
@@ -57,6 +61,7 @@ export default async function JefaVacacionesPage() {
           endDate: r.endDate.toISOString(),
           days: Number(r.days),
           employeeNotes: r.employeeNotes,
+          leaveType: r.leaveType,
         }))}
       />
 

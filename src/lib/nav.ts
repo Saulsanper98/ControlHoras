@@ -6,6 +6,8 @@ import {
   Umbrella,
   Newspaper,
   Users,
+  BarChart3,
+  Shield,
 } from "lucide-react";
 
 export type NavItem = {
@@ -29,4 +31,6 @@ export const jefaNav: NavItem[] = [
   { href: "/jefa/horarios", label: "Horarios", icon: CalendarClock },
   { href: "/jefa/vacaciones", label: "Vacaciones y horas", icon: Umbrella },
   { href: "/jefa/noticias", label: "Noticias", icon: Newspaper },
+  { href: "/jefa/informes", label: "Informe de horas", icon: BarChart3 },
+  { href: "/jefa/auditoria", label: "Auditoría", icon: Shield },
 ];

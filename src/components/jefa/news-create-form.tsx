@@ -16,7 +16,7 @@ export function NewsCreateForm() {
       const result = await createNewsAction(formData);
       if (result.ok) {
         formRef.current?.reset();
-        setMessage({ type: "success", text: "Noticia publicada." });
+        setMessage({ type: "success", text: "Noticia guardada." });
       } else {
         setMessage({ type: "error", text: result.error ?? "Error al publicar." });
       }
@@ -35,14 +35,14 @@ export function NewsCreateForm() {
           name="title"
           placeholder="Título"
           required
-          className="surface-input w-full rounded-md px-3 py-2 text-sm"
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
         />
         <textarea
           name="body"
           placeholder="Contenido"
           rows={4}
           required
-          className="surface-input w-full rounded-md px-3 py-2 text-sm"
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
         />
         <div className="flex flex-wrap items-center gap-4">
           <input type="file" name="image" accept="image/*" className="text-xs text-slate-500" />
@@ -50,12 +50,22 @@ export function NewsCreateForm() {
             <input type="checkbox" name="pinned" className="rounded border-brand-navy/25" />
             Fijar arriba
           </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input type="checkbox" name="draft" className="rounded border-brand-navy/25" />
+            Guardar como borrador
+          </label>
+          <input
+            type="datetime-local"
+            name="scheduledAt"
+            className="field-control px-2 py-1 text-xs"
+            title="Programar publicación"
+          />
           <button
             type="submit"
             disabled={pending}
             className="ml-auto rounded-md bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
           >
-            Publicar
+            Guardar
           </button>
         </div>
         {message && (

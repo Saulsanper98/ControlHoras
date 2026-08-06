@@ -20,19 +20,14 @@ export default async function JefaNoticiasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Noticias</h1>
-        <p className="text-brand-navy/55">Publica y gestiona las noticias de la empresa.</p>
+        <p className="text-brand-navy/55">Publica, programa y gestiona las noticias de la empresa.</p>
       </div>
 
       <NewsCreateForm />
 
       <div className="space-y-3">
-        {news.length === NEWS_LIMIT && (
-          <p className="text-xs text-slate-500">
-            Mostrando las {NEWS_LIMIT} más recientes.
-          </p>
-        )}
         {news.length === 0 ? (
-          <Card className="text-sm text-slate-500">Todavía no hay noticias publicadas.</Card>
+          <Card className="text-sm text-slate-500">Todavía no hay noticias.</Card>
         ) : (
           news.map((n) => (
             <NewsItem
@@ -43,6 +38,7 @@ export default async function JefaNoticiasPage() {
               pinned={n.pinned}
               publishedAt={n.publishedAt.toISOString()}
               imagePath={n.imagePath}
+              status={n.status}
             />
           ))
         )}

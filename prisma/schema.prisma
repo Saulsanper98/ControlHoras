@@ -33,6 +33,17 @@ enum VacationRequestStatus {
   CANCELADA
 }
 
+enum LeaveType {
+  VACACIONES
+  ASUNTOS_PROPIOS
+  MEDIO_DIA
+}
+
+enum NewsStatus {
+  BORRADOR
+  PUBLICADA
+}
+
 model Department {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -69,6 +80,8 @@ model User {
   hourAdjustmentsCreated HourAdjustment[] @relation("CreatedHourAdjustments")
   rejectedTimeSheets TimeSheet[]         @relation("RejectedTimeSheets")
   newsPublished     News[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
@@ -185,6 +198,7 @@ model VacationRequest {
   userId          String
   user            User                  @relation("EmployeeVacationRequests", fields: [userId], references: [id])
   year            Int
+  leaveType       LeaveType             @default(VACACIONES)
   startDate       DateTime              @db.Date
   endDate         DateTime              @db.Date
   days            Decimal               @db.Decimal(5, 2)
@@ -199,6 +213,7 @@ model VacationRequest {
 
   @@index([userId, year])
   @@index([status])
+  @@index([leaveType])
   @@map("vacation_requests")
 }
 
@@ -206,27 +221,60 @@ model HourAdjustment {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation("EmployeeHourAdjustments", fields: [userId], references: [id])
+  year        Int      @default(2026)
   hours       Decimal  @db.Decimal(6, 2)
   reason      String
   createdById String
   createdBy   User     @relation("CreatedHourAdjustments", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
-  @@index([userId])
+  @@index([userId, year])
   @@map("hour_adjustments")
 }
 
 model News {
-  id            String   @id @default(cuid())
+  id            String     @id @default(cuid())
   title         String
   body          String
   imagePath     String?
-  pinned        Boolean  @default(false)
+  pinned        Boolean    @default(false)
+  status        NewsStatus @default(PUBLICADA)
   publishedById String
-  publishedBy   User     @relation(fields: [publishedById], references: [id])
-  publishedAt   DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  publishedBy   User       @relation(fields: [publishedById], references: [id])
+  publishedAt   DateTime   @default(now())
+  scheduledAt   DateTime?
+  updatedAt     DateTime   @updatedAt
 
-  @@index([pinned, publishedAt])
+  @@index([status, pinned, publishedAt])
   @@map("news")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([actorId])
+  @@map("audit_logs")
 }

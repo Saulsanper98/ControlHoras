@@ -67,7 +67,13 @@ export async function addHourAdjustmentAction(
   if (!target.ok) return target;
 
   await prisma.hourAdjustment.create({
-    data: { userId, hours, reason: reason.trim(), createdById: session.user.id },
+    data: {
+      userId,
+      year: new Date().getFullYear(),
+      hours,
+      reason: reason.trim(),
+      createdById: session.user.id,
+    },
   });
 
   revalidateAll(userId);

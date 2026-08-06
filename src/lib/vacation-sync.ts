@@ -3,7 +3,12 @@ import { prisma } from "@/lib/prisma";
 /** Recalcula usedDays a partir de solicitudes aprobadas del año. */
 export async function syncVacationUsedDays(userId: string, year: number): Promise<void> {
   const approved = await prisma.vacationRequest.findMany({
-    where: { userId, year, status: "APROBADA" },
+    where: {
+      userId,
+      year,
+      status: "APROBADA",
+      leaveType: { in: ["VACACIONES", "MEDIO_DIA"] },
+    },
     select: { days: true },
   });
 

@@ -12,6 +12,7 @@ export function NewsItem({
   pinned,
   publishedAt,
   imagePath,
+  status,
 }: {
   id: string;
   title: string;
@@ -19,25 +20,34 @@ export function NewsItem({
   pinned: boolean;
   publishedAt: string;
   imagePath: string | null;
+  status: string;
 }) {
   const [editing, setEditing] = useState(false);
   const [titleValue, setTitleValue] = useState(title);
   const [bodyValue, setBodyValue] = useState(body);
   const [pinnedValue, setPinnedValue] = useState(pinned);
+  const [draftValue, setDraftValue] = useState(status === "BORRADOR");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
 
   function handleSave() {
     setMessage(null);
+    const formData = new FormData();
+    formData.set("title", titleValue);
+    formData.set("body", bodyValue);
+    if (pinnedValue) formData.set("pinned", "on");
+    if (draftValue) formData.set("draft", "on");
+    if (imageFile) formData.set("image", imageFile);
     startTransition(async () => {
-      const result = await updateNewsAction(id, titleValue, bodyValue, pinnedValue);
+      const result = await updateNewsAction(id, formData);
       if (result.ok) setEditing(false);
       else setMessage(result.error ?? "Error al guardar.");
     });
   }
 
   function handleDelete() {
-    if (!window.confirm("¿Eliminar esta noticia? Esta acción no se puede deshacer.")) return;
+    if (!window.confirm("¿Eliminar esta noticia?")) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteNewsAction(id);
@@ -52,29 +62,42 @@ export function NewsItem({
           type="text"
           value={titleValue}
           onChange={(e) => setTitleValue(e.target.value)}
-          className="surface-input w-full rounded-md px-3 py-2 text-sm"
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
         />
         <textarea
           value={bodyValue}
           onChange={(e) => setBodyValue(e.target.value)}
           rows={4}
-          className="surface-input w-full rounded-md px-3 py-2 text-sm"
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
         />
-        <div className="flex items-center gap-4">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+          className="text-xs text-slate-500"
+        />
+        <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-600">
             <input
               type="checkbox"
               checked={pinnedValue}
               onChange={(e) => setPinnedValue(e.target.checked)}
-              className="rounded border-brand-navy/25"
             />
             Fijar arriba
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={draftValue}
+              onChange={(e) => setDraftValue(e.target.checked)}
+            />
+            Guardar como borrador
           </label>
           <div className="ml-auto flex gap-2">
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="surface-btn flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-slate-600"
+              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-slate-600"
             >
               <X className="h-4 w-4" />
               Cancelar
@@ -83,7 +106,7 @@ export function NewsItem({
               type="button"
               onClick={handleSave}
               disabled={pending}
-              className="flex items-center gap-1 rounded-md bg-brand-blue px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
+              className="flex items-center gap-1 rounded-md bg-brand-blue px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
             >
               <Check className="h-4 w-4" />
               Guardar
@@ -99,8 +122,13 @@ export function NewsItem({
     <Card>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
+            {status === "BORRADOR" && (
+              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                Borrador
+              </span>
+            )}
             <p className="font-medium text-brand-navy">{title}</p>
           </div>
           <p className="mt-1 whitespace-pre-line text-sm text-slate-600">{body}</p>
@@ -116,21 +144,10 @@ export function NewsItem({
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            aria-label="Editar noticia"
-            className="text-slate-400 hover:text-brand-blue"
-          >
+          <button type="button" onClick={() => setEditing(true)} aria-label="Editar noticia" className="text-slate-400 hover:text-brand-blue">
             <Pencil className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={pending}
-            aria-label="Eliminar noticia"
-            className="text-slate-400 hover:text-red-600 disabled:opacity-60"
-          >
+          <button type="button" onClick={handleDelete} disabled={pending} aria-label="Eliminar noticia" className="text-slate-400 hover:text-red-600 disabled:opacity-60">
             <Trash2 className="h-4 w-4" />
           </button>
         </div>

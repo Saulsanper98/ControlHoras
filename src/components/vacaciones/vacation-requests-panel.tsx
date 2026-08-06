@@ -32,6 +32,7 @@ type RequestRow = {
   endDate: string;
   days: number;
   status: string;
+  leaveType?: string;
   employeeNotes: string | null;
   rejectionReason: string | null;
   createdAt: string;
@@ -51,6 +52,7 @@ export function VacationRequestsPanel({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [leaveType, setLeaveType] = useState<"VACACIONES" | "ASUNTOS_PROPIOS" | "MEDIO_DIA">("VACACIONES");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function closeModal() {
@@ -58,12 +60,13 @@ export function VacationRequestsPanel({
     setStartDate("");
     setEndDate("");
     setNotes("");
+    setLeaveType("VACACIONES");
   }
 
   function handleCreate() {
     setMessage(null);
     startTransition(async () => {
-      const result = await createVacationRequestAction(startDate, endDate, notes);
+      const result = await createVacationRequestAction(startDate, endDate, notes, leaveType);
       if (result.ok) {
         closeModal();
         setMessage({ type: "success", text: "Solicitud enviada correctamente." });
@@ -150,6 +153,9 @@ export function VacationRequestsPanel({
                     year: "numeric",
                   })}
                   <span className="ml-2 font-normal text-slate-500">{r.days} días</span>
+                  {r.leaveType && r.leaveType !== "VACACIONES" && (
+                    <span className="ml-2 text-xs text-brand-blue">{r.leaveType.replaceAll("_", " ")}</span>
+                  )}
                 </p>
                 {r.employeeNotes && (
                   <p className="mt-0.5 truncate text-xs text-slate-500">{r.employeeNotes}</p>
@@ -179,8 +185,24 @@ export function VacationRequestsPanel({
         </ul>
       )}
 
-      <Modal open={showModal} onClose={closeModal} title="Nueva solicitud de vacaciones">
+      <Modal open={showModal} onClose={closeModal} title="Nueva solicitud">
         <div className="space-y-4">
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
+            <select
+              value={leaveType}
+              onChange={(e) => {
+                const v = e.target.value as typeof leaveType;
+                setLeaveType(v);
+                if (v === "MEDIO_DIA" && startDate) setEndDate(startDate);
+              }}
+              className="field-control w-full px-3 py-2 text-sm"
+            >
+              <option value="VACACIONES">Vacaciones</option>
+              <option value="ASUNTOS_PROPIOS">Asuntos propios</option>
+              <option value="MEDIO_DIA">Medio día</option>
+            </select>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <DateField
               id="vac-start"
@@ -190,7 +212,8 @@ export function VacationRequestsPanel({
               rangeEnd={endDate || undefined}
               onChange={(v) => {
                 setStartDate(v);
-                if (endDate && v > endDate) setEndDate("");
+                if (leaveType === "MEDIO_DIA") setEndDate(v);
+                else if (endDate && v > endDate) setEndDate("");
               }}
             />
             <DateField
@@ -201,6 +224,7 @@ export function VacationRequestsPanel({
               rangeStart={startDate || undefined}
               rangeEnd={endDate || undefined}
               onChange={setEndDate}
+              disabled={leaveType === "MEDIO_DIA"}
             />
           </div>
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { LeaveType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { countVacationDays } from "@/lib/holidays";
@@ -21,10 +22,16 @@ function parseLocalDate(iso: string): Date | null {
 export async function createVacationRequestAction(
   startDate: string,
   endDate: string,
-  employeeNotes: string
+  employeeNotes: string,
+  leaveType: LeaveType = "VACACIONES"
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireEmployeeSession();
   if (!session) return { ok: false, error: "No autorizado." };
+
+  const allowed: LeaveType[] = ["VACACIONES", "ASUNTOS_PROPIOS", "MEDIO_DIA"];
+  if (!allowed.includes(leaveType)) {
+    return { ok: false, error: "Tipo de ausencia no válido." };
+  }
 
   const start = parseLocalDate(startDate);
   const end = parseLocalDate(endDate);
@@ -35,7 +42,11 @@ export async function createVacationRequestAction(
     return { ok: false, error: "La fecha de fin no puede ser anterior al inicio." };
   }
 
-  const days = countVacationDays(start, end);
+  let days =
+    leaveType === "MEDIO_DIA" ? 0.5 : countVacationDays(start, end);
+  if (leaveType === "MEDIO_DIA" && start.toDateString() !== end.toDateString()) {
+    return { ok: false, error: "Medio día debe solicitarse en una sola fecha." };
+  }
   if (days <= 0) {
     return { ok: false, error: "El periodo seleccionado no incluye días laborables." };
   }
@@ -56,30 +67,39 @@ export async function createVacationRequestAction(
   }
 
   const year = start.getFullYear();
-  const balance = await prisma.vacationBalance.findUnique({
-    where: { userId_year: { userId: session.user.id, year } },
-  });
-  const remaining = balance
-    ? Number(balance.totalDays) - Number(balance.usedDays)
-    : null;
 
-  const pendingDays = await prisma.vacationRequest.aggregate({
-    where: { userId: session.user.id, year, status: "PENDIENTE" },
-    _sum: { days: true },
-  });
-  const pending = Number(pendingDays._sum.days ?? 0);
+  if (leaveType === "VACACIONES" || leaveType === "MEDIO_DIA") {
+    const balance = await prisma.vacationBalance.findUnique({
+      where: { userId_year: { userId: session.user.id, year } },
+    });
+    const remaining = balance
+      ? Number(balance.totalDays) - Number(balance.usedDays)
+      : null;
 
-  if (remaining !== null && days + pending > remaining) {
-    return {
-      ok: false,
-      error: `No tienes suficientes días disponibles (${remaining - pending} restantes contando solicitudes pendientes).`,
-    };
+    const pendingDays = await prisma.vacationRequest.aggregate({
+      where: {
+        userId: session.user.id,
+        year,
+        status: "PENDIENTE",
+        leaveType: { in: ["VACACIONES", "MEDIO_DIA"] },
+      },
+      _sum: { days: true },
+    });
+    const pending = Number(pendingDays._sum.days ?? 0);
+
+    if (remaining !== null && days + pending > remaining) {
+      return {
+        ok: false,
+        error: `No tienes suficientes días disponibles (${remaining - pending} restantes contando solicitudes pendientes).`,
+      };
+    }
   }
 
   await prisma.vacationRequest.create({
     data: {
       userId: session.user.id,
       year,
+      leaveType,
       startDate: start,
       endDate: end,
       days,

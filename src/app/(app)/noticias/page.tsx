@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
@@ -5,7 +6,12 @@ import { Card } from "@/components/ui/card";
 const NEWS_LIMIT = 100;
 
 export default async function NoticiasPage() {
+  const now = new Date();
   const news = await prisma.news.findMany({
+    where: {
+      status: "PUBLICADA",
+      OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }],
+    },
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
     include: { publishedBy: true },
     take: NEWS_LIMIT,
@@ -24,21 +30,23 @@ export default async function NoticiasPage() {
         ) : (
           news.map((n) => (
             <Card key={n.id}>
-              <div className="flex items-center gap-2">
-                {n.pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
-                <p className="font-medium text-brand-navy">{n.title}</p>
-              </div>
-              <p className="mt-1 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
-              {n.imagePath && (
-                <img
-                  src={`/api/uploads/${n.imagePath}`}
-                  alt=""
-                  className="mt-2 max-h-64 rounded-md border border-brand-navy/10"
-                />
-              )}
-              <p className="mt-2 text-xs text-slate-500">
-                {n.publishedAt.toLocaleDateString("es-ES")} · {n.publishedBy.name}
-              </p>
+              <Link href={`/noticias/${n.id}`} className="block">
+                <div className="flex items-center gap-2">
+                  {n.pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
+                  <p className="font-medium text-brand-navy hover:underline">{n.title}</p>
+                </div>
+                <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
+                {n.imagePath && (
+                  <img
+                    src={`/api/uploads/${n.imagePath}`}
+                    alt=""
+                    className="mt-2 max-h-64 rounded-md border border-brand-navy/10"
+                  />
+                )}
+                <p className="mt-2 text-xs text-slate-500">
+                  {n.publishedAt.toLocaleDateString("es-ES")} · {n.publishedBy.name}
+                </p>
+              </Link>
             </Card>
           ))
         )}

@@ -18,7 +18,7 @@ export default async function VacationDetailPage({
     prisma.user.findUnique({ where: { id: userId }, include: { department: true } }),
     prisma.vacationBalance.findUnique({ where: { userId_year: { userId, year } } }),
     prisma.hourAdjustment.findMany({
-      where: { userId },
+      where: { userId, year },
       include: { createdBy: true },
       orderBy: { createdAt: "desc" },
     }),

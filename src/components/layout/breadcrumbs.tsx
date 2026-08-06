@@ -12,6 +12,8 @@ const SEGMENT_LABELS: Record<string, string> = {
   vacaciones: "Vacaciones",
   noticias: "Noticias",
   calendario: "Calendario",
+  informes: "Informe de horas",
+  auditoria: "Auditoría",
   "control-horario": "Control horario",
   horario: "Mi horario",
 };

@@ -45,6 +45,9 @@ export default async function HorarioPage() {
                   <p className="font-medium text-brand-navy">{schedule.fileName}</p>
                   <p className="text-sm text-slate-500">
                     Subido el {schedule.createdAt.toLocaleDateString("es-ES")} por {schedule.uploadedBy.name}
+                    {Date.now() - schedule.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000
+                      ? " · Nuevo"
+                      : ""}
                   </p>
                 </div>
               </div>

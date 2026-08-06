@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Users, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
-import { EmployeeRowActions } from "@/components/jefa/employee-row-actions";
+import { EmployeeCreateForm, EmployeeRowActions } from "@/components/jefa/employee-row-actions";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 type EmployeeRowUser = {
@@ -43,11 +43,14 @@ export default async function EmpleadosPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Empleados</h1>
-        <p className="text-brand-navy/55">
-          {activeCount} activos de {users.length} en total, agrupados por departamento.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-brand-navy">Empleados</h1>
+          <p className="text-brand-navy/55">
+            {activeCount} activos de {users.length} en total, agrupados por departamento.
+          </p>
+        </div>
+        <EmployeeCreateForm departments={departments} />
       </div>
 
       {departments.map((dept) => {
@@ -60,7 +63,7 @@ export default async function EmpleadosPage() {
             </h2>
             <div className="space-y-2">
               {list.map((u) => (
-                <EmployeeRow key={u.id} user={u} />
+                <EmployeeRow key={u.id} user={u} departments={departments} />
               ))}
             </div>
           </section>
@@ -74,7 +77,7 @@ export default async function EmpleadosPage() {
           </h2>
           <div className="space-y-2">
             {noDept.map((u) => (
-              <EmployeeRow key={u.id} user={u} />
+              <EmployeeRow key={u.id} user={u} departments={departments} />
             ))}
           </div>
         </section>
@@ -87,7 +90,13 @@ export default async function EmpleadosPage() {
   );
 }
 
-function EmployeeRow({ user }: { user: EmployeeRowUser }) {
+function EmployeeRow({
+  user,
+  departments,
+}: {
+  user: EmployeeRowUser;
+  departments: { id: string; name: string }[];
+}) {
   return (
     <Card className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
@@ -108,7 +117,7 @@ function EmployeeRow({ user }: { user: EmployeeRowUser }) {
       >
         {user.active ? "Activo" : "Inactivo"}
       </span>
-      <EmployeeRowActions userId={user.id} active={user.active} />
+      <EmployeeRowActions user={user} departments={departments} />
     </Card>
   );
 }

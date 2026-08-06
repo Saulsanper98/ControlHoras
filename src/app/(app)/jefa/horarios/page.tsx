@@ -11,40 +11,53 @@ export default async function HorariosPage() {
   const [departments, schedules] = await Promise.all([
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.schedule.findMany({
-      distinct: ["departmentId"],
       orderBy: [{ departmentId: "asc" }, { createdAt: "desc" }],
     }),
   ]);
 
-  const latestByDept = new Map(schedules.map((s) => [s.departmentId, s]));
+  const byDept = new Map<string, typeof schedules>();
+  for (const s of schedules) {
+    const list = byDept.get(s.departmentId) ?? [];
+    list.push(s);
+    byDept.set(s.departmentId, list);
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-brand-navy">Horarios</h1>
         <p className="text-brand-navy/55">
-          Sube el horario de trabajo por departamento (PDF o Excel). Todos los empleados del departamento verán el mismo archivo.
+          Sube el horario por departamento. Se conserva el historial de versiones.
         </p>
       </div>
 
       <div className="space-y-2">
         {departments.map((dept) => {
-          const s = latestByDept.get(dept.id);
+          const list = byDept.get(dept.id) ?? [];
+          const latest = list[0] ?? null;
           return (
             <ScheduleUploadRow
               key={dept.id}
               departmentId={dept.id}
               departmentName={dept.name}
               schedule={
-                s
+                latest
                   ? {
-                      id: s.id,
-                      fileName: s.fileName,
-                      filePath: s.filePath,
-                      createdAt: s.createdAt.toISOString(),
+                      id: latest.id,
+                      fileName: latest.fileName,
+                      filePath: latest.filePath,
+                      createdAt: latest.createdAt.toISOString(),
+                      validFrom: latest.validFrom.toISOString(),
                     }
                   : null
               }
+              history={list.map((s) => ({
+                id: s.id,
+                fileName: s.fileName,
+                filePath: s.filePath,
+                createdAt: s.createdAt.toISOString(),
+                validFrom: s.validFrom.toISOString(),
+              }))}
             />
           );
         })}

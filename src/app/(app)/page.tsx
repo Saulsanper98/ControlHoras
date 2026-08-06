@@ -37,6 +37,10 @@ export default async function DashboardPage() {
   const year = now.getFullYear();
 
   const news = await prisma.news.findMany({
+    where: {
+      status: "PUBLICADA",
+      OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }],
+    },
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
     take: 3,
   });
@@ -63,7 +67,7 @@ export default async function DashboardPage() {
             where: { userId_year: { userId: session.user.id, year } },
           }),
           prisma.hourAdjustment.aggregate({
-            where: { userId: session.user.id },
+            where: { userId: session.user.id, year },
             _sum: { hours: true },
           }),
         ])
@@ -121,6 +125,22 @@ export default async function DashboardPage() {
                 Control enviado
               </span>
             )}
+            {showPersonal && timeSheet?.status === "RECHAZADO" && (
+              <Link
+                href="/control-horario"
+                className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-800 hover:underline"
+              >
+                Control rechazado — corrígelo
+              </Link>
+            )}
+            {showPersonal && (!timeSheet || timeSheet.status === "BORRADOR") && now.getDate() >= 25 && (
+              <Link
+                href="/control-horario"
+                className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 hover:underline"
+              >
+                Recuerda enviar tu control de {MONTH_NAMES[month - 1]}
+              </Link>
+            )}
             {showPersonal && !timeSheet && (
               <Link
                 href="/control-horario"
@@ -133,6 +153,19 @@ export default async function DashboardPage() {
         </div>
       </Stagger>
 
+      {showPersonal && timeSheet?.status === "RECHAZADO" && (
+        <Link href="/control-horario" className="block">
+          <Card className="glass-panel-lift border-red-300/50 bg-red-500/8">
+            <p className="text-sm font-medium text-red-800">Tu control horario fue rechazado</p>
+            <p className="mt-1 text-sm text-brand-navy">
+              {timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}
+            </p>
+            <p className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue">
+              Ir a corregir <ArrowRight className="h-4 w-4" />
+            </p>
+          </Card>
+        </Link>
+      )}
       {showManagement && (
         <div className="animate-fade-slide-up" style={{ animationDelay: "90ms" }}>
           {showPersonal && (

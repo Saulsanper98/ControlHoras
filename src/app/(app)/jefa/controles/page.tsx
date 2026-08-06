@@ -52,11 +52,17 @@ export default async function ControlesPage({
     ...(year ? { year } : {}),
   };
 
-  const [pending, others, othersTotal, departments, years] = await Promise.all([
+  const [pending, drafts, others, othersTotal, departments, years] = await Promise.all([
     prisma.timeSheet.findMany({
       where: { status: "FIRMADO_EMPLEADO", ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
+    }),
+    prisma.timeSheet.findMany({
+      where: { status: "BORRADOR", ...baseWhere },
+      include: { user: { include: { department: true } } },
+      orderBy: [{ year: "desc" }, { month: "desc" }],
+      take: 30,
     }),
     prisma.timeSheet.findMany({
       where: { status: { in: ["FIRMADO_RESPONSABLE", "RECHAZADO"] }, ...baseWhere },
@@ -167,6 +173,19 @@ export default async function ControlesPage({
           </div>
         )}
       </section>
+
+      {drafts.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Sin enviar (borrador) ({drafts.length})
+          </h2>
+          <div className="space-y-2">
+            {drafts.map((t) => (
+              <TimeSheetRow key={t.id} t={t} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {others.length > 0 && (
         <section>

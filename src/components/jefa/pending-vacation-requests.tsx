@@ -16,6 +16,7 @@ type PendingRequest = {
   endDate: string;
   days: number;
   employeeNotes: string | null;
+  leaveType?: string;
 };
 
 export function PendingVacationRequests({ requests }: { requests: PendingRequest[] }) {
@@ -24,18 +25,28 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [overlapPrompt, setOverlapPrompt] = useState<{
+    id: string;
+    warning: string;
+    overlaps: { userName: string; startDate: string; endDate: string }[];
+  } | null>(null);
 
   if (requests.length === 0) return null;
 
-  function handleApprove(id: string) {
+  function handleApprove(id: string, force = false) {
     setMessage(null);
     startTransition(async () => {
-      const result = await approveVacationRequestAction(id);
+      const result = await approveVacationRequestAction(id, force);
       if (result.ok) {
+        setOverlapPrompt(null);
         router.refresh();
-      } else {
-        setMessage(result.error ?? "Error al aprobar.");
+        return;
       }
+      if (result.warning && result.overlaps) {
+        setOverlapPrompt({ id, warning: result.warning, overlaps: result.overlaps });
+        return;
+      }
+      setMessage(result.error ?? "Error al aprobar.");
     });
   }
 
@@ -57,7 +68,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
   return (
     <section className="space-y-3">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700">
-        Solicitudes de vacaciones pendientes ({requests.length})
+        Solicitudes pendientes ({requests.length})
       </h2>
       {message && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>}
       <div className="space-y-2">
@@ -72,6 +83,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 {r.departmentName ?? "—"} ·{" "}
                 {new Date(r.startDate).toLocaleDateString("es-ES")} –{" "}
                 {new Date(r.endDate).toLocaleDateString("es-ES")} ({r.days} días)
+                {r.leaveType && r.leaveType !== "VACACIONES" ? ` · ${r.leaveType}` : ""}
               </p>
               {r.employeeNotes && <p className="text-xs text-slate-500">{r.employeeNotes}</p>}
             </div>
@@ -99,22 +111,56 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         ))}
       </div>
 
+      {overlapPrompt && (
+        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/45 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+            <h3 className="mb-2 text-lg font-semibold text-brand-navy">Posible solape de equipo</h3>
+            <p className="mb-3 text-sm text-slate-600">{overlapPrompt.warning}</p>
+            <ul className="mb-4 max-h-40 space-y-1 overflow-y-auto text-sm text-slate-600">
+              {overlapPrompt.overlaps.map((o, idx) => (
+                <li key={`${o.userName}-${idx}`}>
+                  {o.userName}: {new Date(o.startDate).toLocaleDateString("es-ES")} –{" "}
+                  {new Date(o.endDate).toLocaleDateString("es-ES")}
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setOverlapPrompt(null)}
+                className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => handleApprove(overlapPrompt.id, true)}
+                className="rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
+              >
+                Aprobar igual
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {rejectId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="glass-panel w-full max-w-md rounded-2xl p-5">
+        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
             <h3 className="mb-3 text-lg font-semibold text-brand-navy">Rechazar solicitud</h3>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Motivo (opcional)"
               rows={3}
-              className="surface-input w-full rounded-md px-3 py-2 text-sm"
+              className="field-control w-full rounded-md px-3 py-2 text-sm"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setRejectId(null)}
-                className="surface-btn rounded-md px-4 py-2 text-sm font-medium text-slate-600"
+                className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
                 Cancelar
               </button>

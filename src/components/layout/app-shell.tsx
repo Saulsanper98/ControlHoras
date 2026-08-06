@@ -25,6 +25,7 @@ export function AppShell({
   roleLabel,
   pendingSignatures,
   pendingVacations,
+  inbox,
   children,
 }: {
   role: AppRole;
@@ -32,6 +33,14 @@ export function AppShell({
   roleLabel: string;
   pendingSignatures: number | null;
   pendingVacations: number;
+  inbox: {
+    id: string;
+    title: string;
+    body: string;
+    href: string | null;
+    createdAt: string;
+    readAt: string | null;
+  }[];
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -136,12 +145,11 @@ export function AppShell({
               <Minimize2 className="h-4 w-4" />
             )}
           </button>
-          {pendingSignatures !== null && (
-            <NotificationPanel
-              pendingControls={pendingSignatures}
-              pendingVacations={pendingVacations}
-            />
-          )}
+          <NotificationPanel
+            pendingControls={pendingSignatures}
+            pendingVacations={pendingVacations}
+            inbox={inbox}
+          />
         </header>
 
         <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">

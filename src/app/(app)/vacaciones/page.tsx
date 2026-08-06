@@ -29,7 +29,7 @@ export default async function VacacionesPage({
         where: { userId_year: { userId: session.user.id, year } },
       }),
       prisma.hourAdjustment.findMany({
-        where: { userId: session.user.id },
+        where: { userId: session.user.id, year },
         include: { createdBy: true },
         orderBy: { createdAt: "desc" },
       }),
@@ -165,6 +165,7 @@ export default async function VacacionesPage({
                 endDate: r.endDate.toISOString(),
                 days: Number(r.days),
                 status: r.status,
+                leaveType: r.leaveType,
                 employeeNotes: r.employeeNotes,
                 rejectionReason: r.rejectionReason,
                 createdAt: r.createdAt.toISOString(),

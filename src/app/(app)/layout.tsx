@@ -21,6 +21,21 @@ export default async function AppLayout({
     ? await prisma.vacationRequest.count({ where: { status: "PENDIENTE" } })
     : 0;
 
+  const inboxRaw = await prisma.notification.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
+
+  const inbox = inboxRaw.map((n) => ({
+    id: n.id,
+    title: n.title,
+    body: n.body,
+    href: n.href,
+    createdAt: n.createdAt.toISOString(),
+    readAt: n.readAt?.toISOString() ?? null,
+  }));
+
   return (
     <AppProviders>
       <AppShell
@@ -33,6 +48,7 @@ export default async function AppLayout({
         }
         pendingSignatures={pendingSignatures}
         pendingVacations={pendingVacations}
+        inbox={inbox}
       >
         {children}
       </AppShell>
