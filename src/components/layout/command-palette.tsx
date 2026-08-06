@@ -130,35 +130,37 @@ export function CommandPalette({ role }: { role: AppRole }) {
         open={open}
         onClose={() => setOpen(false)}
         title="Ir a…"
-        className="max-w-xl bg-[#f4f8fc] shadow-[0_28px_70px_rgba(15,23,42,0.32)]"
+        className="max-w-xl !bg-white !opacity-100 shadow-[0_30px_80px_rgba(15,23,42,0.36)]"
       >
-        <input
-          autoFocus
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Escribe para buscar páginas…"
-          className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
-        />
-        <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/8 bg-white px-1 py-1.5">
-          {filtered.map((item) => {
-            const Icon = item.icon;
-            return (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => go(item.href)}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition hover:bg-brand-navy/6"
-                >
-                  <Icon className="h-4 w-4 text-brand-blue" />
-                  {item.label}
-                </button>
-              </li>
-            );
-          })}
-          {filtered.length === 0 && (
-            <li className="px-3 py-4 text-center text-sm text-slate-500">Sin resultados</li>
-          )}
-        </ul>
+        <div className="rounded-xl bg-white">
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Escribe para buscar páginas…"
+            className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
+          />
+          <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/8 bg-white px-1 py-1.5">
+            {filtered.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => go(item.href)}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition hover:bg-brand-navy/6"
+                  >
+                    <Icon className="h-4 w-4 text-brand-blue" />
+                    {item.label}
+                  </button>
+                </li>
+              );
+            })}
+            {filtered.length === 0 && (
+              <li className="px-3 py-4 text-center text-sm text-slate-500">Sin resultados</li>
+            )}
+          </ul>
+        </div>
       </Modal>
     </>
   );
