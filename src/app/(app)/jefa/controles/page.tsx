@@ -23,10 +23,10 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  BORRADOR: "bg-brand-navy/8 text-slate-600",
-  FIRMADO_EMPLEADO: "bg-amber-500/15 text-amber-800",
-  FIRMADO_RESPONSABLE: "bg-emerald-500/15 text-emerald-800",
-  RECHAZADO: "bg-red-500/15 text-red-800",
+  BORRADOR: "bg-brand-navy/[0.06] text-slate-600",
+  FIRMADO_EMPLEADO: "bg-amber-500/12 text-amber-800",
+  FIRMADO_RESPONSABLE: "bg-emerald-500/12 text-emerald-800",
+  RECHAZADO: "bg-red-500/12 text-red-800",
 };
 
 export default async function ControlesPage({
@@ -251,7 +251,7 @@ function TimeSheetRow({
           {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
         </p>
       </div>
-      <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
+      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
         {STATUS_LABEL[t.status]}
       </span>
     </Link>

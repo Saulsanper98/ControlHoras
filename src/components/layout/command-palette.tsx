@@ -115,12 +115,12 @@ export function CommandPalette({ role }: { role: AppRole }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden h-10 min-w-[180px] items-center gap-2 rounded-xl border border-brand-navy/12 bg-white px-3.5 text-sm text-slate-600 shadow-[0_6px_14px_rgba(15,23,42,0.07)] transition hover:-translate-y-px hover:bg-white hover:shadow-[0_8px_18px_rgba(15,23,42,0.1)] md:flex"
+        className="hidden h-10 min-w-[200px] items-center gap-2 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.05] px-3.5 text-sm text-slate-600 transition hover:bg-brand-navy/[0.08] md:flex"
         title="Buscar (Ctrl+K)"
       >
         <Search className="h-4 w-4 text-brand-blue/85" />
         <span className="flex-1 text-left">Buscar…</span>
-        <kbd className="rounded-md border border-brand-navy/10 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
+        <kbd className="rounded-md border border-brand-navy/10 bg-brand-navy/[0.04] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
           ⌘K
         </kbd>
       </button>
@@ -131,9 +131,9 @@ export function CommandPalette({ role }: { role: AppRole }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Escribe para buscar páginas…"
-          className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
+          className="field-control mb-3 w-full px-3 py-2 text-sm"
         />
-        <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/10 bg-white px-1 py-1.5">
+        <ul className="surface-menu max-h-64 overflow-y-auto rounded-xl px-1 py-1.5">
           {filtered.map((item) => {
             const Icon = item.icon;
             return (

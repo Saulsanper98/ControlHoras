@@ -97,7 +97,7 @@ export function FieldSelect({
         role="listbox"
         aria-labelledby={triggerId}
         style={menuStyle}
-        className="max-h-56 overflow-auto rounded-xl border border-brand-navy/12 bg-white py-1 shadow-[0_12px_32px_rgba(15,23,42,0.16)] ring-1 ring-brand-navy/5"
+        className="surface-menu max-h-56 overflow-auto rounded-xl py-1"
       >
         {options.map((opt) => {
           const active = opt.value === value;

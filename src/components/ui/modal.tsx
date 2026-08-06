@@ -46,7 +46,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative max-h-[min(90vh,40rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-[0_16px_40px_rgba(15,23,42,0.18)] ring-1 ring-brand-navy/10",
+          "relative max-h-[min(90vh,40rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-[#f2f6fa] p-6 shadow-[0_16px_40px_rgba(15,23,42,0.16)] ring-1 ring-brand-navy/10",
           className
         )}
       >

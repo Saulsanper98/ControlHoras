@@ -33,7 +33,7 @@ export function SignatureModal({
     <Modal open onClose={onCancel} title={title} className="max-w-lg">
       <p className="mb-2 text-sm text-slate-500">Firma en el recuadro con el ratón o el dedo.</p>
 
-      <div className="rounded-md border-2 border-dashed border-brand-navy/20 bg-white">
+      <div className="rounded-md border border-dashed border-brand-navy/18 bg-brand-navy/[0.03]">
         <SignatureCanvas
           ref={padRef}
           penColor="#0a2240"

@@ -87,7 +87,7 @@ export function TimeField({
         </button>
       </div>
       {open && !disabled && (
-        <div className="absolute z-50 mt-1 min-w-[16rem] rounded-lg border border-brand-navy/12 bg-[#eef4fa] p-2 shadow-lg">
+        <div className="surface-menu absolute z-50 mt-1 min-w-[16rem] rounded-lg p-2">
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             Hora manual
           </p>

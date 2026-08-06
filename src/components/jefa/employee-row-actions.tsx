@@ -157,7 +157,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => setEditOpen(true)}
         disabled={pending}
-        className="flex items-center gap-1 rounded-md border border-brand-navy/15 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand-navy/5 disabled:opacity-60"
+        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-brand-navy/[0.06] disabled:opacity-60"
       >
         <Pencil className="h-3.5 w-3.5" />
         Editar
@@ -166,7 +166,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={handleToggle}
         disabled={pending}
-        className="flex items-center gap-1 rounded-md border border-brand-navy/15 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand-navy/5 disabled:opacity-60"
+        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-brand-navy/[0.06] disabled:opacity-60"
       >
         {user.active ? <UserX className="h-3.5 w-3.5" /> : <UserCheck className="h-3.5 w-3.5" />}
         {user.active ? "Desactivar" : "Activar"}
@@ -175,7 +175,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={handleResetPassword}
         disabled={pending}
-        className="flex items-center gap-1 rounded-md border border-brand-blue/30 px-2.5 py-1 text-xs font-medium text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
+        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-60"
       >
         <KeyRound className="h-3.5 w-3.5" />
         Reset pass

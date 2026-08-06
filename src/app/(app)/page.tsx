@@ -170,11 +170,11 @@ export default async function DashboardPage() {
       {showManagement && (
         <div className="animate-fade-slide-up space-y-5" style={{ animationDelay: "90ms" }}>
           {(nextPending || nextVacationRequests.length > 0) && (
-            <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+            <div className="divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)]">
               {nextPending && (
                 <Link
                   href={`/jefa/controles/${nextPending.id}`}
-                  className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.035]"
                 >
                   <div>
                     <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
@@ -195,7 +195,7 @@ export default async function DashboardPage() {
                 <Link
                   key={r.id}
                   href="/jefa/vacaciones"
-                  className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.035]"
                 >
                   <div>
                     <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
@@ -208,7 +208,7 @@ export default async function DashboardPage() {
               ))}
             </div>
           )}
-          <div className="grid grid-cols-1 divide-y divide-brand-navy/10 border-y border-brand-navy/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
+          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Controles pendientes de firmar"
               value={String(pendientes)}
@@ -238,7 +238,7 @@ export default async function DashboardPage() {
               Mi resumen personal
             </h2>
           )}
-          <div className="grid grid-cols-1 divide-y divide-brand-navy/10 border-y border-brand-navy/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
+          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Control horario de este mes"
               value={timeSheet ? STATUS_LABEL[timeSheet.status] : "Sin empezar"}
@@ -297,12 +297,12 @@ function NewsSection({
           description="Cuando la responsable publique novedades, aparecerán aquí."
         />
       ) : (
-        <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+        <div className="divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)]">
           {news.map((item) => (
             <Link
               key={item.id}
               href={`/noticias/${item.id}`}
-              className="block py-3 transition hover:bg-brand-navy/[0.03]"
+              className="block py-3.5 transition hover:bg-brand-navy/[0.035]"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium text-brand-navy">{item.title}</p>

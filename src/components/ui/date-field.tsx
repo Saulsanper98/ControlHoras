@@ -160,7 +160,7 @@ export function DateField({
         <div
           role="dialog"
           aria-label={label ?? "Calendario"}
-          className="absolute z-50 mt-2 w-[17.5rem] rounded-xl border border-brand-navy/12 bg-[#eef4fa] p-3 shadow-xl ring-1 ring-brand-navy/5 animate-fade-slide-up"
+          className="surface-menu absolute z-50 mt-2 w-[17.5rem] rounded-xl p-3 animate-fade-slide-up"
         >
           <div className="mb-3 flex items-center justify-between">
             <button

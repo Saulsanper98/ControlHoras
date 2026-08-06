@@ -112,8 +112,8 @@ function EmployeeRow({
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            user.active ? "bg-emerald-500/15 text-emerald-800" : "bg-brand-navy/8 text-slate-500"
+          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+            user.active ? "bg-emerald-500/12 text-emerald-800" : "bg-brand-navy/[0.06] text-slate-500"
           }`}
         >
           {user.active ? "Activo" : "Inactivo"}

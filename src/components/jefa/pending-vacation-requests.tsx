@@ -106,7 +106,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 onClick={() => setRejectId(r.id)}
                 disabled={pending}
-                className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 ring-1 ring-red-300/70 hover:bg-red-50 disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-500/10 disabled:opacity-60"
               >
                 <XCircle className="h-4 w-4" />
                 Rechazar

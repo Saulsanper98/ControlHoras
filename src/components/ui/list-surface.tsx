@@ -9,7 +9,12 @@ export function ListSurface({
   className?: string;
 }) {
   return (
-    <div className={cn("divide-y divide-brand-navy/10 border-y border-brand-navy/10", className)}>
+    <div
+      className={cn(
+        "divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)]",
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -28,8 +33,8 @@ export function ListRow({
   return (
     <div
       className={cn(
-        "py-3",
-        interactive && "transition hover:bg-brand-navy/[0.03]",
+        "py-3.5",
+        interactive && "transition hover:bg-brand-navy/[0.035]",
         className
       )}
     >
@@ -47,7 +52,14 @@ export function SectionBlock({
   className?: string;
 }) {
   return (
-    <div className={cn("border-y border-brand-navy/10 py-4", className)}>{children}</div>
+    <div
+      className={cn(
+        "border-y border-[color:var(--surface-divider)] py-4",
+        className
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -60,7 +72,12 @@ export function TableSurface({
   className?: string;
 }) {
   return (
-    <div className={cn("overflow-x-auto border-y border-brand-navy/10", className)}>
+    <div
+      className={cn(
+        "overflow-x-auto border-y border-[color:var(--surface-divider)]",
+        className
+      )}
+    >
       {children}
     </div>
   );

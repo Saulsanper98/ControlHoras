@@ -102,7 +102,7 @@ export default async function VacacionesPage({
         </PageHeader>
       </Stagger>
 
-      <div className="grid grid-cols-1 divide-y divide-brand-navy/10 border-y border-brand-navy/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
         <div className="flex items-center gap-4 py-5 sm:pr-5">
           <Umbrella className="h-5 w-5 shrink-0 text-brand-blue" />
           <div className="min-w-0 flex-1">
@@ -129,7 +129,7 @@ export default async function VacacionesPage({
         </div>
       </div>
 
-      <section className="border-y border-brand-navy/10 py-4">
+      <section className="border-y border-[color:var(--surface-divider)] py-4">
         <VacationTimeline
           year={year}
           requests={vacationRequests.map((r) => ({
@@ -142,7 +142,7 @@ export default async function VacacionesPage({
       </section>
 
       {balance?.notes && (
-        <section className="border-y border-brand-navy/10 py-4">
+        <section className="border-y border-[color:var(--surface-divider)] py-4">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
             Notas de la responsable
           </p>
