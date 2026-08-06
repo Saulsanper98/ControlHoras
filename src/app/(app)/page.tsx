@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Card, StatCard } from "@/components/ui/card";
+import { StatCard } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
 import { formatRelativeTime } from "@/lib/format-relative-time";
@@ -154,60 +154,61 @@ export default async function DashboardPage() {
       </Stagger>
 
       {showPersonal && timeSheet?.status === "RECHAZADO" && (
-        <Link href="/control-horario" className="block">
-          <Card className="glass-panel-lift border-red-300/50 bg-red-500/8">
-            <p className="text-sm font-medium text-red-800">Tu control horario fue rechazado</p>
-            <p className="mt-1 text-sm text-brand-navy">
-              {timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}
-            </p>
-            <p className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue">
-              Ir a corregir <ArrowRight className="h-4 w-4" />
-            </p>
-          </Card>
+        <Link
+          href="/control-horario"
+          className="block rounded-2xl bg-red-500/10 px-4 py-3 ring-1 ring-red-300/40 transition hover:bg-red-500/14"
+        >
+          <p className="text-sm font-medium text-red-800">Tu control horario fue rechazado</p>
+          <p className="mt-1 text-sm text-brand-navy">
+            {timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}
+          </p>
+          <p className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue">
+            Ir a corregir <ArrowRight className="h-4 w-4" />
+          </p>
         </Link>
       )}
       {showManagement && (
-        <div className="animate-fade-slide-up" style={{ animationDelay: "90ms" }}>
-          {showPersonal && (
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
-              Resumen de gestión
-            </h2>
-          )}
-          {nextPending && (
-            <Link href={`/jefa/controles/${nextPending.id}`} className="mb-4 block">
-              <Card className="glass-panel-lift flex items-center justify-between gap-3 border-brand-blue/30 bg-brand-blue/5">
-                <div>
-                  <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
-                  <p className="font-semibold text-brand-navy">
-                    {nextPending.user.name} · {MONTH_NAMES[nextPending.month - 1]} de {nextPending.year}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {nextPending.user.department?.name ?? "—"}
-                    {pendingVacations > 0 && ` · ${pendingVacations} solicitud${pendingVacations === 1 ? "" : "es"} de vacaciones pendiente${pendingVacations === 1 ? "" : "s"}`}
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 shrink-0 text-brand-blue" />
-              </Card>
-            </Link>
-          )}
-          {nextVacationRequests.length > 0 && (
-            <div className="mb-4 space-y-2">
+        <div className="animate-fade-slide-up space-y-5" style={{ animationDelay: "90ms" }}>
+          {(nextPending || nextVacationRequests.length > 0) && (
+            <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+              {nextPending && (
+                <Link
+                  href={`/jefa/controles/${nextPending.id}`}
+                  className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
+                    <p className="font-semibold text-brand-navy">
+                      {nextPending.user.name} · {MONTH_NAMES[nextPending.month - 1]} de{" "}
+                      {nextPending.year}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {nextPending.user.department?.name ?? "—"}
+                      {pendingVacations > 0 &&
+                        ` · ${pendingVacations} solicitud${pendingVacations === 1 ? "" : "es"} de vacaciones pendiente${pendingVacations === 1 ? "" : "s"}`}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-brand-blue" />
+                </Link>
+              )}
               {nextVacationRequests.map((r) => (
-                <Link key={r.id} href="/jefa/vacaciones" className="block">
-                  <Card className="glass-panel-lift flex items-center justify-between gap-3 border-amber-300/40 bg-amber-500/8">
-                    <div>
-                      <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
-                      <p className="font-semibold text-brand-navy">
-                        {r.user.name} · {Number(r.days)} días
-                      </p>
-                    </div>
-                    <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
-                  </Card>
+                <Link
+                  key={r.id}
+                  href="/jefa/vacaciones"
+                  className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
+                    <p className="font-semibold text-brand-navy">
+                      {r.user.name} · {Number(r.days)} días
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
                 </Link>
               ))}
             </div>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 divide-y divide-brand-navy/10 border-y border-brand-navy/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Controles pendientes de firmar"
               value={String(pendientes)}
@@ -237,7 +238,7 @@ export default async function DashboardPage() {
               Mi resumen personal
             </h2>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 divide-y divide-brand-navy/10 border-y border-brand-navy/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Control horario de este mes"
               value={timeSheet ? STATUS_LABEL[timeSheet.status] : "Sin empezar"}
@@ -290,27 +291,27 @@ function NewsSection({
         </Link>
       </div>
       {news.length === 0 ? (
-        <Card>
-          <EmptyState
-            icon={Newspaper}
-            title="Sin noticias todavía"
-            description="Cuando la responsable publique novedades, aparecerán aquí."
-          />
-        </Card>
+        <EmptyState
+          icon={Newspaper}
+          title="Sin noticias todavía"
+          description="Cuando la responsable publique novedades, aparecerán aquí."
+        />
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
           {news.map((item) => (
-            <Card key={item.id} className="glass-panel-lift group">
+            <Link
+              key={item.id}
+              href={`/noticias/${item.id}`}
+              className="block py-3 transition hover:bg-brand-navy/[0.03]"
+            >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium text-brand-navy">{item.title}</p>
                 <span className="shrink-0 text-xs text-slate-400">
                   {formatRelativeTime(item.publishedAt)}
                 </span>
               </div>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-500 transition group-hover:line-clamp-none">
-                {item.body}
-              </p>
-            </Card>
+              <p className="mt-1 line-clamp-2 text-sm text-slate-500">{item.body}</p>
+            </Link>
           ))}
         </div>
       )}

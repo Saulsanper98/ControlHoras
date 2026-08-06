@@ -23,12 +23,14 @@ export function TimeField({
   disabled,
   className,
   id,
+  variant = "default",
 }: {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   className?: string;
   id?: string;
+  variant?: "default" | "plain";
 }) {
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -69,13 +71,16 @@ export function TimeField({
             if (!value) return;
             if (normalized) onChange(normalized);
           }}
-          className="field-control field-time w-full min-h-8 pr-14 pl-2 py-1 text-sm font-medium tabular-nums text-brand-navy disabled:opacity-50"
+          className={cn(
+            "field-time w-full min-h-8 pr-10 pl-2 py-1 text-sm font-medium tabular-nums text-brand-navy disabled:opacity-50",
+            variant === "plain" ? "field-control-plain" : "field-control"
+          )}
         />
         <button
           type="button"
           disabled={disabled}
           onClick={() => setOpen((v) => !v)}
-          className="absolute right-1 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-brand-navy/6 hover:text-brand-blue disabled:opacity-40"
+          className="absolute right-0.5 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-brand-navy/6 hover:text-brand-blue disabled:opacity-40"
           aria-label="Horas rápidas"
         >
           <Clock className="h-3.5 w-3.5" />

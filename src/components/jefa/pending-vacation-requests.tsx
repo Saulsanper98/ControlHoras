@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, XCircle } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
 import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
 } from "@/app/(app)/jefa/vacaciones/request-actions";
+import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 
 type PendingRequest = {
   id: string;
@@ -71,11 +73,11 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         Solicitudes pendientes ({requests.length})
       </h2>
       {message && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>}
-      <div className="space-y-2">
+      <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
         {requests.map((r) => (
           <div
             key={r.id}
-            className="glass-panel flex flex-wrap items-center justify-between gap-3 rounded-xl p-4"
+            className="flex flex-wrap items-center justify-between gap-3 py-3"
           >
             <div>
               <p className="font-medium text-brand-navy">{r.userName}</p>
@@ -83,7 +85,9 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 {r.departmentName ?? "—"} ·{" "}
                 {new Date(r.startDate).toLocaleDateString("es-ES")} –{" "}
                 {new Date(r.endDate).toLocaleDateString("es-ES")} ({r.days} días)
-                {r.leaveType && r.leaveType !== "VACACIONES" ? ` · ${r.leaveType}` : ""}
+                {r.leaveType && r.leaveType !== "VACACIONES"
+                  ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
+                  : ""}
               </p>
               {r.employeeNotes && <p className="text-xs text-slate-500">{r.employeeNotes}</p>}
             </div>
@@ -92,7 +96,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 onClick={() => handleApprove(r.id)}
                 disabled={pending}
-                className="flex items-center gap-1 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
               >
                 <Check className="h-4 w-4" />
                 Aprobar
@@ -101,7 +105,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 onClick={() => setRejectId(r.id)}
                 disabled={pending}
-                className="flex items-center gap-1 rounded-md border border-red-300 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 ring-1 ring-red-300/70 hover:bg-red-50 disabled:opacity-60"
               >
                 <XCircle className="h-4 w-4" />
                 Rechazar
@@ -111,10 +115,13 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         ))}
       </div>
 
-      {overlapPrompt && (
-        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/45 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
-            <h3 className="mb-2 text-lg font-semibold text-brand-navy">Posible solape de equipo</h3>
+      <Modal
+        open={Boolean(overlapPrompt)}
+        onClose={() => setOverlapPrompt(null)}
+        title="Posible solape de equipo"
+      >
+        {overlapPrompt && (
+          <div>
             <p className="mb-3 text-sm text-slate-600">{overlapPrompt.warning}</p>
             <ul className="mb-4 max-h-40 space-y-1 overflow-y-auto text-sm text-slate-600">
               {overlapPrompt.overlaps.map((o, idx) => (
@@ -128,7 +135,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
               <button
                 type="button"
                 onClick={() => setOverlapPrompt(null)}
-                className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
               >
                 Cancelar
               </button>
@@ -136,46 +143,45 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 disabled={pending}
                 onClick={() => handleApprove(overlapPrompt.id, true)}
-                className="rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
               >
                 Aprobar igual
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
-      {rejectId && (
-        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
-            <h3 className="mb-3 text-lg font-semibold text-brand-navy">Rechazar solicitud</h3>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Motivo (opcional)"
-              rows={3}
-              className="field-control w-full rounded-md px-3 py-2 text-sm"
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setRejectId(null)}
-                className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleReject}
-                disabled={pending}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
-              >
-                Rechazar
-              </button>
-            </div>
-          </div>
+      <Modal
+        open={Boolean(rejectId)}
+        onClose={() => setRejectId(null)}
+        title="Rechazar solicitud"
+      >
+        <textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Motivo (opcional)"
+          rows={3}
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setRejectId(null)}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleReject}
+            disabled={pending}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+          >
+            Rechazar
+          </button>
         </div>
-      )}
+      </Modal>
     </section>
   );
 }

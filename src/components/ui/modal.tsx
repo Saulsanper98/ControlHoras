@@ -34,11 +34,11 @@ export function Modal({
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 bg-[#0a2240]/70"
+        className="absolute inset-0 bg-slate-900/35"
         onClick={onClose}
       />
       <div
@@ -46,15 +46,9 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative w-full max-w-md rounded-2xl p-6 ring-1 ring-brand-navy/10",
+          "relative max-h-[min(90vh,40rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-[0_16px_40px_rgba(15,23,42,0.18)] ring-1 ring-brand-navy/10",
           className
         )}
-        style={{
-          backgroundColor: "#ffffff",
-          opacity: 1,
-          boxShadow: "0 28px 70px rgba(10, 34, 64, 0.35)",
-          isolation: "isolate",
-        }}
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <h2 id="modal-title" className="font-display text-lg font-semibold text-brand-navy">

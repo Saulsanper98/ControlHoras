@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CalendarPlus, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
+import { FieldSelect } from "@/components/ui/field-select";
 import { countVacationDays } from "@/lib/holidays";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
@@ -189,19 +190,19 @@ export function VacationRequestsPanel({
         <div className="space-y-4">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
-            <select
+            <FieldSelect
               value={leaveType}
-              onChange={(e) => {
-                const v = e.target.value as typeof leaveType;
-                setLeaveType(v);
-                if (v === "MEDIO_DIA" && startDate) setEndDate(startDate);
+              onChange={(v) => {
+                const next = v as typeof leaveType;
+                setLeaveType(next);
+                if (next === "MEDIO_DIA" && startDate) setEndDate(startDate);
               }}
-              className="field-control w-full px-3 py-2 text-sm"
-            >
-              <option value="VACACIONES">Vacaciones</option>
-              <option value="ASUNTOS_PROPIOS">Asuntos propios</option>
-              <option value="MEDIO_DIA">Medio día</option>
-            </select>
+              options={[
+                { value: "VACACIONES", label: "Vacaciones" },
+                { value: "ASUNTOS_PROPIOS", label: "Asuntos propios" },
+                { value: "MEDIO_DIA", label: "Medio día" },
+              ]}
+            />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <DateField

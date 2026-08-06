@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { PenLine, XCircle } from "lucide-react";
 import { SignatureModal } from "@/components/signature/signature-pad";
+import { Modal } from "@/components/ui/modal";
 import { rejectTimeSheetAction, signAsResponsableAction } from "@/app/(app)/jefa/controles/actions";
 
 export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
@@ -76,37 +77,36 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
         />
       )}
 
-      {showReject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="glass-panel w-full max-w-md rounded-2xl p-5">
-            <h3 className="mb-3 text-lg font-semibold text-brand-navy">Rechazar control horario</h3>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Motivo (opcional)"
-              rows={3}
-              className="surface-input w-full rounded-md px-3 py-2 text-sm"
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowReject(false)}
-                className="surface-btn rounded-md px-4 py-2 text-sm font-medium text-slate-600"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleReject}
-                disabled={pending}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
-              >
-                {pending ? "Rechazando..." : "Rechazar"}
-              </button>
-            </div>
-          </div>
+      <Modal
+        open={showReject}
+        onClose={() => setShowReject(false)}
+        title="Rechazar control horario"
+      >
+        <textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Motivo (opcional)"
+          rows={3}
+          className="field-control w-full rounded-md px-3 py-2 text-sm"
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setShowReject(false)}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleReject}
+            disabled={pending}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+          >
+            {pending ? "Rechazando..." : "Rechazar"}
+          </button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

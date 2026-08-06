@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, CalendarDays } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { PendingVacationRequests } from "@/components/jefa/pending-vacation-requests";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
@@ -65,42 +64,42 @@ export default async function JefaVacacionesPage() {
         }))}
       />
 
-      <div className="space-y-2">
+      <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
         {employees.map((e) => {
           const balance = balanceByUser.get(e.id);
           const remaining = balance ? Number(balance.totalDays) - Number(balance.usedDays) : null;
           const hours = hoursByUser.get(e.id) ?? 0;
           return (
-            <Link key={e.id} href={`/jefa/vacaciones/${e.id}`}>
-              <Card className="flex items-center justify-between transition hover:border-brand-blue">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-brand-blue/10 p-2 text-brand-blue">
-                    <Umbrella className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-brand-navy">{e.name}</p>
-                    <p className="text-sm text-slate-500">{e.department?.name ?? "—"}</p>
-                  </div>
-                </div>
-                <div className="flex gap-6 text-right text-sm">
-                  <div>
-                    <p className="text-slate-500">Vacaciones</p>
-                    <p className="font-medium text-brand-navy">
-                      {remaining !== null ? `${remaining} días` : "Sin datos"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Bolsa de horas</p>
-                    <p className="font-medium text-brand-navy">{hours.toFixed(1)} h</p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          );
-        })}
-        {employees.length === 0 && (
-          <Card className="text-sm text-slate-500">No hay empleados dados de alta.</Card>
-        )}
+            <Link
+              key={e.id}
+              href={`/jefa/vacaciones/${e.id}`}
+            className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+          >
+            <div className="flex items-center gap-3">
+              <Umbrella className="h-4 w-4 text-brand-blue" />
+              <div>
+                <p className="font-medium text-brand-navy">{e.name}</p>
+                <p className="text-sm text-slate-500">{e.department?.name ?? "—"}</p>
+              </div>
+            </div>
+            <div className="flex gap-6 text-right text-sm">
+              <div>
+                <p className="text-xs text-slate-500">Vacaciones</p>
+                <p className="font-medium tabular-nums text-brand-navy">
+                  {remaining !== null ? `${remaining} días` : "Sin datos"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Bolsa</p>
+                <p className="font-medium tabular-nums text-brand-navy">{hours.toFixed(1)} h</p>
+              </div>
+            </div>
+          </Link>
+        );
+      })}
+      {employees.length === 0 && (
+        <p className="py-6 text-sm text-slate-500">No hay empleados dados de alta.</p>
+      )}
       </div>
     </div>
   );

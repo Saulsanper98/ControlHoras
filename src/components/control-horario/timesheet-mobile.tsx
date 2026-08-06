@@ -36,7 +36,7 @@ export function TimeSheetMobileDays({
   shiftKeyForEntry: (entry: Entry) => ShiftKey;
 }) {
   return (
-    <div className="space-y-2 md:hidden">
+    <div className="divide-y divide-brand-navy/8 md:hidden">
       {entries.map((entry) => {
         const hours = calculateDayHours(entry.checkIn, entry.checkOut);
         const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
@@ -54,9 +54,9 @@ export function TimeSheetMobileDays({
         return (
           <div
             key={entry.day}
-            className={`rounded-xl border border-brand-navy/10 p-3 ${
-              holidayName ? "row-holiday" : isWeekend ? "row-weekend" : "bg-white/30"
-            } ${isToday ? "ring-2 ring-brand-blue/30" : ""}`}
+            className={`px-4 py-3 ${
+              holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
+            } ${isToday ? "bg-brand-blue/[0.04]" : ""}`}
           >
             <div className="mb-2 flex items-center justify-between">
               <span className="font-semibold text-brand-navy">
@@ -75,6 +75,7 @@ export function TimeSheetMobileDays({
               onChange={(v) => onApplyShift(entry.day, v as ShiftKey)}
               options={rowOptions}
               size="sm"
+              variant="plain"
               className="mb-2"
             />
             <div className="grid grid-cols-2 gap-2">
@@ -82,11 +83,13 @@ export function TimeSheetMobileDays({
                 disabled={!editable}
                 value={entry.checkIn}
                 onChange={(v) => onUpdate(entry.day, { checkIn: v })}
+                variant="plain"
               />
               <TimeField
                 disabled={!editable}
                 value={entry.checkOut}
                 onChange={(v) => onUpdate(entry.day, { checkOut: v })}
+                variant="plain"
               />
             </div>
             <p className="mt-2 text-xs tabular-nums text-slate-500">

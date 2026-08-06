@@ -15,7 +15,6 @@ import {
   Copy,
   Loader2,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { FieldSelect } from "@/components/ui/field-select";
 import { TimeField } from "@/components/ui/time-field";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
@@ -327,7 +326,7 @@ export function TimeSheetForm({
 
   return (
     <div className="space-y-4">
-      <Card className="overflow-hidden p-0">
+      <div className="overflow-hidden rounded-2xl bg-[#e8f0f8]/90 ring-1 ring-brand-navy/10">
         {/* Cabecera + resumen + herramientas en un solo bloque */}
         <div className="border-b border-brand-navy/10 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -546,6 +545,7 @@ export function TimeSheetForm({
                         onChange={(v) => applyShiftToEntry(entry.day, v as ShiftKey)}
                         options={rowOptions}
                         size="sm"
+                        variant="plain"
                         className="w-28"
                       />
                     </td>
@@ -554,6 +554,7 @@ export function TimeSheetForm({
                         disabled={!editable}
                         value={entry.checkIn}
                         onChange={(v) => updateEntry(entry.day, { checkIn: v })}
+                        variant="plain"
                         className="w-28"
                       />
                     </td>
@@ -562,6 +563,7 @@ export function TimeSheetForm({
                         disabled={!editable}
                         value={entry.checkOut}
                         onChange={(v) => updateEntry(entry.day, { checkOut: v })}
+                        variant="plain"
                         className="w-28"
                       />
                     </td>
@@ -575,7 +577,8 @@ export function TimeSheetForm({
                         disabled={!editable}
                         value={entry.notes}
                         onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
-                        className="field-control w-full min-w-[100px] px-2 py-1 text-sm"
+                        className="field-control-plain w-full min-w-[100px] px-2 py-1 text-sm"
+                        placeholder="—"
                       />
                     </td>
                   </tr>
@@ -720,7 +723,7 @@ export function TimeSheetForm({
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
       {message && (
         <p
