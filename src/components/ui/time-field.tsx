@@ -6,6 +6,17 @@ import { cn } from "@/lib/utils";
 
 const PRESETS = ["06:00", "14:00", "22:00", "00:00"];
 
+function normalizeTime(raw: string) {
+  const value = raw.trim();
+  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
 export function TimeField({
   value,
   onChange,
@@ -23,6 +34,11 @@ export function TimeField({
   const inputId = id ?? autoId;
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [manualValue, setManualValue] = useState(value);
+
+  useEffect(() => {
+    setManualValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (!open) return;
@@ -55,24 +71,63 @@ export function TimeField({
         </button>
       </div>
       {open && !disabled && (
-        <div className="absolute z-50 mt-1 flex gap-1 rounded-lg border border-brand-navy/12 bg-[#eef4fa] p-1.5 shadow-lg">
-          {PRESETS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => {
-                onChange(t);
+        <div className="absolute z-50 mt-1 min-w-[16rem] rounded-lg border border-brand-navy/12 bg-[#eef4fa] p-2 shadow-lg">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Hora manual
+          </p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={manualValue}
+              onChange={(e) => setManualValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                const normalized = normalizeTime(manualValue);
+                if (!normalized) return;
+                onChange(normalized);
                 setOpen(false);
               }}
-              className={`rounded-md px-2 py-1 text-xs font-medium tabular-nums transition ${
-                value === t
-                  ? "bg-brand-blue text-white"
-                  : "text-brand-navy hover:bg-brand-navy/8"
-              }`}
+              placeholder="HH:MM"
+              inputMode="numeric"
+              className="field-control h-8 flex-1 px-2 text-sm tabular-nums text-brand-navy"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const normalized = normalizeTime(manualValue);
+                if (!normalized) return;
+                onChange(normalized);
+                setOpen(false);
+              }}
+              className="rounded-md bg-brand-blue px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-blue/90"
             >
-              {t}
+              Aplicar
             </button>
-          ))}
+          </div>
+
+          <p className="mb-1 mt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Horas predeterminadas
+          </p>
+          <div className="flex gap-1">
+            {PRESETS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => {
+                  onChange(t);
+                  setOpen(false);
+                }}
+                className={`rounded-md px-2 py-1 text-xs font-medium tabular-nums transition ${
+                  value === t
+                    ? "bg-brand-blue text-white"
+                    : "text-brand-navy hover:bg-brand-navy/8"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
