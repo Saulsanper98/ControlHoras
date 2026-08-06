@@ -32,6 +32,11 @@ export async function uploadScheduleAction(
     throw err;
   }
 
+  const previous = await prisma.schedule.findFirst({
+    where: { departmentId },
+    orderBy: { createdAt: "desc" },
+  });
+
   await prisma.schedule.create({
     data: {
       departmentId,
@@ -41,6 +46,11 @@ export async function uploadScheduleAction(
       uploadedById: session.user.id,
     },
   });
+
+  if (previous) {
+    await prisma.schedule.delete({ where: { id: previous.id } });
+    await deleteUploadedFile(previous.filePath);
+  }
 
   revalidatePath("/jefa/horarios");
   revalidatePath("/horario");

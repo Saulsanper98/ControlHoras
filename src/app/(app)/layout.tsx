@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canManage } from "@/lib/roles";
 import { AppShell } from "@/components/layout/app-shell";
+import { ToastProvider } from "@/components/ui/toast";
 
 export default async function AppLayout({
   children,
@@ -17,17 +18,19 @@ export default async function AppLayout({
     : null;
 
   return (
-    <AppShell
-      role={session.user.role}
-      userName={session.user.name ?? ""}
-      roleLabel={
-        session.user.role === "JEFA"
-          ? "Responsable"
-          : session.user.departmentName ?? "Empleado"
-      }
-      pendingSignatures={pendingSignatures}
-    >
-      {children}
-    </AppShell>
+    <ToastProvider>
+      <AppShell
+        role={session.user.role}
+        userName={session.user.name ?? ""}
+        roleLabel={
+          session.user.role === "JEFA"
+            ? "Responsable"
+            : session.user.departmentName ?? "Empleado"
+        }
+        pendingSignatures={pendingSignatures}
+      >
+        {children}
+      </AppShell>
+    </ToastProvider>
   );
 }

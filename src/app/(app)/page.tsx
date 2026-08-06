@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ClipboardList, Umbrella, Clock, Users, Newspaper } from "lucide-react";
+import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, StatCard } from "@/components/ui/card";
@@ -42,7 +42,7 @@ export default async function DashboardPage() {
   const showManagement = canManage(role);
   const showPersonal = hasOwnEmployeeData(role);
 
-  const [managementStats, personalStats] = await Promise.all([
+  const [managementStats, personalStats, nextPending, pendingVacations] = await Promise.all([
     showManagement
       ? Promise.all([
           prisma.timeSheet.count({ where: { status: "FIRMADO_EMPLEADO" } }),
@@ -64,6 +64,16 @@ export default async function DashboardPage() {
           }),
         ])
       : null,
+    showManagement
+      ? prisma.timeSheet.findFirst({
+          where: { status: "FIRMADO_EMPLEADO" },
+          orderBy: { submittedAt: "asc" },
+          include: { user: { include: { department: true } } },
+        })
+      : null,
+    showManagement
+      ? prisma.vacationRequest.count({ where: { status: "PENDIENTE" } })
+      : 0,
   ]);
 
   const [pendientes, empleados, controlesDelMes] = managementStats ?? [0, 0, 0];
@@ -100,6 +110,36 @@ export default async function DashboardPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
               Resumen de gestión
             </h2>
+          )}
+          {nextPending && (
+            <Link href={`/jefa/controles/${nextPending.id}`} className="mb-4 block">
+              <Card className="flex items-center justify-between gap-3 border-brand-blue/30 bg-brand-blue/5 transition hover:border-brand-blue">
+                <div>
+                  <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
+                  <p className="font-semibold text-brand-navy">
+                    {nextPending.user.name} · {MONTH_NAMES[nextPending.month - 1]} de {nextPending.year}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {nextPending.user.department?.name ?? "—"}
+                    {pendingVacations > 0 && ` · ${pendingVacations} solicitud${pendingVacations === 1 ? "" : "es"} de vacaciones pendiente${pendingVacations === 1 ? "" : "s"}`}
+                  </p>
+                </div>
+                <ArrowRight className="h-5 w-5 shrink-0 text-brand-blue" />
+              </Card>
+            </Link>
+          )}
+          {!nextPending && pendingVacations > 0 && (
+            <Link href="/jefa/vacaciones" className="mb-4 block">
+              <Card className="flex items-center justify-between gap-3 border-amber-300/50 bg-amber-500/10 transition hover:border-amber-400">
+                <div>
+                  <p className="text-sm font-medium text-amber-800">Solicitudes de vacaciones</p>
+                  <p className="font-semibold text-brand-navy">
+                    {pendingVacations} pendiente{pendingVacations === 1 ? "" : "s"} de revisión
+                  </p>
+                </div>
+                <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
+              </Card>
+            </Link>
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Users, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { EmployeeRowActions } from "@/components/jefa/employee-row-actions";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 type EmployeeRowUser = {
@@ -107,6 +108,7 @@ function EmployeeRow({ user }: { user: EmployeeRowUser }) {
       >
         {user.active ? "Activo" : "Inactivo"}
       </span>
+      <EmployeeRowActions userId={user.id} active={user.active} />
     </Card>
   );
 }
