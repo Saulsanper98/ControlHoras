@@ -10,7 +10,16 @@ import { prisma } from "@/lib/prisma";
 // por temporización. El valor no corresponde a ninguna contraseña real.
 const DUMMY_HASH = "$2b$10$CwTycUXWue0Thq9StjUM0uJ8Q0f6a6b8I8/6t3aRMdT8FRZ5uT.Nm";
 
+// AUTH_SECRET es obligatorio en producción. En desarrollo, si falta .env,
+// usamos un valor fijo solo para no romper `next dev` (p. ej. MissingSecret).
+const authSecret =
+  process.env.AUTH_SECRET ??
+  (process.env.NODE_ENV === "production"
+    ? undefined
+    : "dev-only-insecure-auth-secret-change-me");
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: authSecret,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
