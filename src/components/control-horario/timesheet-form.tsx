@@ -425,7 +425,6 @@ export function TimeSheetForm({
                   type="checkbox"
                   checked={weekdaysOnly}
                   onChange={(e) => setWeekdaysOnly(e.target.checked)}
-                  className="h-4 w-4 rounded border-brand-navy/25 text-brand-blue focus:ring-brand-blue"
                 />
                 Solo L–V
               </label>

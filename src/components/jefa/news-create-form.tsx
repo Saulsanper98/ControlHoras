@@ -47,11 +47,11 @@ export function NewsCreateForm() {
         <div className="flex flex-wrap items-center gap-4">
           <input type="file" name="image" accept="image/*" className="text-xs text-slate-500" />
           <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" name="pinned" className="rounded border-brand-navy/25" />
+            <input type="checkbox" name="pinned" className="accent-brand-blue" />
             Fijar arriba
           </label>
           <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" name="draft" className="rounded border-brand-navy/25" />
+            <input type="checkbox" name="draft" className="accent-brand-blue" />
             Guardar como borrador
           </label>
           <input

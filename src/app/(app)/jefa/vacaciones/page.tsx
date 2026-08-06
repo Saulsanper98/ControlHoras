@@ -12,7 +12,8 @@ export default async function JefaVacacionesPage() {
 
   const year = new Date().getFullYear();
 
-  const [employees, balances, adjustmentSums, pendingRequests] = await Promise.all([
+  const [departments, employees, balances, adjustmentSums, pendingRequests] = await Promise.all([
+    prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.user.findMany({
       where: { role: "EMPLEADO", active: true },
       include: { department: true },
@@ -34,8 +35,50 @@ export default async function JefaVacacionesPage() {
   const balanceByUser = new Map(balances.map((b) => [b.userId, b]));
   const hoursByUser = new Map(adjustmentSums.map((a) => [a.userId, Number(a._sum.hours ?? 0)]));
 
+  type Emp = (typeof employees)[number];
+  const byDept = new Map<string, Emp[]>();
+  const noDept: Emp[] = [];
+  for (const e of employees) {
+    if (!e.departmentId) {
+      noDept.push(e);
+      continue;
+    }
+    const list = byDept.get(e.departmentId) ?? [];
+    list.push(e);
+    byDept.set(e.departmentId, list);
+  }
+
+  function EmployeeLink({ e }: { e: Emp }) {
+    const balance = balanceByUser.get(e.id);
+    const remaining = balance ? Number(balance.totalDays) - Number(balance.usedDays) : null;
+    const hours = hoursByUser.get(e.id) ?? 0;
+    return (
+      <Link
+        href={`/jefa/vacaciones/${e.id}`}
+        className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.035]"
+      >
+        <div className="flex items-center gap-3">
+          <Umbrella className="h-4 w-4 text-brand-blue" />
+          <p className="font-medium text-brand-navy">{e.name}</p>
+        </div>
+        <div className="flex gap-6 text-right text-sm">
+          <div>
+            <p className="text-xs text-slate-500">Vacaciones</p>
+            <p className="font-medium tabular-nums text-brand-navy">
+              {remaining !== null ? `${remaining} días` : "Sin datos"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">Bolsa</p>
+            <p className="font-medium tabular-nums text-brand-navy">{hours.toFixed(1)} h</p>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
@@ -65,43 +108,41 @@ export default async function JefaVacacionesPage() {
         }))}
       />
 
-      <ListSurface>
-        {employees.map((e) => {
-          const balance = balanceByUser.get(e.id);
-          const remaining = balance ? Number(balance.totalDays) - Number(balance.usedDays) : null;
-          const hours = hoursByUser.get(e.id) ?? 0;
-          return (
-            <Link
-              key={e.id}
-              href={`/jefa/vacaciones/${e.id}`}
-              className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
-            >
-              <div className="flex items-center gap-3">
-                <Umbrella className="h-4 w-4 text-brand-blue" />
-                <div>
-                  <p className="font-medium text-brand-navy">{e.name}</p>
-                  <p className="text-sm text-slate-500">{e.department?.name ?? "—"}</p>
-                </div>
-              </div>
-              <div className="flex gap-6 text-right text-sm">
-                <div>
-                  <p className="text-xs text-slate-500">Vacaciones</p>
-                  <p className="font-medium tabular-nums text-brand-navy">
-                    {remaining !== null ? `${remaining} días` : "Sin datos"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Bolsa</p>
-                  <p className="font-medium tabular-nums text-brand-navy">{hours.toFixed(1)} h</p>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-        {employees.length === 0 && (
-          <p className="py-6 text-sm text-slate-500">No hay empleados dados de alta.</p>
-        )}
-      </ListSurface>
+      {departments.map((dept) => {
+        const list = byDept.get(dept.id) ?? [];
+        if (list.length === 0) return null;
+        return (
+          <section key={dept.id}>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
+              {dept.name} ({list.length})
+            </h2>
+            <ListSurface>
+              {list.map((e) => (
+                <EmployeeLink key={e.id} e={e} />
+              ))}
+            </ListSurface>
+          </section>
+        );
+      })}
+
+      {noDept.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Sin departamento ({noDept.length})
+          </h2>
+          <ListSurface>
+            {noDept.map((e) => (
+              <EmployeeLink key={e.id} e={e} />
+            ))}
+          </ListSurface>
+        </section>
+      )}
+
+      {employees.length === 0 && (
+        <p className="border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
+          No hay empleados dados de alta.
+        </p>
+      )}
     </div>
   );
 }

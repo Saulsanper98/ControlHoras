@@ -135,6 +135,45 @@ body {
   background: rgba(10, 34, 64, 0.06);
 }
 
+/* Checkboxes: sin blanco puro del navegador */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(10, 34, 64, 0.22);
+  background: rgba(10, 34, 64, 0.06);
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="checkbox"]:hover {
+  background: rgba(10, 34, 64, 0.1);
+  border-color: rgba(10, 34, 64, 0.3);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--color-brand-blue);
+  border-color: var(--color-brand-blue);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.2);
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Controles de formulario: tint navy, sin blanco puro que “flote” */
 .field-control {
   background: var(--surface-input);
