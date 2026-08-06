@@ -111,7 +111,7 @@ export function AppShell({
           />
         </div>
 
-        <header className="glass-panel-header relative z-10 flex items-center gap-3 px-4 py-3">
+        <header className="glass-panel-header relative z-30 flex items-center gap-3 px-4 py-3">
           <button
             type="button"
             onClick={() => setOpen(true)}
