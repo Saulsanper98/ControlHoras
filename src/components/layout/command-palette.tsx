@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ClipboardList,
-  LayoutDashboard,
   Search,
   Umbrella,
   Users,
@@ -63,13 +62,13 @@ export function CommandPalette({ role }: { role: AppRole }) {
         icon: ClipboardList,
       });
     }
-    base.unshift({
-      id: "home",
-      label: "Panel principal",
-      href: "/",
-      icon: LayoutDashboard,
+    // Evitar duplicar "Panel principal" si ya viene en nav
+    const seen = new Set<string>();
+    return base.filter((item) => {
+      if (seen.has(item.href)) return false;
+      seen.add(item.href);
+      return true;
     });
-    return base;
   }, [role]);
 
   const filtered = useMemo(() => {
@@ -116,7 +115,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden h-10 min-w-[180px] items-center gap-2 rounded-xl border border-brand-navy/12 bg-white/65 px-3.5 text-sm text-slate-600 shadow-[0_6px_14px_rgba(15,23,42,0.07)] backdrop-blur-sm transition hover:-translate-y-px hover:bg-white/80 hover:shadow-[0_8px_18px_rgba(15,23,42,0.1)] md:flex"
+        className="hidden h-10 min-w-[180px] items-center gap-2 rounded-xl border border-brand-navy/12 bg-white px-3.5 text-sm text-slate-600 shadow-[0_6px_14px_rgba(15,23,42,0.07)] transition hover:-translate-y-px hover:bg-white hover:shadow-[0_8px_18px_rgba(15,23,42,0.1)] md:flex"
         title="Buscar (Ctrl+K)"
       >
         <Search className="h-4 w-4 text-brand-blue/85" />
@@ -126,41 +125,34 @@ export function CommandPalette({ role }: { role: AppRole }) {
         </kbd>
       </button>
 
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        title="Ir a…"
-        className="max-w-xl !bg-white !opacity-100 shadow-[0_30px_80px_rgba(15,23,42,0.36)]"
-      >
-        <div className="rounded-xl bg-white">
-          <input
-            autoFocus
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Escribe para buscar páginas…"
-            className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
-          />
-          <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/8 bg-white px-1 py-1.5">
-            {filtered.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => go(item.href)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition hover:bg-brand-navy/6"
-                  >
-                    <Icon className="h-4 w-4 text-brand-blue" />
-                    {item.label}
-                  </button>
-                </li>
-              );
-            })}
-            {filtered.length === 0 && (
-              <li className="px-3 py-4 text-center text-sm text-slate-500">Sin resultados</li>
-            )}
-          </ul>
-        </div>
+      <Modal open={open} onClose={() => setOpen(false)} title="Ir a…" className="max-w-xl">
+        <input
+          autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Escribe para buscar páginas…"
+          className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
+        />
+        <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/10 bg-white px-1 py-1.5">
+          {filtered.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => go(item.href)}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition hover:bg-brand-navy/6"
+                >
+                  <Icon className="h-4 w-4 text-brand-blue" />
+                  {item.label}
+                </button>
+              </li>
+            );
+          })}
+          {filtered.length === 0 && (
+            <li className="px-3 py-4 text-center text-sm text-slate-500">Sin resultados</li>
+          )}
+        </ul>
       </Modal>
     </>
   );

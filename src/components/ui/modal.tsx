@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,14 +31,14 @@ export function Modal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 animate-modal-backdrop bg-brand-navy/62 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-[#0a2240]/70"
         onClick={onClose}
       />
       <div
@@ -45,10 +46,15 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "animate-modal-panel relative w-full max-w-md rounded-2xl bg-[#e8f0f8] p-6 ring-1 ring-brand-navy/10",
+          "relative w-full max-w-md rounded-2xl p-6 ring-1 ring-brand-navy/10",
           className
         )}
-        style={{ boxShadow: "var(--shadow-modal)" }}
+        style={{
+          backgroundColor: "#ffffff",
+          opacity: 1,
+          boxShadow: "0 28px 70px rgba(10, 34, 64, 0.35)",
+          isolation: "isolate",
+        }}
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <h2 id="modal-title" className="font-display text-lg font-semibold text-brand-navy">
@@ -64,6 +70,7 @@ export function Modal({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
