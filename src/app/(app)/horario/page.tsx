@@ -1,15 +1,16 @@
+import { redirect } from "next/navigation";
 import { CalendarClock, Download, FileWarning } from "lucide-react";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { requireEmployeeSession } from "@/lib/auth-helpers";
 
 // Solo el PDF tiene un visor nativo en el navegador; Excel siempre se
 // descarga porque no hay forma de previsualizarlo sin una librería extra.
 const PREVIEWABLE_EXTENSIONS = [".pdf"];
 
 export default async function HorarioPage() {
-  const session = await auth();
-  if (!session) return null;
+  const session = await requireEmployeeSession();
+  if (!session) redirect("/");
 
   const departmentId = session.user.departmentId;
   const schedule = departmentId

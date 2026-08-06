@@ -24,7 +24,7 @@ export default async function VacationDetailPage({
     }),
   ]);
 
-  if (!employee) notFound();
+  if (!employee || employee.role !== "EMPLEADO") notFound();
 
   return (
     <div className="space-y-6">

@@ -71,7 +71,15 @@ export async function rejectTimeSheetAction(
     where: { id: timeSheet.id },
     data: {
       status: "RECHAZADO",
-      notes: reason ? `Rechazado: ${reason}` : "Rechazado por la responsable.",
+      // Conserva las notas del empleado y añade el motivo de rechazo.
+      notes: [
+        timeSheet.notes?.trim() || null,
+        reason.trim()
+          ? `Rechazado: ${reason.trim()}`
+          : "Rechazado por la responsable.",
+      ]
+        .filter(Boolean)
+        .join("\n"),
     },
   });
 

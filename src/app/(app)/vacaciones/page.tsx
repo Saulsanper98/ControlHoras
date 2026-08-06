@@ -1,11 +1,12 @@
+import { redirect } from "next/navigation";
 import { Umbrella, Clock } from "lucide-react";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, StatCard } from "@/components/ui/card";
+import { requireEmployeeSession } from "@/lib/auth-helpers";
 
 export default async function VacacionesPage() {
-  const session = await auth();
-  if (!session) return null;
+  const session = await requireEmployeeSession();
+  if (!session) redirect("/");
 
   const year = new Date().getFullYear();
 

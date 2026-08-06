@@ -11,6 +11,14 @@ function revalidateAll(userId: string) {
   revalidatePath("/");
 }
 
+async function requireActiveEmployee(userId: string) {
+  const employee = await prisma.user.findUnique({ where: { id: userId } });
+  if (!employee || employee.role !== "EMPLEADO") {
+    return { ok: false as const, error: "Empleado no encontrado." };
+  }
+  return { ok: true as const, employee };
+}
+
 export async function saveVacationBalanceAction(
   userId: string,
   year: number,
@@ -27,8 +35,8 @@ export async function saveVacationBalanceAction(
     return { ok: false, error: "Los días usados no pueden superar los días totales." };
   }
 
-  const employee = await prisma.user.findUnique({ where: { id: userId } });
-  if (!employee) return { ok: false, error: "Empleado no encontrado." };
+  const target = await requireActiveEmployee(userId);
+  if (!target.ok) return target;
 
   await prisma.vacationBalance.upsert({
     where: { userId_year: { userId, year } },
@@ -52,8 +60,8 @@ export async function addHourAdjustmentAction(
   }
   if (!reason.trim()) return { ok: false, error: "Indica un motivo." };
 
-  const employee = await prisma.user.findUnique({ where: { id: userId } });
-  if (!employee) return { ok: false, error: "Empleado no encontrado." };
+  const target = await requireActiveEmployee(userId);
+  if (!target.ok) return target;
 
   await prisma.hourAdjustment.create({
     data: { userId, hours, reason: reason.trim(), createdById: session.user.id },
@@ -69,6 +77,11 @@ export async function deleteHourAdjustmentAction(
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
+
+  const existing = await prisma.hourAdjustment.findUnique({ where: { id } });
+  if (!existing || existing.userId !== userId) {
+    return { ok: false, error: "No se pudo eliminar el ajuste." };
+  }
 
   try {
     await prisma.hourAdjustment.delete({ where: { id } });

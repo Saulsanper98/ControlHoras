@@ -27,6 +27,12 @@ export async function GET(
   const session = await auth();
   if (!session) return new NextResponse("No autorizado", { status: 401 });
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { active: true },
+  });
+  if (!dbUser?.active) return new NextResponse("No autorizado", { status: 401 });
+
   const { path: segments } = await params;
   if (segments.length === 0) return new NextResponse("Ruta inválida", { status: 400 });
 
@@ -75,7 +81,7 @@ export async function GET(
   const ext = path.extname(absolutePath).toLowerCase();
   const mimeType = MIME_TYPES[ext] ?? "application/octet-stream";
   const disposition = INLINE_VIEWABLE.has(mimeType) ? "inline" : "attachment";
-  const fileName = path.basename(absolutePath);
+  const fileName = path.basename(absolutePath).replace(/["\\\r\n]/g, "_");
 
   try {
     await stat(absolutePath);

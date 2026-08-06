@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { TimeSheetForm } from "@/components/control-horario/timesheet-form";
 
 const MONTH_NAMES = [
@@ -12,8 +14,8 @@ export default async function ControlHorarioPage({
 }: {
   searchParams: Promise<{ month?: string; year?: string }>;
 }) {
-  const session = await auth();
-  if (!session) return null;
+  const session = await requireEmployeeSession();
+  if (!session) redirect("/");
 
   const now = new Date();
   const params = await searchParams;

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Menu, X, Bell, KeyRound } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SignOutButton } from "@/components/layout/sign-out-button";
+import type { AppRole } from "@/lib/roles";
 
 export function AppShell({
   role,
@@ -14,7 +15,7 @@ export function AppShell({
   pendingSignatures,
   children,
 }: {
-  role: "EMPLEADO" | "JEFA" | "ADMIN";
+  role: AppRole;
   userName: string;
   roleLabel: string;
   pendingSignatures: number | null;

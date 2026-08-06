@@ -31,7 +31,10 @@ export async function loginAction(
 ): Promise<{ error: string | null; redirectTo?: string | null }> {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
-  const callbackUrl = String(formData.get("callbackUrl") ?? "/");
+  const rawCallback = String(formData.get("callbackUrl") ?? "/");
+  // Solo rutas relativas internas (evita open-redirect).
+  const callbackUrl =
+    rawCallback.startsWith("/") && !rawCallback.startsWith("//") ? rawCallback : "/";
 
   try {
     // Sin redirect automático: el cliente anima la salida y navega después.

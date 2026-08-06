@@ -13,7 +13,7 @@ export default async function JefaVacacionesPage() {
 
   const [employees, balances, adjustmentSums] = await Promise.all([
     prisma.user.findMany({
-      where: { role: { in: ["EMPLEADO", "ADMIN"] }, active: true },
+      where: { role: "EMPLEADO", active: true },
       include: { department: true },
       orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
     }),

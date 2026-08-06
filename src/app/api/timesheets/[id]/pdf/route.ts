@@ -14,6 +14,12 @@ export async function GET(
   const session = await auth();
   if (!session) return new NextResponse("No autorizado", { status: 401 });
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { active: true },
+  });
+  if (!dbUser?.active) return new NextResponse("No autorizado", { status: 401 });
+
   const { id } = await params;
 
   const timeSheet = await prisma.timeSheet.findUnique({
@@ -63,7 +69,10 @@ export async function GET(
     })
   );
 
-  const fileName = `control-horario-${timeSheet.user.name.replace(/\s+/g, "_")}-${timeSheet.month}-${timeSheet.year}.pdf`;
+  const fileName = `control-horario-${timeSheet.user.name.replace(/\s+/g, "_")}-${timeSheet.month}-${timeSheet.year}.pdf`.replace(
+    /["\\\r\n]/g,
+    "_"
+  );
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

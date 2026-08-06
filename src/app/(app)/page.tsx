@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     showManagement
       ? Promise.all([
           prisma.timeSheet.count({ where: { status: "FIRMADO_EMPLEADO" } }),
-          prisma.user.count({ where: { role: { in: ["EMPLEADO", "ADMIN"] }, active: true } }),
+          prisma.user.count({ where: { role: "EMPLEADO", active: true } }),
           prisma.timeSheet.count({ where: { month, year } }),
         ])
       : null,

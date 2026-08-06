@@ -23,9 +23,7 @@ export default async function AppLayout({
       roleLabel={
         session.user.role === "JEFA"
           ? "Responsable"
-          : session.user.role === "ADMIN"
-            ? `Administrador · ${session.user.departmentName ?? "Sistemas"}`
-            : session.user.departmentName ?? "Empleado"
+          : session.user.departmentName ?? "Empleado"
       }
       pendingSignatures={pendingSignatures}
     >

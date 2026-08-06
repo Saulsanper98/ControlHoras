@@ -44,7 +44,18 @@ export default auth(async (req) => {
     }
 
     const role = dbUser.role;
-    if (pathname.startsWith("/jefa") && role !== "JEFA" && role !== "ADMIN") {
+    if (pathname.startsWith("/jefa") && role !== "JEFA") {
+      return NextResponse.redirect(new URL("/", req.nextUrl.origin));
+    }
+
+    // Rutas solo de empleado: la responsable no tiene control horario propio.
+    const employeeOnlyPrefixes = ["/control-horario", "/horario", "/vacaciones"];
+    if (
+      role === "JEFA" &&
+      employeeOnlyPrefixes.some(
+        (p) => pathname === p || pathname.startsWith(`${p}/`)
+      )
+    ) {
       return NextResponse.redirect(new URL("/", req.nextUrl.origin));
     }
 

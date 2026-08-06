@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Users, Mail, ShieldCheck } from "lucide-react";
+import { Users, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { requireManagerSession } from "@/lib/auth-helpers";
@@ -8,7 +8,7 @@ type EmployeeRowUser = {
   id: string;
   name: string;
   email: string;
-  role: "EMPLEADO" | "JEFA" | "ADMIN";
+  role: "EMPLEADO" | "JEFA";
   active: boolean;
   departmentId: string | null;
 };
@@ -20,7 +20,7 @@ export default async function EmpleadosPage() {
   const [departments, users] = await Promise.all([
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.user.findMany({
-      where: { role: { in: ["EMPLEADO", "ADMIN"] } },
+      where: { role: "EMPLEADO" },
       select: { id: true, name: true, email: true, role: true, active: true, departmentId: true },
       orderBy: { name: "asc" },
     }),
@@ -94,14 +94,7 @@ function EmployeeRow({ user }: { user: EmployeeRowUser }) {
           <Users className="h-5 w-5" />
         </div>
         <div>
-          <p className="flex items-center gap-2 font-medium text-brand-navy">
-            {user.name}
-            {user.role === "ADMIN" && (
-              <span className="flex items-center gap-1 rounded-full bg-brand-yellow/40 px-2 py-0.5 text-xs font-medium text-brand-navy">
-                <ShieldCheck className="h-3 w-3" /> Admin
-              </span>
-            )}
-          </p>
+          <p className="font-medium text-brand-navy">{user.name}</p>
           <p className="flex items-center gap-1 text-sm text-slate-500">
             <Mail className="h-3.5 w-3.5" /> {user.email}
           </p>
