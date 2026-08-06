@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CalendarClock, Trash2 } from "lucide-react";
+import { FileText, Trash2 } from "lucide-react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
+import { DateField } from "@/components/ui/date-field";
 import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/horarios/actions";
 
 type Schedule = {
@@ -27,6 +28,7 @@ export function ScheduleUploadRow({
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [validFrom, setValidFrom] = useState(() => new Date().toISOString().slice(0, 10));
+  const [showHistory, setShowHistory] = useState(false);
 
   function handleFile(file: File) {
     setMessage(null);
@@ -48,65 +50,88 @@ export function ScheduleUploadRow({
     setMessage(null);
     startTransition(async () => {
       const result = await deleteScheduleAction(id);
-      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el horario." });
+      if (!result.ok) {
+        setMessage({ type: "error", text: result.error ?? "Error al eliminar el horario." });
+      }
     });
   }
 
   return (
-    <div className="space-y-3 py-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <CalendarClock className="h-4 w-4 text-brand-blue" />
-          <div>
-            <p className="font-medium text-brand-navy">{departmentName}</p>
-            <p className="text-sm text-slate-500">Horario compartido del departamento</p>
+    <div className="space-y-4 py-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-semibold text-brand-navy">{departmentName}</p>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                schedule
+                  ? "bg-emerald-500/12 text-emerald-800"
+                  : "bg-amber-500/12 text-amber-800"
+              }`}
+            >
+              {schedule ? "Con horario" : "Sin horario"}
+            </span>
           </div>
-        </div>
-
-        <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
           {schedule ? (
-            <div className="text-sm">
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
               <a
                 href={`/api/uploads/${schedule.filePath}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-blue hover:underline"
+                className="inline-flex max-w-full items-center gap-1.5 truncate font-medium text-brand-blue hover:underline"
               >
-                {schedule.fileName}
+                <FileText className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{schedule.fileName}</span>
               </a>
-              <p className="text-xs text-slate-500">
-                Vigente desde {new Date(schedule.validFrom).toLocaleDateString("es-ES")}
-              </p>
+              <span className="text-slate-500">
+                Vigente desde{" "}
+                <span className="tabular-nums text-brand-navy/80">
+                  {new Date(schedule.validFrom).toLocaleDateString("es-ES")}
+                </span>
+              </span>
             </div>
           ) : (
-            <span className="text-sm text-slate-500">Sin horario asignado</span>
+            <p className="mt-1 text-sm text-slate-500">
+              Aún no hay cuadrante publicado para este departamento.
+            </p>
           )}
-
-          <input
-            type="date"
-            value={validFrom}
-            onChange={(e) => setValidFrom(e.target.value)}
-            className="field-control px-2 py-1.5 text-xs"
-            title="Fecha de vigencia"
-          />
-
-          <FileDropzone
-            accept=".pdf,.xlsx,.xls"
-            disabled={pending}
-            pending={pending}
-            label={schedule ? "Subir nueva versión" : "Subir horario (PDF o Excel)"}
-            onFile={handleFile}
-            className="w-full sm:w-64"
-          />
         </div>
+
+        {history.length > 1 && (
+          <button
+            type="button"
+            onClick={() => setShowHistory((v) => !v)}
+            className="text-xs font-medium text-brand-blue hover:underline"
+          >
+            {showHistory ? "Ocultar historial" : `Historial (${history.length})`}
+          </button>
+        )}
       </div>
 
-      {history.length > 1 && (
-        <div className="border-t border-brand-navy/8 pt-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Historial</p>
-          <ul className="divide-y divide-brand-navy/8">
-            {history.map((h, idx) => (
-              <li key={h.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+      <div className="flex flex-col gap-3 border-t border-[color:var(--surface-divider)] pt-4 sm:flex-row sm:items-end">
+        <div className="w-full sm:w-44">
+          <DateField
+            id={`valid-from-${departmentId}`}
+            label="Vigente desde"
+            value={validFrom}
+            onChange={setValidFrom}
+          />
+        </div>
+        <FileDropzone
+          accept=".pdf,.xlsx,.xls"
+          disabled={pending}
+          pending={pending}
+          label={schedule ? "Subir nueva versión" : "Subir horario (PDF o Excel)"}
+          onFile={handleFile}
+          className="w-full flex-1"
+        />
+      </div>
+
+      {showHistory && history.length > 1 && (
+        <ul className="divide-y divide-[color:var(--surface-divider)] border-t border-[color:var(--surface-divider)]">
+          {history.map((h, idx) => (
+            <li key={h.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+              <div className="min-w-0">
                 <a
                   href={`/api/uploads/${h.filePath}`}
                   target="_blank"
@@ -114,32 +139,34 @@ export function ScheduleUploadRow({
                   className="truncate text-brand-blue hover:underline"
                 >
                   {h.fileName}
-                  {idx === 0 ? " (actual)" : ""}
+                  {idx === 0 ? " · actual" : ""}
                 </a>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">
-                    {new Date(h.validFrom).toLocaleDateString("es-ES")}
-                  </span>
-                  {idx > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(h.id)}
-                      disabled={pending}
-                      className="text-slate-400 hover:text-red-600"
-                      aria-label="Eliminar versión"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+                <p className="text-xs text-slate-500">
+                  Vigente {new Date(h.validFrom).toLocaleDateString("es-ES")}
+                </p>
+              </div>
+              {idx > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleDelete(h.id)}
+                  disabled={pending}
+                  className="rounded-md p-1.5 text-slate-400 transition hover:bg-red-500/10 hover:text-red-600"
+                  aria-label="Eliminar versión"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
 
       {message && (
-        <p className={`text-xs ${message.type === "success" ? "text-emerald-700" : "text-red-600"}`}>
+        <p
+          className={`text-sm ${
+            message.type === "success" ? "text-emerald-700" : "text-red-600"
+          }`}
+        >
           {message.text}
         </p>
       )}

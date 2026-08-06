@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/ui/page-header";
 import { ScheduleUploadRow } from "@/components/jefa/schedule-upload-row";
 import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
@@ -11,7 +12,7 @@ export default async function HorariosPage() {
   const [departments, schedules] = await Promise.all([
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.schedule.findMany({
-      orderBy: [{ departmentId: "asc" }, { createdAt: "desc" }],
+      orderBy: [{ departmentId: "asc" }, { validFrom: "desc" }, { createdAt: "desc" }],
     }),
   ]);
 
@@ -22,17 +23,45 @@ export default async function HorariosPage() {
     byDept.set(s.departmentId, list);
   }
 
+  const withSchedule = departments.filter((d) => (byDept.get(d.id) ?? []).length > 0).length;
+  const withoutSchedule = departments.length - withSchedule;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Horarios</h1>
-        <p className="text-brand-navy/55">
-          Sube el horario por departamento. Se conserva el historial de versiones.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Horarios"
+        description="Publica el cuadrante por departamento. Se conserva el historial de versiones."
+      />
+
+      {departments.length > 0 && (
+        <div className="grid grid-cols-2 divide-x divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3">
+          <div className="py-4 sm:px-4">
+            <p className="text-sm text-slate-500">Departamentos</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-brand-navy">
+              {departments.length}
+            </p>
+          </div>
+          <div className="py-4 sm:px-4">
+            <p className="text-sm text-slate-500">Con horario</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-emerald-800">
+              {withSchedule}
+            </p>
+          </div>
+          <div className="col-span-2 py-4 sm:col-span-1 sm:px-4">
+            <p className="text-sm text-slate-500">Sin horario</p>
+            <p
+              className={`mt-1 text-2xl font-semibold tabular-nums ${
+                withoutSchedule > 0 ? "text-amber-800" : "text-brand-navy"
+              }`}
+            >
+              {withoutSchedule}
+            </p>
+          </div>
+        </div>
+      )}
 
       {departments.length === 0 ? (
-        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+        <p className="border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
           No hay departamentos configurados.
         </p>
       ) : (
