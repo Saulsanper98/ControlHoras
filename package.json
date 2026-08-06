@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p 3000",
     "dev:stable": "bash ./scripts/dev-stable.sh",
     "dev:watchdog": "bash ./scripts/dev-watchdog.sh",
     "build": "next build",
