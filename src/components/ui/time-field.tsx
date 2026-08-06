@@ -33,6 +33,7 @@ export function TimeField({
   const autoId = useId();
   const inputId = id ?? autoId;
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [manualValue, setManualValue] = useState(value);
 
@@ -53,11 +54,21 @@ export function TimeField({
     <div ref={rootRef} className={cn("relative", className)}>
       <div className="relative">
         <input
+          ref={inputRef}
           id={inputId}
-          type="time"
+          type="text"
           value={value}
           disabled={disabled}
+          placeholder="HH:MM"
+          inputMode="numeric"
+          onFocus={() => !disabled && setOpen(true)}
+          onClick={() => !disabled && setOpen(true)}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={() => {
+            const normalized = normalizeTime(value);
+            if (!value) return;
+            if (normalized) onChange(normalized);
+          }}
           className="field-control field-time w-full min-h-8 pr-14 pl-2 py-1 text-sm font-medium tabular-nums text-brand-navy disabled:opacity-50"
         />
         <button
@@ -99,6 +110,7 @@ export function TimeField({
                 if (!normalized) return;
                 onChange(normalized);
                 setOpen(false);
+                inputRef.current?.focus();
               }}
               className="rounded-md bg-brand-blue px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-blue/90"
             >
@@ -117,6 +129,7 @@ export function TimeField({
                 onClick={() => {
                   onChange(t);
                   setOpen(false);
+                  inputRef.current?.focus();
                 }}
                 className={`rounded-md px-2 py-1 text-xs font-medium tabular-nums transition ${
                   value === t

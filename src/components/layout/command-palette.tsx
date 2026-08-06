@@ -116,12 +116,12 @@ export function CommandPalette({ role }: { role: AppRole }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden items-center gap-2 rounded-lg border border-brand-navy/12 bg-white/40 px-3 py-1.5 text-xs text-slate-500 transition hover:bg-white/60 md:flex"
+        className="hidden h-10 min-w-[180px] items-center gap-2 rounded-xl border border-brand-navy/12 bg-white/65 px-3.5 text-sm text-slate-600 shadow-[0_6px_14px_rgba(15,23,42,0.07)] backdrop-blur-sm transition hover:-translate-y-px hover:bg-white/80 hover:shadow-[0_8px_18px_rgba(15,23,42,0.1)] md:flex"
         title="Buscar (Ctrl+K)"
       >
-        <Search className="h-3.5 w-3.5" />
-        <span>Buscar…</span>
-        <kbd className="rounded border border-brand-navy/10 bg-white/50 px-1.5 py-0.5 font-mono text-[10px]">
+        <Search className="h-4 w-4 text-brand-blue/85" />
+        <span className="flex-1 text-left">Buscar…</span>
+        <kbd className="rounded-md border border-brand-navy/10 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
           ⌘K
         </kbd>
       </button>
