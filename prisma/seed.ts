@@ -125,6 +125,20 @@ async function main() {
     data: { active: false },
   });
 
+  // Saldos de vacaciones anuales por defecto (22 días laborables).
+  const vacationYear = new Date().getFullYear();
+  const employees = await prisma.user.findMany({
+    where: { role: "EMPLEADO", active: true },
+    select: { id: true },
+  });
+  for (const emp of employees) {
+    await prisma.vacationBalance.upsert({
+      where: { userId_year: { userId: emp.id, year: vacationYear } },
+      update: {},
+      create: { userId: emp.id, year: vacationYear, totalDays: 22 },
+    });
+  }
+
   console.log("Seed completada. Contraseña temporal para todos los usuarios nuevos: %s", DEFAULT_PASSWORD);
   console.log("  responsableoperaciones@movilidadgc.org (JEFA)");
   console.log(`  ${created} cuentas creadas/actualizadas a partir del roster real.`);

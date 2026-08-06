@@ -1,16 +1,24 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card, StatCard } from "@/components/ui/card";
+import { Select } from "@/components/ui/select";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 
-export default async function VacacionesPage() {
+export default async function VacacionesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ year?: string }>;
+}) {
   const session = await requireEmployeeSession();
   if (!session) redirect("/");
 
-  const year = new Date().getFullYear();
+  const params = await searchParams;
+  const currentYear = new Date().getFullYear();
+  const year = Number(params.year) || currentYear;
 
-  const [balance, adjustments] = await Promise.all([
+  const [balance, adjustments, availableYears] = await Promise.all([
     prisma.vacationBalance.findUnique({
       where: { userId_year: { userId: session.user.id, year } },
     }),
@@ -19,7 +27,16 @@ export default async function VacacionesPage() {
       include: { createdBy: true },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.vacationBalance.findMany({
+      where: { userId: session.user.id },
+      select: { year: true },
+      orderBy: { year: "desc" },
+    }),
   ]);
+
+  const years = [
+    ...new Set([currentYear, ...availableYears.map((b) => b.year)]),
+  ].sort((a, b) => b - a);
 
   const totalDays = balance ? Number(balance.totalDays) : 0;
   const usedDays = balance ? Number(balance.usedDays) : 0;
@@ -28,11 +45,33 @@ export default async function VacacionesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
-        <p className="text-brand-navy/55">
-          Consulta tus días de vacaciones restantes y tu bolsa de horas acumuladas.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
+          <p className="text-brand-navy/55">
+            Consulta tus días de vacaciones restantes y tu bolsa de horas acumuladas.
+          </p>
+        </div>
+        <form method="get" className="flex items-end gap-2">
+          <div>
+            <label htmlFor="vac-year" className="mb-1 block text-xs font-medium text-slate-500">
+              Año
+            </label>
+            <Select id="vac-year" name="year" defaultValue={String(year)}>
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <button
+            type="submit"
+            className="rounded-md bg-brand-blue px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-dark"
+          >
+            Ver
+          </button>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -49,6 +88,13 @@ export default async function VacacionesPage() {
           icon={Clock}
         />
       </div>
+
+      {balance?.notes && (
+        <Card>
+          <p className="text-sm font-medium text-brand-navy">Notas de la responsable</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{balance.notes}</p>
+        </Card>
+      )}
 
       <Card>
         <p className="mb-3 text-sm font-medium text-brand-navy">Historial de ajustes de horas</p>

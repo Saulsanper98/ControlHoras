@@ -80,8 +80,15 @@ export default async function ControlDetailPage({
 
       {timeSheet.notes && (
         <p className="surface-muted rounded-md px-3 py-2 text-sm text-slate-600">
-          <span className="font-medium">Notas: </span>
+          <span className="font-medium">Notas del empleado: </span>
           {timeSheet.notes}
+        </p>
+      )}
+
+      {timeSheet.rejectionReason && (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <span className="font-medium">Motivo del rechazo: </span>
+          {timeSheet.rejectionReason}
         </p>
       )}
 

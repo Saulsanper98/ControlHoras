@@ -215,7 +215,14 @@ export async function signAsEmployeeAction(
   await prisma.$transaction([
     prisma.timeSheet.update({
       where: { id: timeSheet.id },
-      data: { notes, status: "FIRMADO_EMPLEADO", submittedAt: new Date() },
+      data: {
+        notes,
+        status: "FIRMADO_EMPLEADO",
+        submittedAt: new Date(),
+        rejectionReason: null,
+        rejectedAt: null,
+        rejectedById: null,
+      },
     }),
     ...entries.map((entry) => {
       const hours = calculateDayHours(entry.checkIn, entry.checkOut);
@@ -262,9 +269,20 @@ export async function deleteAttachmentAction(attachmentId: string): Promise<{ ok
   const session = await requireEmployeeSession();
   if (!session) return { ok: false, error: "No autorizado." };
 
-  const attachment = await prisma.attachment.findUnique({ where: { id: attachmentId } });
+  const attachment = await prisma.attachment.findUnique({
+    where: { id: attachmentId },
+    include: { timeSheet: true },
+  });
   if (!attachment || attachment.userId !== session.user.id) {
     return { ok: false, error: "Adjunto no encontrado." };
+  }
+
+  if (
+    attachment.timeSheet &&
+    attachment.timeSheet.status !== "BORRADOR" &&
+    attachment.timeSheet.status !== "RECHAZADO"
+  ) {
+    return { ok: false, error: "Este control horario ya no se puede editar." };
   }
 
   await prisma.attachment.delete({ where: { id: attachmentId } });

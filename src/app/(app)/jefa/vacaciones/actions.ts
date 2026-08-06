@@ -16,6 +16,9 @@ async function requireActiveEmployee(userId: string) {
   if (!employee || employee.role !== "EMPLEADO") {
     return { ok: false as const, error: "Empleado no encontrado." };
   }
+  if (!employee.active) {
+    return { ok: false as const, error: "El empleado está inactivo." };
+  }
   return { ok: true as const, employee };
 }
 

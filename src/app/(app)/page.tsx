@@ -106,16 +106,19 @@ export default async function DashboardPage() {
               label="Controles pendientes de firmar"
               value={String(pendientes)}
               icon={ClipboardList}
+              href="/jefa/controles"
             />
             <StatCard
               label="Empleados activos"
               value={String(empleados)}
               icon={Users}
+              href="/jefa/empleados"
             />
             <StatCard
               label="Controles horarios este mes"
               value={String(controlesDelMes)}
               icon={Clock}
+              href={`/jefa/controles?month=${month}&year=${year}`}
             />
           </div>
         </div>
@@ -133,18 +136,21 @@ export default async function DashboardPage() {
               label="Control horario de este mes"
               value={timeSheet ? STATUS_LABEL[timeSheet.status] : "Sin empezar"}
               icon={ClipboardList}
+              href="/control-horario"
             />
             <StatCard
               label="Vacaciones restantes"
               value={diasRestantes !== null ? `${diasRestantes} días` : "Sin datos"}
               hint={year.toString()}
               icon={Umbrella}
+              href="/vacaciones"
             />
             <StatCard
               label="Bolsa de horas"
               value={`${horasAcumuladas.toFixed(1)} h`}
               hint="Ajustes acumulados"
               icon={Clock}
+              href="/vacaciones"
             />
           </div>
         </div>

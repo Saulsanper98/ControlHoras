@@ -47,6 +47,7 @@ export default async function ControlHorarioPage({
         monthNames={MONTH_NAMES}
         status={timeSheet?.status ?? "BORRADOR"}
         notes={timeSheet?.notes ?? ""}
+        rejectionReason={timeSheet?.rejectionReason}
         entries={
           timeSheet?.entries.map((e) => ({
             day: e.day,

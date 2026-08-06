@@ -67,23 +67,31 @@ export async function rejectTimeSheetAction(
     return { ok: false, error: "Este control horario no está pendiente de firma." };
   }
 
-  await prisma.timeSheet.update({
-    where: { id: timeSheet.id },
-    data: {
-      status: "RECHAZADO",
-      // Conserva las notas del empleado y añade el motivo de rechazo.
-      notes: [
-        timeSheet.notes?.trim() || null,
-        reason.trim()
-          ? `Rechazado: ${reason.trim()}`
-          : "Rechazado por la responsable.",
-      ]
-        .filter(Boolean)
-        .join("\n"),
-    },
+  await prisma.$transaction(async (tx) => {
+    const employeeSignature = await tx.signature.findUnique({
+      where: { timeSheetId_signerRole: { timeSheetId: timeSheet.id, signerRole: "EMPLEADO" } },
+    });
+
+    await tx.timeSheet.update({
+      where: { id: timeSheet.id },
+      data: {
+        status: "RECHAZADO",
+        rejectionReason: reason.trim() || "Rechazado por la responsable.",
+        rejectedAt: new Date(),
+        rejectedById: session.user.id,
+        submittedAt: null,
+      },
+    });
+
+    if (employeeSignature) {
+      await tx.signature.delete({
+        where: { timeSheetId_signerRole: { timeSheetId: timeSheet.id, signerRole: "EMPLEADO" } },
+      });
+      await deleteUploadedFile(employeeSignature.imagePath);
+    }
   });
 
-  revalidatePath("/jefa/controles");
+  revalidatePath("/control-horario");
   revalidatePath(`/jefa/controles/${timeSheetId}`);
   return { ok: true };
 }

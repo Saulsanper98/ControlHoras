@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { Paperclip, Trash2, ChevronLeft, ChevronRight, Save, PenLine, Download, Wand2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -57,6 +58,7 @@ export function TimeSheetForm({
   monthNames,
   status,
   notes: initialNotes,
+  rejectionReason,
   entries: initialEntries,
   attachments,
   employeeSignaturePath,
@@ -68,11 +70,13 @@ export function TimeSheetForm({
   monthNames: string[];
   status: string;
   notes: string;
+  rejectionReason?: string | null;
   entries: Entry[];
   attachments: Attachment[];
   employeeSignaturePath: string | null;
   responsableSignaturePath: string | null;
 }) {
+  const router = useRouter();
   const editable = status === "BORRADOR" || status === "RECHAZADO";
   const days = daysInMonth(month, year);
 
@@ -109,6 +113,13 @@ export function TimeSheetForm({
   }
 
   function applyBulkShift() {
+    if (
+      !window.confirm(
+        `¿Aplicar turno ${SHIFTS[bulkShift].label} a ${weekdaysOnly ? "todos los días laborables" : "todo el mes"}? Se sobrescribirán las horas actuales.`
+      )
+    ) {
+      return;
+    }
     setEntries((prev) =>
       prev.map((e) => {
         const isWeekend = [0, 6].includes(new Date(year, month - 1, e.day).getDay());
@@ -123,11 +134,12 @@ export function TimeSheetForm({
     setMessage(null);
     startTransition(async () => {
       const result = await saveDraftAction(month, year, entries, notes);
-      setMessage(
-        result.ok
-          ? { type: "success", text: "Borrador guardado." }
-          : { type: "error", text: result.error ?? "Error al guardar." }
-      );
+      if (result.ok) {
+        setMessage({ type: "success", text: "Borrador guardado." });
+        router.refresh();
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Error al guardar." });
+      }
     });
   }
 
@@ -135,11 +147,12 @@ export function TimeSheetForm({
     setMessage(null);
     startTransition(async () => {
       const result = await uploadAttachmentAction(month, year, formData);
-      setMessage(
-        result.ok
-          ? { type: "success", text: "Archivo adjuntado." }
-          : { type: "error", text: result.error ?? "Error al subir el archivo." }
-      );
+      if (result.ok) {
+        setMessage({ type: "success", text: "Archivo adjuntado." });
+        router.refresh();
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
+      }
     });
   }
 
@@ -148,7 +161,11 @@ export function TimeSheetForm({
     setMessage(null);
     startTransition(async () => {
       const result = await deleteAttachmentAction(id);
-      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
+      if (result.ok) {
+        router.refresh();
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
+      }
     });
   }
 
@@ -158,6 +175,7 @@ export function TimeSheetForm({
       const result = await signAsEmployeeAction(month, year, entries, notes, signatureDataUrl);
       if (result.ok) {
         setShowSignPad(false);
+        router.refresh();
       } else {
         setMessage({ type: "error", text: result.error ?? "Error al firmar." });
       }
@@ -216,6 +234,13 @@ export function TimeSheetForm({
         >
           {message.text}
         </p>
+      )}
+
+      {status === "RECHAZADO" && rejectionReason && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <p className="font-medium">Motivo del rechazo</p>
+          <p className="mt-1 whitespace-pre-wrap">{rejectionReason}</p>
+        </div>
       )}
 
       {editable && (
