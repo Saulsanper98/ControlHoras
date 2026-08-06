@@ -51,6 +51,11 @@ function validateTimeSheetInput(month: number, year: number, entries: EntryInput
     if (entry.checkOut && !TIME_RE.test(entry.checkOut)) {
       return `Hora de salida inválida en el día ${entry.day}.`;
     }
+    const hasIn = Boolean(entry.checkIn);
+    const hasOut = Boolean(entry.checkOut);
+    if (hasIn !== hasOut) {
+      return `El día ${entry.day} tiene solo entrada o solo salida; completa ambas o déjalas vacías.`;
+    }
     if (entry.checkIn && entry.checkOut) {
       const hours = calculateDayHours(entry.checkIn, entry.checkOut);
       if (isSuspiciousShift(hours)) {
@@ -290,4 +295,68 @@ export async function deleteAttachmentAction(attachmentId: string): Promise<{ ok
 
   revalidatePath("/control-horario");
   return { ok: true };
+}
+
+export async function copyFromPreviousMonthAction(
+  month: number,
+  year: number
+): Promise<{ ok: boolean; error?: string; entries?: EntryInput[] }> {
+  const session = await requireEmployeeSession();
+  if (!session) return { ok: false, error: "No autorizado." };
+
+  const prevMonth = month === 1 ? 12 : month - 1;
+  const prevYear = month === 1 ? year - 1 : year;
+
+  const previous = await prisma.timeSheet.findUnique({
+    where: { userId_month_year: { userId: session.user.id, month: prevMonth, year: prevYear } },
+    include: { entries: { orderBy: { day: "asc" } } },
+  });
+
+  if (!previous || previous.entries.length === 0) {
+    return { ok: false, error: "No hay datos en el mes anterior para copiar." };
+  }
+
+  const current = await getOrCreateDraftTimeSheet(session.user.id, month, year);
+  if (current.status !== "BORRADOR" && current.status !== "RECHAZADO") {
+    return { ok: false, error: "Este control horario ya no se puede editar." };
+  }
+
+  const maxDay = daysInMonth(month, year);
+  const entries: EntryInput[] = previous.entries
+    .filter((e) => e.day <= maxDay)
+    .map((e) => ({
+      day: e.day,
+      checkIn: e.checkIn ?? "",
+      checkOut: e.checkOut ?? "",
+      notes: e.notes ?? "",
+    }));
+
+  const validationError = validateTimeSheetInput(month, year, entries);
+  if (validationError) return { ok: false, error: validationError };
+
+  await prisma.$transaction(
+    entries.map((entry) => {
+      const hours = calculateDayHours(entry.checkIn, entry.checkOut);
+      return prisma.timeEntry.upsert({
+        where: { timeSheetId_day: { timeSheetId: current.id, day: entry.day } },
+        create: {
+          timeSheetId: current.id,
+          day: entry.day,
+          checkIn: entry.checkIn || null,
+          checkOut: entry.checkOut || null,
+          notes: entry.notes || null,
+          ...hours,
+        },
+        update: {
+          checkIn: entry.checkIn || null,
+          checkOut: entry.checkOut || null,
+          notes: entry.notes || null,
+          ...hours,
+        },
+      });
+    })
+  );
+
+  revalidatePath("/control-horario");
+  return { ok: true, entries };
 }

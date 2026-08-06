@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card, StatCard } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
+import { VacationRequestsPanel } from "@/components/vacaciones/vacation-requests-panel";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 
 export default async function VacacionesPage({
@@ -18,7 +18,7 @@ export default async function VacacionesPage({
   const currentYear = new Date().getFullYear();
   const year = Number(params.year) || currentYear;
 
-  const [balance, adjustments, availableYears] = await Promise.all([
+  const [balance, adjustments, availableYears, vacationRequests] = await Promise.all([
     prisma.vacationBalance.findUnique({
       where: { userId_year: { userId: session.user.id, year } },
     }),
@@ -31,6 +31,10 @@ export default async function VacacionesPage({
       where: { userId: session.user.id },
       select: { year: true },
       orderBy: { year: "desc" },
+    }),
+    prisma.vacationRequest.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
     }),
   ]);
 
@@ -95,6 +99,20 @@ export default async function VacacionesPage({
           <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{balance.notes}</p>
         </Card>
       )}
+
+      <VacationRequestsPanel
+        year={year}
+        requests={vacationRequests.map((r) => ({
+          id: r.id,
+          startDate: r.startDate.toISOString(),
+          endDate: r.endDate.toISOString(),
+          days: Number(r.days),
+          status: r.status,
+          employeeNotes: r.employeeNotes,
+          rejectionReason: r.rejectionReason,
+          createdAt: r.createdAt.toISOString(),
+        }))}
+      />
 
       <Card>
         <p className="mb-3 text-sm font-medium text-brand-navy">Historial de ajustes de horas</p>

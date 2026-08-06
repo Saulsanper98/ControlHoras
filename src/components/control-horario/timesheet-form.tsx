@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { Paperclip, Trash2, ChevronLeft, ChevronRight, Save, PenLine, Download, Wand2 } from "lucide-react";
+import { Paperclip, Trash2, ChevronLeft, ChevronRight, Save, PenLine, Download, Wand2, Copy } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
+import { holidaysInMonth } from "@/lib/holidays";
 import { SignatureModal } from "@/components/signature/signature-pad";
 import {
+  copyFromPreviousMonthAction,
   deleteAttachmentAction,
   saveDraftAction,
   signAsEmployeeAction,
@@ -98,6 +100,45 @@ export function TimeSheetForm({
     () => sumDayHours(entries.map((e) => calculateDayHours(e.checkIn, e.checkOut))),
     [entries]
   );
+
+  const monthHolidays = useMemo(() => holidaysInMonth(month, year), [month, year]);
+
+  const summary = useMemo(() => {
+    let workedDays = 0;
+    let freeDays = 0;
+    for (const entry of entries) {
+      if (entry.checkIn && entry.checkOut) workedDays += 1;
+      else if (!entry.checkIn && !entry.checkOut) freeDays += 1;
+    }
+    return { workedDays, freeDays, holidayCount: monthHolidays.size };
+  }, [entries, monthHolidays.size]);
+
+  function handleCopyPreviousMonth() {
+    if (
+      !window.confirm(
+        "¿Copiar las horas del mes anterior? Se sobrescribirán los días que coincidan."
+      )
+    ) {
+      return;
+    }
+    setMessage(null);
+    startTransition(async () => {
+      const result = await copyFromPreviousMonthAction(month, year);
+      if (result.ok && result.entries) {
+        const byDay = new Map(result.entries.map((e) => [e.day, e]));
+        setEntries((prev) =>
+          prev.map((e) => {
+            const copied = byDay.get(e.day);
+            return copied ?? e;
+          })
+        );
+        setMessage({ type: "success", text: "Horas copiadas del mes anterior." });
+        router.refresh();
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Error al copiar." });
+      }
+    });
+  }
 
   function updateEntry(day: number, patch: Partial<Entry>) {
     setEntries((prev) => prev.map((e) => (e.day === day ? { ...e, ...patch } : e)));
@@ -243,6 +284,34 @@ export function TimeSheetForm({
         </div>
       )}
 
+      <Card className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div>
+          <p className="text-xs text-slate-500">Días trabajados</p>
+          <p className="text-lg font-semibold text-brand-navy">{summary.workedDays}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Días libres</p>
+          <p className="text-lg font-semibold text-brand-navy">{summary.freeDays}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Festivos en el mes</p>
+          <p className="text-lg font-semibold text-brand-navy">{summary.holidayCount}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Horas totales</p>
+          <p className="text-lg font-semibold text-brand-navy">{totals.totalHours.toFixed(1)} h</p>
+        </div>
+      </Card>
+
+      {monthHolidays.size > 0 && (
+        <p className="text-xs text-slate-500">
+          Festivos:{" "}
+          {[...monthHolidays.entries()]
+            .map(([day, name]) => `${day} (${name})`)
+            .join(" · ")}
+        </p>
+      )}
+
       {editable && (
         <Card className="flex flex-wrap items-end gap-3">
           <div className="w-44">
@@ -276,13 +345,22 @@ export function TimeSheetForm({
             className="flex items-center gap-2 rounded-md border border-brand-blue px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
           >
             <Wand2 className="h-4 w-4" />
-            Aplicar turno a todo el mes
+            Aplicar turno
+          </button>
+          <button
+            type="button"
+            onClick={handleCopyPreviousMonth}
+            disabled={pending}
+            className="flex items-center gap-2 rounded-md border border-brand-navy/20 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-brand-navy/5 disabled:opacity-60"
+          >
+            <Copy className="h-4 w-4" />
+            Copiar mes anterior
           </button>
         </Card>
       )}
 
-      <Card className="overflow-x-auto p-0">
-        <table className="w-full min-w-[920px] text-sm">
+      <Card className="overflow-x-auto p-0 -mx-1 sm:mx-0">
+        <table className="w-full min-w-[720px] text-sm sm:min-w-[920px]">
           <thead>
             <tr className="surface-muted border-b border-brand-navy/10 text-left text-xs uppercase tracking-wide text-slate-500">
               <th className="px-3 py-2">Día</th>
@@ -303,14 +381,23 @@ export function TimeSheetForm({
                 weekday: "short",
               });
               const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
+              const holidayName = monthHolidays.get(entry.day);
               const shiftKey = shiftKeyForEntry(entry);
               return (
                 <tr
                   key={entry.day}
-                  className={`border-b border-brand-navy/5 last:border-0 ${isWeekend ? "surface-row" : ""}`}
+                  className={`border-b border-brand-navy/5 last:border-0 ${
+                    isWeekend || holidayName ? "surface-row bg-amber-500/5" : ""
+                  }`}
                 >
-                  <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
-                    {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
+                  <td className="px-2 py-1.5 whitespace-nowrap text-slate-600 sm:px-3">
+                    {entry.day}{" "}
+                    <span className="text-xs text-slate-500">{weekday}</span>
+                    {holidayName && (
+                      <span className="ml-1 text-xs text-amber-700" title={holidayName}>
+                        ★
+                      </span>
+                    )}
                   </td>
                   <td className="px-3 py-1.5">
                     <Select
