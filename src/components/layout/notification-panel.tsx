@@ -96,8 +96,7 @@ export function NotificationPanel({
               onClick={() => setOpen(false)}
             />
             <div
-              className="fixed right-4 top-14 z-[200] w-80 rounded-xl border border-brand-navy/10 p-2 shadow-xl ring-1 ring-brand-navy/5 sm:right-6"
-              style={{ backgroundColor: "#ffffff", opacity: 1, isolation: "isolate" }}
+              className="surface-menu fixed right-4 top-14 z-[200] w-80 rounded-xl p-2 sm:right-6"
             >
               <div className="flex items-center justify-between px-2 py-1.5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
