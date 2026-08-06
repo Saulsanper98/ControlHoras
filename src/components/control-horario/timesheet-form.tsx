@@ -326,9 +326,9 @@ export function TimeSheetForm({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl bg-[#e8f0f8]/90 ring-1 ring-brand-navy/10">
+      <div className="overflow-hidden border-y border-brand-navy/10">
         {/* Cabecera + resumen + herramientas en un solo bloque */}
-        <div className="border-b border-brand-navy/10 px-4 py-4 sm:px-5">
+        <div className="border-b border-brand-navy/10 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Link
@@ -496,7 +496,7 @@ export function TimeSheetForm({
         <ScrollShadow className="hidden md:block">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-brand-navy/10 bg-[#e8f0f8]/95 text-left text-[11px] uppercase tracking-wide text-slate-500 backdrop-blur-sm">
+              <tr className="border-b border-brand-navy/10 text-left text-[11px] uppercase tracking-wide text-slate-500">
                 <th className="px-3 py-2.5">Día</th>
                 <th className="px-3 py-2.5">Turno</th>
                 <th className="px-3 py-2.5">Entrada</th>
@@ -601,14 +601,14 @@ export function TimeSheetForm({
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-brand-navy/10 bg-[#e8f0f8]/95 px-4 py-2 backdrop-blur-sm md:hidden">
+          <div className="sticky bottom-0 z-10 border-t border-brand-navy/10 bg-[#dce6f0]/95 px-0 py-2 backdrop-blur-sm md:hidden">
             <p className="text-center text-xs tabular-nums text-brand-navy">
               <strong>{totals.totalHours.toFixed(1)} h</strong> totales · {summary.workedDays} días trabajados
             </p>
           </div>
         )}
 
-        <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+        <div className="border-t border-brand-navy/10 py-4">
           <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
             Notas del mes
           </label>
@@ -622,7 +622,7 @@ export function TimeSheetForm({
           />
         </div>
 
-        <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+        <div className="border-t border-brand-navy/10 py-4">
           <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
             <Paperclip className="h-4 w-4" />
             Adjuntos (PDF/Excel)
@@ -683,7 +683,7 @@ export function TimeSheetForm({
         </div>
 
         {(employeeSignaturePath || responsableSignaturePath) && (
-          <div className="border-t border-brand-navy/10 px-4 py-4 sm:px-5">
+          <div className="border-t border-brand-navy/10 py-4">
             <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
             <div className="flex flex-wrap gap-6">
             {employeeSignaturePath && (

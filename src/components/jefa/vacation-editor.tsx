@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
 import {
   addHourAdjustmentAction,
   deleteHourAdjustmentAction,
@@ -89,7 +89,7 @@ export function VacationEditor({
         </p>
       )}
 
-      <Card>
+      <SectionBlock>
         <p className="mb-3 text-sm font-medium text-brand-navy">Saldo de vacaciones ({year})</p>
         <div className="flex flex-wrap items-end gap-4">
           <div>
@@ -103,7 +103,7 @@ export function VacationEditor({
               min="0"
               value={totalDays}
               onChange={(e) => setTotalDays(Number(e.target.value))}
-              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <div>
@@ -117,7 +117,7 @@ export function VacationEditor({
               min="0"
               value={usedDays}
               onChange={(e) => setUsedDays(Number(e.target.value))}
-              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <div className="min-w-[160px] flex-1">
@@ -129,7 +129,7 @@ export function VacationEditor({
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="surface-input w-full rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-full rounded-md px-2 py-1.5 text-sm"
             />
           </div>
           <button
@@ -145,9 +145,9 @@ export function VacationEditor({
           Restantes:{" "}
           <span className="font-medium text-brand-navy">{(totalDays - usedDays).toFixed(1)} días</span>
         </p>
-      </Card>
+      </SectionBlock>
 
-      <Card>
+      <section>
         <div className="mb-3 flex items-center justify-between">
           <p className="text-sm font-medium text-brand-navy">Bolsa de horas</p>
           <p className="text-sm text-slate-500">
@@ -155,74 +155,77 @@ export function VacationEditor({
           </p>
         </div>
 
-        <div className="mb-4 flex flex-wrap items-end gap-3">
-          <div>
-            <label htmlFor="hour-adjustment" className="mb-1 block text-xs text-slate-500">
-              Horas (+/-)
-            </label>
-            <input
-              id="hour-adjustment"
-              type="number"
-              step="0.5"
-              value={hours}
-              onChange={(e) => setHours(e.target.value)}
-              className="surface-input w-24 rounded-md px-2 py-1.5 text-sm"
-            />
-          </div>
-          <div className="min-w-[160px] flex-1">
-            <label htmlFor="hour-adjustment-reason" className="mb-1 block text-xs text-slate-500">
-              Motivo
-            </label>
-            <input
-              id="hour-adjustment-reason"
-              type="text"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="surface-input w-full rounded-md px-2 py-1.5 text-sm"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleAddAdjustment}
-            disabled={pending}
-            className="rounded-md border border-brand-blue px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
-          >
-            Añadir ajuste
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          {adjustments.length === 0 && (
-            <p className="text-sm text-slate-500">Sin ajustes registrados.</p>
-          )}
-          {adjustments.map((a) => (
-            <div
-              key={a.id}
-              className="surface-muted flex items-center justify-between rounded-md border border-brand-navy/10 px-3 py-2 text-sm"
-            >
-              <div>
-                <span className={`font-medium ${a.hours >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                  {a.hours >= 0 ? "+" : ""}
-                  {a.hours.toFixed(1)} h
-                </span>
-                <span className="ml-2 text-slate-500">{a.reason}</span>
-                <span className="ml-2 text-xs text-slate-500">
-                  {new Date(a.createdAt).toLocaleDateString("es-ES")} · {a.createdByName}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleDeleteAdjustment(a.id)}
-                disabled={pending}
-                aria-label="Eliminar ajuste"
-                className="text-slate-400 hover:text-red-600 disabled:opacity-60"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+        <SectionBlock className="mb-0">
+          <div className="mb-4 flex flex-wrap items-end gap-3">
+            <div>
+              <label htmlFor="hour-adjustment" className="mb-1 block text-xs text-slate-500">
+                Horas (+/-)
+              </label>
+              <input
+                id="hour-adjustment"
+                type="number"
+                step="0.5"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+                className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
+              />
             </div>
-          ))}
-        </div>
-      </Card>
+            <div className="min-w-[160px] flex-1">
+              <label htmlFor="hour-adjustment-reason" className="mb-1 block text-xs text-slate-500">
+                Motivo
+              </label>
+              <input
+                id="hour-adjustment-reason"
+                type="text"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="field-control w-full rounded-md px-2 py-1.5 text-sm"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleAddAdjustment}
+              disabled={pending}
+              className="rounded-md border border-brand-blue px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
+            >
+              Añadir ajuste
+            </button>
+          </div>
+        </SectionBlock>
+
+        {adjustments.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-500">Sin ajustes registrados.</p>
+        ) : (
+          <ListSurface className="mt-3">
+            {adjustments.map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center justify-between gap-3 py-3 text-sm"
+              >
+                <div>
+                  <span className={`font-medium ${a.hours >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                    {a.hours >= 0 ? "+" : ""}
+                    {a.hours.toFixed(1)} h
+                  </span>
+                  <span className="ml-2 text-slate-500">{a.reason}</span>
+                  <span className="ml-2 text-xs text-slate-500">
+                    {new Date(a.createdAt).toLocaleDateString("es-ES")} · {a.createdByName}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteAdjustment(a.id)}
+                  disabled={pending}
+                  aria-label="Eliminar ajuste"
+                  className="text-slate-400 hover:text-red-600 disabled:opacity-60"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </ListSurface>
+        )}
+      </section>
     </div>
   );
 }

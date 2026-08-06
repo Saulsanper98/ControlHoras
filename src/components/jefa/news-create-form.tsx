@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Newspaper } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { SectionBlock } from "@/components/ui/list-surface";
 import { createNewsAction } from "@/app/(app)/jefa/noticias/actions";
 
 export function NewsCreateForm() {
@@ -24,7 +24,7 @@ export function NewsCreateForm() {
   }
 
   return (
-    <Card>
+    <SectionBlock>
       <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
         <Newspaper className="h-4 w-4" />
         Publicar noticia
@@ -74,6 +74,6 @@ export function NewsCreateForm() {
           </p>
         )}
       </form>
-    </Card>
+    </SectionBlock>
   );
 }

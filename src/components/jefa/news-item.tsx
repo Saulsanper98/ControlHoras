@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { Pin, Pencil, Trash2, X, Check } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
 
 export function NewsItem({
@@ -57,7 +56,7 @@ export function NewsItem({
 
   if (editing) {
     return (
-      <Card className="space-y-3">
+      <div className="space-y-3 py-4">
         <input
           type="text"
           value={titleValue}
@@ -114,12 +113,12 @@ export function NewsItem({
           </div>
         </div>
         {message && <p className="text-sm text-red-600">{message}</p>}
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
+    <div className="py-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -136,7 +135,7 @@ export function NewsItem({
             <img
               src={`/api/uploads/${imagePath}`}
               alt=""
-              className="mt-2 max-h-48 rounded-md border border-brand-navy/10"
+              className="mt-2 max-h-48 rounded-md"
             />
           )}
           <p className="mt-2 text-xs text-slate-500">
@@ -153,6 +152,6 @@ export function NewsItem({
         </div>
       </div>
       {message && <p className="mt-2 text-sm text-red-600">{message}</p>}
-    </Card>
+    </div>
   );
 }

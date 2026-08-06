@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/** Panel único. Evitar anidar Cards dentro de Cards. */
+/**
+ * @deprecated Prefer ListSurface / SectionBlock / TableSurface.
+ * Card se mantiene solo por compatibilidad; no anidar Cards.
+ */
 export function Card({
   className,
   children,
@@ -10,12 +13,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-2xl bg-[#e8f0f8]/90 p-5 ring-1 ring-brand-navy/10",
-        className
-      )}
-    >
+    <div className={cn("border-y border-brand-navy/10 py-4", className)}>
       {children}
     </div>
   );

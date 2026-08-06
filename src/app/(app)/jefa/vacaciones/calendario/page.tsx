@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
+import { SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { daysInMonth } from "@/lib/timesheet-calc";
 
@@ -30,7 +30,6 @@ export default async function VacationCalendarPage({
   const monthStart = new Date(year, month - 1, 1);
   const monthEnd = new Date(year, month, 0);
   const days = daysInMonth(month, year);
-  // Monday-first offset
   const firstDow = (monthStart.getDay() + 6) % 7;
 
   const [departments, approved] = await Promise.all([
@@ -50,7 +49,6 @@ export default async function VacationCalendarPage({
 
   const peopleByDay = new Map<number, { name: string; dept: string }[]>();
   for (const r of approved) {
-    const start = Math.max(1, r.startDate.getDate() === r.startDate.getDate() && r.startDate < monthStart ? 1 : r.startDate.getMonth() + 1 === month && r.startDate.getFullYear() === year ? r.startDate.getDate() : 1);
     const from = r.startDate < monthStart ? 1 : r.startDate.getDate();
     const to = r.endDate > monthEnd ? days : r.endDate.getDate();
     for (let d = from; d <= to; d++) {
@@ -61,7 +59,6 @@ export default async function VacationCalendarPage({
       });
       peopleByDay.set(d, list);
     }
-    void start;
   }
 
   const prev = month === 1 ? { month: 12, year: year - 1 } : { month: month - 1, year };
@@ -82,7 +79,7 @@ export default async function VacationCalendarPage({
         <p className="text-brand-navy/55">Cobertura del equipo por día del mes.</p>
       </div>
 
-      <Card className="flex flex-wrap items-center justify-between gap-3 py-3">
+      <SectionBlock className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/jefa/vacaciones/calendario?month=${prev.month}&year=${prev.year}${queryDept}`}
           className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-brand-navy/5"
@@ -98,7 +95,7 @@ export default async function VacationCalendarPage({
         >
           {MONTH_NAMES[next.month - 1]} →
         </Link>
-      </Card>
+      </SectionBlock>
 
       <form method="get" className="flex flex-wrap items-end gap-2">
         <input type="hidden" name="month" value={month} />
@@ -120,7 +117,7 @@ export default async function VacationCalendarPage({
         </button>
       </form>
 
-      <Card className="overflow-x-auto p-3">
+      <div className="overflow-x-auto border-y border-brand-navy/10 py-3">
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
           {WEEKDAYS.map((d) => (
             <div key={d} className="py-1">
@@ -130,7 +127,7 @@ export default async function VacationCalendarPage({
         </div>
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: firstDow }).map((_, i) => (
-            <div key={`empty-${i}`} className="min-h-20 rounded-lg bg-transparent" />
+            <div key={`empty-${i}`} className="min-h-20" />
           ))}
           {Array.from({ length: days }, (_, i) => {
             const day = i + 1;
@@ -139,8 +136,8 @@ export default async function VacationCalendarPage({
             return (
               <div
                 key={day}
-                className={`min-h-20 rounded-lg border p-1.5 text-left ${
-                  weekend ? "border-brand-navy/8 bg-brand-navy/[0.04]" : "border-brand-navy/10 bg-white"
+                className={`min-h-20 border-t p-1.5 text-left ${
+                  weekend ? "border-brand-navy/8 bg-brand-navy/[0.04]" : "border-brand-navy/10"
                 }`}
               >
                 <p className="text-xs font-semibold text-brand-navy">{day}</p>
@@ -148,7 +145,7 @@ export default async function VacationCalendarPage({
                   {people.slice(0, 3).map((p, idx) => (
                     <p
                       key={`${day}-${p.name}-${idx}`}
-                      className="truncate rounded bg-amber-500/15 px-1 text-[10px] font-medium text-amber-900"
+                      className="truncate bg-amber-500/15 px-1 text-[10px] font-medium text-amber-900"
                       title={`${p.name} · ${p.dept}`}
                     >
                       {p.name}
@@ -162,7 +159,7 @@ export default async function VacationCalendarPage({
             );
           })}
         </div>
-      </Card>
+      </div>
 
       {approved.length === 0 && (
         <p className="text-sm text-slate-500">No hay vacaciones aprobadas en este mes.</p>

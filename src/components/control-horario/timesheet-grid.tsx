@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { TableSurface } from "@/components/ui/list-surface";
 import { sumDayHours } from "@/lib/timesheet-calc";
 
 type GridEntry = {
@@ -31,11 +31,11 @@ export function TimeSheetGrid({
   );
 
   return (
-    <Card className="overflow-x-auto p-0">
+    <TableSurface>
       <table className="w-full min-w-[820px] text-sm">
         <thead>
-          <tr className="surface-muted border-b border-brand-navy/10 text-left text-xs uppercase tracking-wide text-slate-500">
-            <th className="px-3 py-2">Día</th>
+          <tr className="border-b border-brand-navy/10 text-left text-xs uppercase tracking-wide text-slate-500">
+            <th className="px-0 py-2 sm:px-3">Día</th>
             <th className="px-3 py-2">Entrada</th>
             <th className="px-3 py-2">Salida</th>
             <th className="px-3 py-2">Total</th>
@@ -54,7 +54,7 @@ export function TimeSheetGrid({
               });
               return (
                 <tr key={entry.day} className="border-b border-brand-navy/5 last:border-0">
-                  <td className="px-3 py-1.5 whitespace-nowrap text-slate-600">
+                  <td className="whitespace-nowrap px-0 py-1.5 text-slate-600 sm:px-3">
                     {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
                   </td>
                   <td className="px-3 py-1.5 text-slate-600">{entry.checkIn || "—"}</td>
@@ -76,8 +76,8 @@ export function TimeSheetGrid({
           )}
         </tbody>
         <tfoot>
-          <tr className="surface-muted font-semibold text-brand-navy">
-            <td className="px-3 py-2" colSpan={3}>
+          <tr className="border-t border-brand-navy/10 font-semibold text-brand-navy">
+            <td className="px-0 py-2 sm:px-3" colSpan={3}>
               Totales
             </td>
             <td className="px-3 py-2">{totals.totalHours.toFixed(2)}</td>
@@ -88,6 +88,6 @@ export function TimeSheetGrid({
           </tr>
         </tfoot>
       </table>
-    </Card>
+    </TableSurface>
   );
 }

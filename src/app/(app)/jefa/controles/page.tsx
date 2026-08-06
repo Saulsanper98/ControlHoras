@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/ui/page-header";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Stagger } from "@/components/ui/stagger";
+import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 const PAGE_SIZE = 20;
@@ -83,7 +83,6 @@ export default async function ControlesPage({
   ]);
 
   const hasFilters = Boolean(departmentId || month || year);
-
   const totalPages = Math.max(1, Math.ceil(othersTotal / PAGE_SIZE));
 
   const queryBase = new URLSearchParams();
@@ -101,7 +100,7 @@ export default async function ControlesPage({
         />
       </Stagger>
 
-      <Card>
+      <SectionBlock>
         <form className="flex flex-wrap items-end gap-3" method="get">
           <div className="w-40">
             <label htmlFor="filter-department" className="mb-1 block text-xs font-medium text-slate-500">
@@ -157,20 +156,22 @@ export default async function ControlesPage({
             </Link>
           )}
         </form>
-      </Card>
+      </SectionBlock>
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
           Pendientes de firma ({pending.length})
         </h2>
         {pending.length === 0 ? (
-          <Card className="text-sm text-slate-500">No hay controles pendientes.</Card>
+          <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+            No hay controles pendientes.
+          </p>
         ) : (
-          <div className="space-y-2">
+          <ListSurface>
             {pending.map((t) => (
               <TimeSheetRow key={t.id} t={t} />
             ))}
-          </div>
+          </ListSurface>
         )}
       </section>
 
@@ -179,11 +180,11 @@ export default async function ControlesPage({
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
             Sin enviar (borrador) ({drafts.length})
           </h2>
-          <div className="space-y-2">
+          <ListSurface>
             {drafts.map((t) => (
               <TimeSheetRow key={t.id} t={t} />
             ))}
-          </div>
+          </ListSurface>
         </section>
       )}
 
@@ -197,11 +198,11 @@ export default async function ControlesPage({
               Página {page} de {totalPages} · {othersTotal} registros en total
             </p>
           )}
-          <div className="space-y-2">
+          <ListSurface>
             {others.map((t) => (
               <TimeSheetRow key={t.id} t={t} />
             ))}
-          </div>
+          </ListSurface>
           {totalPages > 1 && (
             <div className="mt-4 flex justify-center gap-2">
               {page > 1 && (
@@ -240,18 +241,19 @@ function TimeSheetRow({
   };
 }) {
   return (
-    <Link href={`/jefa/controles/${t.id}`}>
-      <Card className="glass-panel-lift flex items-center justify-between">
-        <div>
-          <p className="font-medium text-brand-navy">{t.user.name}</p>
-          <p className="text-sm text-slate-500">
-            {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
-          </p>
-        </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
-          {STATUS_LABEL[t.status]}
-        </span>
-      </Card>
+    <Link
+      href={`/jefa/controles/${t.id}`}
+      className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+    >
+      <div>
+        <p className="font-medium text-brand-navy">{t.user.name}</p>
+        <p className="text-sm text-slate-500">
+          {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
+        </p>
+      </div>
+      <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
+        {STATUS_LABEL[t.status]}
+      </span>
     </Link>
   );
 }

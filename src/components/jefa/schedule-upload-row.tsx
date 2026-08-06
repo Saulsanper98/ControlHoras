@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { CalendarClock, Trash2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/horarios/actions";
 
@@ -54,10 +53,10 @@ export function ScheduleUploadRow({
   }
 
   return (
-    <Card className="space-y-3">
+    <div className="space-y-3 py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <CalendarClock className="h-5 w-5 text-brand-blue" />
+          <CalendarClock className="h-4 w-4 text-brand-blue" />
           <div>
             <p className="font-medium text-brand-navy">{departmentName}</p>
             <p className="text-sm text-slate-500">Horario compartido del departamento</p>
@@ -105,9 +104,9 @@ export function ScheduleUploadRow({
       {history.length > 1 && (
         <div className="border-t border-brand-navy/8 pt-3">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Historial</p>
-          <ul className="space-y-1">
+          <ul className="divide-y divide-brand-navy/8">
             {history.map((h, idx) => (
-              <li key={h.id} className="flex items-center justify-between gap-2 text-sm">
+              <li key={h.id} className="flex items-center justify-between gap-2 py-2 text-sm">
                 <a
                   href={`/api/uploads/${h.filePath}`}
                   target="_blank"
@@ -144,6 +143,6 @@ export function ScheduleUploadRow({
           {message.text}
         </p>
       )}
-    </Card>
+    </div>
   );
 }

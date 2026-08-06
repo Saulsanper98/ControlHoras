@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { NewsCreateForm } from "@/components/jefa/news-create-form";
 import { NewsItem } from "@/components/jefa/news-item";
+import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 const NEWS_LIMIT = 100;
@@ -25,11 +25,13 @@ export default async function JefaNoticiasPage() {
 
       <NewsCreateForm />
 
-      <div className="space-y-3">
-        {news.length === 0 ? (
-          <Card className="text-sm text-slate-500">Todavía no hay noticias.</Card>
-        ) : (
-          news.map((n) => (
+      {news.length === 0 ? (
+        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+          Todavía no hay noticias.
+        </p>
+      ) : (
+        <ListSurface>
+          {news.map((n) => (
             <NewsItem
               key={n.id}
               id={n.id}
@@ -40,9 +42,9 @@ export default async function JefaNoticiasPage() {
               imagePath={n.imagePath}
               status={n.status}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </ListSurface>
+      )}
     </div>
   );
 }

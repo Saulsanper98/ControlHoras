@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { CalendarClock, Download, FileWarning } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
+import { SectionBlock } from "@/components/ui/list-surface";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 
 // Solo el PDF tiene un visor nativo en el navegador; Excel siempre se
@@ -35,12 +35,10 @@ export default async function HorarioPage() {
 
       {schedule ? (
         <>
-          <Card>
+          <SectionBlock>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-brand-blue/10 p-2 text-brand-blue">
-                  <CalendarClock className="h-5 w-5" />
-                </div>
+                <CalendarClock className="h-4 w-4 text-brand-blue" />
                 <div>
                   <p className="font-medium text-brand-navy">{schedule.fileName}</p>
                   <p className="text-sm text-slate-500">
@@ -61,27 +59,27 @@ export default async function HorarioPage() {
                 {canPreview ? "Abrir en pestaña nueva" : "Descargar"}
               </a>
             </div>
-          </Card>
+          </SectionBlock>
 
           {canPreview ? (
-            <Card className="overflow-hidden p-0">
+            <div className="overflow-hidden border-y border-brand-navy/10">
               <iframe
                 src={`/api/uploads/${schedule.filePath}`}
                 title="Horario asignado"
                 className="h-[75vh] w-full"
               />
-            </Card>
+            </div>
           ) : (
-            <Card className="flex items-center gap-3 text-sm text-slate-500">
+            <p className="flex items-center gap-3 border-y border-brand-navy/10 py-4 text-sm text-slate-500">
               <FileWarning className="h-5 w-5 shrink-0 text-slate-400" />
               Este archivo es un Excel y no se puede previsualizar aquí: descárgalo para abrirlo.
-            </Card>
+            </p>
           )}
         </>
       ) : (
-        <Card>
-          <p className="text-sm text-slate-500">Todavía no se ha asignado ningún horario.</p>
-        </Card>
+        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+          Todavía no se ha asignado ningún horario.
+        </p>
       )}
     </div>
   );

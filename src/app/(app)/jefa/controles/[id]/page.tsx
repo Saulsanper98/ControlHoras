@@ -79,33 +79,35 @@ export default async function ControlDetailPage({
       />
 
       {timeSheet.notes && (
-        <p className="surface-muted rounded-md px-3 py-2 text-sm text-slate-600">
+        <p className="border-y border-brand-navy/10 py-3 text-sm text-slate-600">
           <span className="font-medium">Notas del empleado: </span>
           {timeSheet.notes}
         </p>
       )}
 
       {timeSheet.rejectionReason && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p className="border-y border-red-200/80 bg-red-50/50 py-3 text-sm text-red-800">
           <span className="font-medium">Motivo del rechazo: </span>
           {timeSheet.rejectionReason}
         </p>
       )}
 
       {timeSheet.attachments.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-brand-navy">Archivos adjuntos</p>
-          {timeSheet.attachments.map((a) => (
-            <a
-              key={a.id}
-              href={`/api/uploads/${a.filePath}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="surface-muted block rounded-md border border-brand-navy/10 px-3 py-2 text-sm text-brand-blue hover:underline"
-            >
-              {a.fileName}
-            </a>
-          ))}
+        <div>
+          <p className="mb-2 text-sm font-medium text-brand-navy">Archivos adjuntos</p>
+          <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+            {timeSheet.attachments.map((a) => (
+              <a
+                key={a.id}
+                href={`/api/uploads/${a.filePath}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block py-3 text-sm text-brand-blue transition hover:bg-brand-navy/[0.03] hover:underline"
+              >
+                {a.fileName}
+              </a>
+            ))}
+          </div>
         </div>
       )}
 

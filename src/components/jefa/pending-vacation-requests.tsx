@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
+import { ListSurface } from "@/components/ui/list-surface";
 import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
@@ -73,7 +74,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         Solicitudes pendientes ({requests.length})
       </h2>
       {message && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>}
-      <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+      <ListSurface>
         {requests.map((r) => (
           <div
             key={r.id}
@@ -113,7 +114,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
             </div>
           </div>
         ))}
-      </div>
+      </ListSurface>
 
       <Modal
         open={Boolean(overlapPrompt)}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, CalendarDays } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ListSurface } from "@/components/ui/list-surface";
 import { PendingVacationRequests } from "@/components/jefa/pending-vacation-requests";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
@@ -64,7 +65,7 @@ export default async function JefaVacacionesPage() {
         }))}
       />
 
-      <div className="divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+      <ListSurface>
         {employees.map((e) => {
           const balance = balanceByUser.get(e.id);
           const remaining = balance ? Number(balance.totalDays) - Number(balance.usedDays) : null;
@@ -73,34 +74,34 @@ export default async function JefaVacacionesPage() {
             <Link
               key={e.id}
               href={`/jefa/vacaciones/${e.id}`}
-            className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
-          >
-            <div className="flex items-center gap-3">
-              <Umbrella className="h-4 w-4 text-brand-blue" />
-              <div>
-                <p className="font-medium text-brand-navy">{e.name}</p>
-                <p className="text-sm text-slate-500">{e.department?.name ?? "—"}</p>
+              className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
+            >
+              <div className="flex items-center gap-3">
+                <Umbrella className="h-4 w-4 text-brand-blue" />
+                <div>
+                  <p className="font-medium text-brand-navy">{e.name}</p>
+                  <p className="text-sm text-slate-500">{e.department?.name ?? "—"}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex gap-6 text-right text-sm">
-              <div>
-                <p className="text-xs text-slate-500">Vacaciones</p>
-                <p className="font-medium tabular-nums text-brand-navy">
-                  {remaining !== null ? `${remaining} días` : "Sin datos"}
-                </p>
+              <div className="flex gap-6 text-right text-sm">
+                <div>
+                  <p className="text-xs text-slate-500">Vacaciones</p>
+                  <p className="font-medium tabular-nums text-brand-navy">
+                    {remaining !== null ? `${remaining} días` : "Sin datos"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Bolsa</p>
+                  <p className="font-medium tabular-nums text-brand-navy">{hours.toFixed(1)} h</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-slate-500">Bolsa</p>
-                <p className="font-medium tabular-nums text-brand-navy">{hours.toFixed(1)} h</p>
-              </div>
-            </div>
-          </Link>
-        );
-      })}
-      {employees.length === 0 && (
-        <p className="py-6 text-sm text-slate-500">No hay empleados dados de alta.</p>
-      )}
-      </div>
+            </Link>
+          );
+        })}
+        {employees.length === 0 && (
+          <p className="py-6 text-sm text-slate-500">No hay empleados dados de alta.</p>
+        )}
+      </ListSurface>
     </div>
   );
 }

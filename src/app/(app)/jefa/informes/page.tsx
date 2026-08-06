@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { TableSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { calculateDayHours, sumDayHours } from "@/lib/timesheet-calc";
 
@@ -64,7 +64,7 @@ export default async function InformeHorasPage({
         description={`Totales de ${MONTH_NAMES[month - 1]} de ${year} por empleado y departamento.`}
       />
 
-      <form method="get" className="flex flex-wrap gap-2">
+      <form method="get" className="flex flex-wrap gap-2 border-y border-brand-navy/10 py-4">
         <select name="month" defaultValue={month} className="field-control px-3 py-2 text-sm">
           {MONTH_NAMES.map((m, i) => (
             <option key={m} value={i + 1}>
@@ -90,11 +90,11 @@ export default async function InformeHorasPage({
             <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-navy/50">
               {dept} · {deptTotal.toFixed(1)} h
             </h2>
-            <Card className="overflow-x-auto p-0">
+            <TableSurface>
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-brand-navy/10 text-xs uppercase text-slate-500">
                   <tr>
-                    <th className="px-3 py-2">Empleado</th>
+                    <th className="px-0 py-2 sm:px-3">Empleado</th>
                     <th className="px-3 py-2">Estado</th>
                     <th className="px-3 py-2 tabular-nums">Total</th>
                     <th className="px-3 py-2 tabular-nums">Norm.</th>
@@ -105,8 +105,8 @@ export default async function InformeHorasPage({
                 </thead>
                 <tbody>
                   {list.map((r) => (
-                    <tr key={r.id} className="border-b border-brand-navy/5">
-                      <td className="px-3 py-2 font-medium text-brand-navy">{r.name}</td>
+                    <tr key={r.id} className="border-b border-brand-navy/5 last:border-0">
+                      <td className="px-0 py-2 font-medium text-brand-navy sm:px-3">{r.name}</td>
                       <td className="px-3 py-2 text-slate-500">{r.status}</td>
                       <td className="px-3 py-2 tabular-nums">{r.total.toFixed(1)}</td>
                       <td className="px-3 py-2 tabular-nums">{r.normal.toFixed(1)}</td>
@@ -126,13 +126,15 @@ export default async function InformeHorasPage({
                   ))}
                 </tbody>
               </table>
-            </Card>
+            </TableSurface>
           </section>
         );
       })}
 
       {rows.length === 0 && (
-        <Card className="text-sm text-slate-500">No hay controles en este mes.</Card>
+        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+          No hay controles en este mes.
+        </p>
       )}
     </div>
   );

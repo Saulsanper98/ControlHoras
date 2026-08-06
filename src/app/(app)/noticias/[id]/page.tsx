@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
+import { SectionBlock } from "@/components/ui/list-surface";
 
 export default async function NoticiaDetallePage({
   params,
@@ -27,23 +27,23 @@ export default async function NoticiaDetallePage({
         <ChevronLeft className="h-4 w-4" />
         Volver a noticias
       </Link>
-      <Card>
+      <SectionBlock className="space-y-4">
         <div className="flex items-center gap-2">
           {news.pinned && <Pin className="h-4 w-4 text-brand-blue" />}
           <h1 className="font-display text-2xl font-semibold text-brand-navy">{news.title}</h1>
         </div>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="text-xs text-slate-500">
           {news.publishedAt.toLocaleDateString("es-ES")} · {news.publishedBy.name}
         </p>
         {news.imagePath && (
           <img
             src={`/api/uploads/${news.imagePath}`}
             alt=""
-            className="mt-4 max-h-[28rem] w-full rounded-xl object-cover"
+            className="max-h-[28rem] w-full rounded-xl object-cover"
           />
         )}
-        <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-700">{news.body}</p>
-      </Card>
+        <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">{news.body}</p>
+      </SectionBlock>
     </div>
   );
 }

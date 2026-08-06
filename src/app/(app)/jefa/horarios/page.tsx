@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { ScheduleUploadRow } from "@/components/jefa/schedule-upload-row";
+import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 export default async function HorariosPage() {
@@ -31,40 +31,43 @@ export default async function HorariosPage() {
         </p>
       </div>
 
-      <div className="space-y-2">
-        {departments.map((dept) => {
-          const list = byDept.get(dept.id) ?? [];
-          const latest = list[0] ?? null;
-          return (
-            <ScheduleUploadRow
-              key={dept.id}
-              departmentId={dept.id}
-              departmentName={dept.name}
-              schedule={
-                latest
-                  ? {
-                      id: latest.id,
-                      fileName: latest.fileName,
-                      filePath: latest.filePath,
-                      createdAt: latest.createdAt.toISOString(),
-                      validFrom: latest.validFrom.toISOString(),
-                    }
-                  : null
-              }
-              history={list.map((s) => ({
-                id: s.id,
-                fileName: s.fileName,
-                filePath: s.filePath,
-                createdAt: s.createdAt.toISOString(),
-                validFrom: s.validFrom.toISOString(),
-              }))}
-            />
-          );
-        })}
-        {departments.length === 0 && (
-          <Card className="text-sm text-slate-500">No hay departamentos configurados.</Card>
-        )}
-      </div>
+      {departments.length === 0 ? (
+        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+          No hay departamentos configurados.
+        </p>
+      ) : (
+        <ListSurface>
+          {departments.map((dept) => {
+            const list = byDept.get(dept.id) ?? [];
+            const latest = list[0] ?? null;
+            return (
+              <ScheduleUploadRow
+                key={dept.id}
+                departmentId={dept.id}
+                departmentName={dept.name}
+                schedule={
+                  latest
+                    ? {
+                        id: latest.id,
+                        fileName: latest.fileName,
+                        filePath: latest.filePath,
+                        createdAt: latest.createdAt.toISOString(),
+                        validFrom: latest.validFrom.toISOString(),
+                      }
+                    : null
+                }
+                history={list.map((s) => ({
+                  id: s.id,
+                  fileName: s.fileName,
+                  filePath: s.filePath,
+                  createdAt: s.createdAt.toISOString(),
+                  validFrom: s.validFrom.toISOString(),
+                }))}
+              />
+            );
+          })}
+        </ListSurface>
+      )}
     </div>
   );
 }

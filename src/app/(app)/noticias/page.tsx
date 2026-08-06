@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
+import { ListSurface } from "@/components/ui/list-surface";
 
 const NEWS_LIMIT = 100;
 
@@ -24,33 +24,37 @@ export default async function NoticiasPage() {
         <p className="text-brand-navy/55">Todas las noticias y comunicados de la empresa.</p>
       </div>
 
-      <div className="space-y-3">
-        {news.length === 0 ? (
-          <Card className="text-sm text-slate-500">Todavía no hay noticias publicadas.</Card>
-        ) : (
-          news.map((n) => (
-            <Card key={n.id}>
-              <Link href={`/noticias/${n.id}`} className="block">
-                <div className="flex items-center gap-2">
-                  {n.pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
-                  <p className="font-medium text-brand-navy hover:underline">{n.title}</p>
-                </div>
-                <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
-                {n.imagePath && (
-                  <img
-                    src={`/api/uploads/${n.imagePath}`}
-                    alt=""
-                    className="mt-2 max-h-64 rounded-md border border-brand-navy/10"
-                  />
-                )}
-                <p className="mt-2 text-xs text-slate-500">
-                  {n.publishedAt.toLocaleDateString("es-ES")} · {n.publishedBy.name}
-                </p>
-              </Link>
-            </Card>
-          ))
-        )}
-      </div>
+      {news.length === 0 ? (
+        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
+          Todavía no hay noticias publicadas.
+        </p>
+      ) : (
+        <ListSurface>
+          {news.map((n) => (
+            <Link
+              key={n.id}
+              href={`/noticias/${n.id}`}
+              className="block py-4 transition hover:bg-brand-navy/[0.03]"
+            >
+              <div className="flex items-center gap-2">
+                {n.pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
+                <p className="font-medium text-brand-navy">{n.title}</p>
+              </div>
+              <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
+              {n.imagePath && (
+                <img
+                  src={`/api/uploads/${n.imagePath}`}
+                  alt=""
+                  className="mt-2 max-h-64 rounded-md"
+                />
+              )}
+              <p className="mt-2 text-xs text-slate-500">
+                {n.publishedAt.toLocaleDateString("es-ES")} · {n.publishedBy.name}
+              </p>
+            </Link>
+          ))}
+        </ListSurface>
+      )}
     </div>
   );
 }
