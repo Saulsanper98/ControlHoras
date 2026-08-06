@@ -126,15 +126,20 @@ export function CommandPalette({ role }: { role: AppRole }) {
         </kbd>
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Ir a…">
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Ir a…"
+        className="max-w-xl bg-[#f4f8fc] shadow-[0_28px_70px_rgba(15,23,42,0.32)]"
+      >
         <input
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Escribe para buscar páginas…"
-          className="field-control mb-3 w-full px-3 py-2 text-sm"
+          className="field-control mb-3 w-full bg-white px-3 py-2 text-sm"
         />
-        <ul className="max-h-64 overflow-y-auto">
+        <ul className="max-h-64 overflow-y-auto rounded-xl border border-brand-navy/8 bg-white px-1 py-1.5">
           {filtered.map((item) => {
             const Icon = item.icon;
             return (

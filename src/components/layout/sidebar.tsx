@@ -49,7 +49,7 @@ export function Sidebar({
   const items = role === "JEFA" ? jefaNav : employeeNav;
 
   return (
-    <nav className="flex flex-col gap-2 px-3 py-4">
+    <nav className="flex flex-col gap-2.5 px-2 py-3">
       {items.map((item) => (
         <NavLink
           key={item.href}

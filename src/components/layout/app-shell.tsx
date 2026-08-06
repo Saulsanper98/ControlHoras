@@ -69,10 +69,10 @@ export function AppShell({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-3 py-4">
+        <div className="flex-1 px-3 py-4">
           <Sidebar role={role} onNavigate={() => setOpen(false)} />
         </div>
-        <div className="mx-3 mb-4 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+        <div className="mx-3 mb-4 mt-auto rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3">
           <div className="mb-2 px-3 text-xs">
             <p className="font-medium text-slate-100">{userName}</p>
             <p className="text-slate-400">{roleLabel}</p>

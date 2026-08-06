@@ -37,7 +37,7 @@ export function Modal({
       <button
         type="button"
         aria-label="Cerrar"
-        className="absolute inset-0 animate-modal-backdrop bg-brand-navy/45 backdrop-blur-sm"
+        className="absolute inset-0 animate-modal-backdrop bg-brand-navy/62 backdrop-blur-[2px]"
         onClick={onClose}
       />
       <div
