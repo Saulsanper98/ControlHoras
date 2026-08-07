@@ -78,6 +78,8 @@ export function FieldSelect({
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         setOpen(false);
         return;
       }

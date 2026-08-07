@@ -13,7 +13,7 @@ import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { daysInMonth } from "@/lib/timesheet-calc";
-import { LEAVE_TYPE_LABEL } from "@/lib/labels";
+import { LEAVE_TYPE_COLOR, LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
@@ -56,6 +56,13 @@ export default async function VacationCalendarPage({
   ]);
 
   type DayPerson = { name: string; dept: string; leaveType: string };
+
+  function chipDisplayName(fullName: string): string {
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length <= 1) return parts[0] ?? fullName;
+    return `${parts[0]} ${parts[1]![0]}.`;
+  }
+
   const peopleByDay = new Map<number, DayPerson[]>();
   for (const r of approved) {
     const from = r.startDate < monthStart ? 1 : r.startDate.getDate();
@@ -63,7 +70,7 @@ export default async function VacationCalendarPage({
     for (let d = from; d <= to; d++) {
       const list = peopleByDay.get(d) ?? [];
       list.push({
-        name: r.user.name.split(" ")[0] ?? r.user.name,
+        name: chipDisplayName(r.user.name),
         dept: r.user.department?.name ?? "—",
         leaveType: r.leaveType,
       });
@@ -94,13 +101,7 @@ export default async function VacationCalendarPage({
   }
 
   function chipClass(leaveType: string) {
-    if (leaveType === "ASUNTOS_PROPIOS") {
-      return "bg-brand-navy/10 text-brand-navy";
-    }
-    if (leaveType === "MEDIO_DIA") {
-      return "bg-sky-500/15 text-sky-900";
-    }
-    return "bg-amber-500/15 text-amber-900";
+    return LEAVE_TYPE_COLOR[leaveType] ?? "bg-brand-navy/[0.06] text-slate-600";
   }
 
   return (
@@ -116,7 +117,7 @@ export default async function VacationCalendarPage({
               year={year}
               options={yearOptions.map((y) => ({
                 year: y,
-                href: calendarHref({ year: y, month: 1 }),
+                href: calendarHref({ year: y }),
               }))}
             />
           </PageHeader>
@@ -177,6 +178,11 @@ export default async function VacationCalendarPage({
         <button type="submit" className="btn-primary">
           Filtrar
         </button>
+        {departmentId && (
+          <Link href={calendarHref({ department: "" })} className="btn-ghost">
+            Limpiar departamento
+          </Link>
+        )}
       </form>
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
@@ -192,15 +198,30 @@ export default async function VacationCalendarPage({
           {showAllTypes ? "Solo vacaciones" : "Incluir todos los tipos"}
         </Link>
         <span className="inline-flex items-center gap-1.5">
-          <span className="rounded-lg bg-amber-500/15 px-2 py-0.5 font-medium text-amber-900">
+          <span
+            className={cn(
+              "rounded-lg px-2 py-0.5 font-medium",
+              LEAVE_TYPE_COLOR.VACACIONES
+            )}
+          >
             {LEAVE_TYPE_LABEL.VACACIONES}
           </span>
           {showAllTypes && (
             <>
-              <span className="rounded-lg bg-brand-navy/10 px-2 py-0.5 font-medium text-brand-navy">
+              <span
+                className={cn(
+                  "rounded-lg px-2 py-0.5 font-medium",
+                  LEAVE_TYPE_COLOR.ASUNTOS_PROPIOS
+                )}
+              >
                 {LEAVE_TYPE_LABEL.ASUNTOS_PROPIOS}
               </span>
-              <span className="rounded-lg bg-sky-500/15 px-2 py-0.5 font-medium text-sky-900">
+              <span
+                className={cn(
+                  "rounded-lg px-2 py-0.5 font-medium",
+                  LEAVE_TYPE_COLOR.MEDIO_DIA
+                )}
+              >
                 {LEAVE_TYPE_LABEL.MEDIO_DIA}
               </span>
             </>
@@ -221,6 +242,17 @@ export default async function VacationCalendarPage({
             showAllTypes
               ? "No hay ausencias aprobadas en este mes para el filtro actual."
               : "No hay vacaciones aprobadas en este mes. Prueba a incluir todos los tipos."
+          }
+          action={
+            departmentId ? (
+              <Link href={calendarHref({ department: "" })} className="btn-secondary">
+                Quitar filtro de departamento
+              </Link>
+            ) : !showAllTypes ? (
+              <Link href={calendarHref({ tipos: "todos" })} className="btn-secondary">
+                Incluir todos los tipos
+              </Link>
+            ) : undefined
           }
         />
       ) : (

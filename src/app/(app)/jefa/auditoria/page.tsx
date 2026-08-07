@@ -38,13 +38,19 @@ const ENTITY_LABEL: Record<string, string> = {
   News: "Noticia",
 };
 
-function entityHref(entityType: string, entityId: string | null): string | null {
+function entityHref(
+  entityType: string,
+  entityId: string | null,
+  vacationUserByRequestId: Map<string, string>
+): string | null {
   if (!entityId) return null;
   switch (entityType) {
     case "TimeSheet":
       return `/jefa/controles/${entityId}`;
-    case "VacationRequest":
-      return `/jefa/vacaciones`;
+    case "VacationRequest": {
+      const userId = vacationUserByRequestId.get(entityId);
+      return userId ? `/jefa/vacaciones/${userId}` : `/jefa/vacaciones`;
+    }
     case "User":
       return `/jefa/empleados`;
     case "News":
@@ -99,6 +105,20 @@ export default async function AuditoriaPage({
       orderBy: { action: "asc" },
     }),
   ]);
+
+  const vacationRequestIds = logs
+    .filter((l) => l.entityType === "VacationRequest" && l.entityId)
+    .map((l) => l.entityId!);
+  const vacationRequests =
+    vacationRequestIds.length > 0
+      ? await prisma.vacationRequest.findMany({
+          where: { id: { in: vacationRequestIds } },
+          select: { id: true, userId: true },
+        })
+      : [];
+  const vacationUserByRequestId = new Map(
+    vacationRequests.map((r) => [r.id, r.userId])
+  );
 
   const totalPages = Math.max(1, Math.ceil(total / TAKE));
   const hasPrev = page > 1;
@@ -155,7 +175,7 @@ export default async function AuditoriaPage({
           </button>
           {(action || actorQuery) && (
             <Link href="/jefa/auditoria" className="btn-sm btn-ghost">
-              Limpiar
+              Limpiar filtros
             </Link>
           )}
         </form>
@@ -172,8 +192,8 @@ export default async function AuditoriaPage({
           }
           action={
             action || actorQuery ? (
-              <Link href="/jefa/auditoria" className="btn-ghost">
-                Limpiar
+              <Link href="/jefa/auditoria" className="btn-primary">
+                Limpiar filtros
               </Link>
             ) : undefined
           }
@@ -194,7 +214,11 @@ export default async function AuditoriaPage({
                 </thead>
                 <tbody>
                   {logs.map((l) => {
-                    const href = entityHref(l.entityType, l.entityId);
+                    const href = entityHref(
+                      l.entityType,
+                      l.entityId,
+                      vacationUserByRequestId
+                    );
                     const label = `${ENTITY_LABEL[l.entityType] ?? l.entityType}${
                       l.entityId ? ` · ${l.entityId.slice(0, 8)}…` : ""
                     }`;

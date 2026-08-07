@@ -74,10 +74,10 @@ export function VacationRequestsPanel({
   function handleCancel(id: string) {
     void (async () => {
       const ok = await confirm({
-        title: "Cancelar solicitud",
-        message: "¿Cancelar esta solicitud de vacaciones?",
+        title: "Retirar solicitud",
+        message: "¿Retirar esta solicitud de vacaciones?",
         variant: "danger",
-        confirmLabel: "Cancelar solicitud",
+        confirmLabel: "Retirar solicitud",
       });
       if (!ok) return;
       startTransition(async () => {
@@ -163,7 +163,7 @@ export function VacationRequestsPanel({
                   <span>· {formatRelativeTime(r.createdAt)}</span>
                 </p>
                 {r.rejectionReason && (
-                  <Alert variant="danger" className="mt-2 rounded-md border">
+                  <Alert variant="danger" className="mt-2">
                     <p className="text-xs">{r.rejectionReason}</p>
                   </Alert>
                 )}
@@ -271,7 +271,7 @@ export function VacationRequestsPanel({
             <button
               type="button"
               onClick={handleCreate}
-              disabled={pending || !startDate || !endDate}
+              disabled={pending || !startDate || !endDate || estimatedDays === 0}
               className="btn-primary"
             >
               {pending ? "Enviando…" : "Enviar solicitud"}

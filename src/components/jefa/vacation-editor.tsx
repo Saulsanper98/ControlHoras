@@ -140,6 +140,7 @@ export function VacationEditor({
               onChange={(e) => setNotes(e.target.value)}
               className="field-control w-full px-2 py-1.5 text-sm"
             />
+            <p className="mt-1 text-xs text-slate-500">Visible para el empleado</p>
           </div>
           <button
             type="button"
@@ -186,7 +187,7 @@ export function VacationEditor({
             </div>
             <div className="min-w-[160px] flex-1">
               <label htmlFor="hour-adjustment-reason" className="mb-1 block text-xs text-slate-500">
-                Motivo
+                Motivo <span className="text-red-600">*</span>
               </label>
               <input
                 id="hour-adjustment-reason"

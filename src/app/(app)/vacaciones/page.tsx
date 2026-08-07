@@ -97,7 +97,9 @@ export default async function VacacionesPage({
   const totalDays = balance ? Number(balance.totalDays) : 0;
   const usedDays = balance ? Number(balance.usedDays) : 0;
   const pendingDays = Number(pendingDaysAgg._sum.days ?? 0);
-  const remaining = balance ? totalDays - usedDays - pendingDays : null;
+  const rawRemaining = balance ? totalDays - usedDays - pendingDays : null;
+  const remaining = rawRemaining !== null ? Math.max(0, rawRemaining) : null;
+  const remainingNegative = rawRemaining !== null && rawRemaining < 0;
   const totalHours = adjustments.reduce((sum, a) => sum + Number(a.hours), 0);
 
   const timelineRequests = vacationRequests
@@ -135,8 +137,15 @@ export default async function VacacionesPage({
           <div className="min-w-0 flex-1">
             <p className="text-sm text-slate-500">Vacaciones disponibles</p>
             <p className="font-display text-xl font-semibold tabular-nums text-brand-navy">
-              {remaining !== null ? `${remaining} días` : "Sin datos"}
+              {remaining !== null
+                ? `${remaining} días`
+                : "Consulta con tu responsable si no ves tu saldo"}
             </p>
+            {remainingNegative && (
+              <p className="mt-0.5 text-xs text-amber-700">
+                El saldo registrado está por debajo de cero; se muestra 0 hasta regularizar.
+              </p>
+            )}
             {totalDays > 0 && (
               <p className="mt-0.5 text-xs tabular-nums text-slate-500">
                 Total {totalDays} · Usados {usedDays}

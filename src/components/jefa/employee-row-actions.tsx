@@ -15,6 +15,14 @@ import {
   updateEmployeeAction,
 } from "@/app/(app)/jefa/empleados/actions";
 
+const NO_DEPARTMENT = "";
+
+function departmentOptions(departments: Dept[]) {
+  return [
+    { value: NO_DEPARTMENT, label: "Sin departamento" },
+    ...departments.map((d) => ({ value: d.id, label: d.name })),
+  ];
+}
 type Dept = { id: string; name: string };
 type Employee = {
   id: string;
@@ -46,11 +54,15 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [departmentId, setDepartmentId] = useState(departments[0]?.id ?? "");
+  const [departmentId, setDepartmentId] = useState(NO_DEPARTMENT);
 
   function submit() {
     startTransition(async () => {
-      const result = await createEmployeeAction({ name, email, departmentId });
+      const result = await createEmployeeAction({
+        name,
+        email,
+        departmentId: departmentId || null,
+      });
       if (result.ok) {
         tempPasswordToast(
           showToast,
@@ -68,7 +80,12 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="btn-primary">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={departments.length === 0}
+        className="btn-primary disabled:opacity-50"
+      >
         <UserPlus className="h-4 w-4" />
         Alta de empleado
       </button>
@@ -107,7 +124,7 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
               id="emp-create-dept"
               value={departmentId}
               onChange={setDepartmentId}
-              options={departments.map((d) => ({ value: d.id, label: d.name }))}
+              options={departmentOptions(departments)}
             />
           </div>
           <p className="text-xs text-slate-500">
@@ -141,7 +158,7 @@ export function EmployeeRowActions({
   const [editOpen, setEditOpen] = useState(false);
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [departmentId, setDepartmentId] = useState(user.departmentId ?? departments[0]?.id ?? "");
+  const [departmentId, setDepartmentId] = useState(user.departmentId ?? NO_DEPARTMENT);
 
   async function handleToggle() {
     const next = !user.active;
@@ -189,7 +206,7 @@ export function EmployeeRowActions({
         userId: user.id,
         name,
         email,
-        departmentId,
+        departmentId: departmentId || null,
       });
       if (result.ok) {
         showToast("Empleado actualizado.");
@@ -264,7 +281,7 @@ export function EmployeeRowActions({
               id={`emp-edit-dept-${user.id}`}
               value={departmentId}
               onChange={setDepartmentId}
-              options={departments.map((d) => ({ value: d.id, label: d.name }))}
+              options={departmentOptions(departments)}
             />
           </div>
           <button

@@ -113,7 +113,11 @@ export default async function JefaVacacionesPage({
               <p className="text-xs text-amber-700">{pending} días en trámite</p>
             )}
             {total > 0 && (
-              <div className="mt-1.5 w-28 max-w-full">
+              <div
+                className="mt-1.5 w-28 max-w-full"
+                title={`Usados ${used} · En trámite ${pending} de ${total} días`}
+                aria-label={`Vacaciones: ${used} días usados, ${pending} en trámite, de ${total} totales`}
+              >
                 <div className="flex h-1 overflow-hidden rounded-full bg-brand-navy/8">
                   <div
                     className="bg-brand-blue"

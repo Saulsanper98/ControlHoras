@@ -6,15 +6,19 @@ export function YearSwitcher({
   year,
   options = [],
   className,
+  id,
 }: {
   year: number;
   options?: { year: number; href: string }[];
   className?: string;
+  /** id del grupo para asociar con <label htmlFor>. */
+  id?: string;
 }) {
   if (options.length === 0) return null;
 
   return (
     <div
+      id={id}
       className={cn("flex flex-wrap gap-1.5", className)}
       role="group"
       aria-label="Seleccionar año"

@@ -154,16 +154,20 @@ export function DateField({
   const minDate = min ? parseISODate(min) : null;
   const maxDate = max ? parseISODate(max) : null;
 
-  function shiftMonth(delta: number) {
-    const d = new Date(viewYear, viewMonth - 1 + delta, 1);
-    setViewYear(d.getFullYear());
-    setViewMonth(d.getMonth() + 1);
-  }
-
   function isDisabled(date: Date): boolean {
     if (minDate && date < minDate) return true;
     if (maxDate && date > maxDate) return true;
     return false;
+  }
+
+  const todayIso = toISODate(new Date());
+  const todayDate = parseISODate(todayIso);
+  const todayDisabled = !todayDate || isDisabled(todayDate);
+
+  function shiftMonth(delta: number) {
+    const d = new Date(viewYear, viewMonth - 1 + delta, 1);
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth() + 1);
   }
 
   const panel =
@@ -267,11 +271,15 @@ export function DateField({
           </span>
           <button
             type="button"
+            disabled={todayDisabled}
             onClick={() => {
-              onChange(toISODate(new Date()));
+              onChange(todayIso);
               setOpen(false);
             }}
-            className="font-medium text-brand-blue hover:underline"
+            className={cn(
+              "font-medium text-brand-blue hover:underline",
+              todayDisabled && "cursor-not-allowed opacity-40 hover:no-underline"
+            )}
           >
             Hoy
           </button>

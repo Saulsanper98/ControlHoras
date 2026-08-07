@@ -7,17 +7,16 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Stagger } from "@/components/ui/stagger";
 import { EmptyState } from "@/components/ui/empty-state";
+import { InlineEmpty } from "@/components/ui/inline-empty";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionEyebrow } from "@/components/ui/section-title";
 import { ListSurface, ListRow, SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { MONTH_NAMES_ES } from "@/lib/format-date";
+import { TIMESHEET_STATUS_DESCRIPTION, TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 
 const PAGE_SIZE = 20;
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
+const DRAFTS_TAKE = 30;
 
 export default async function ControlesPage({
   searchParams,
@@ -33,7 +32,6 @@ export default async function ControlesPage({
   const year = params.year ? Number(params.year) : undefined;
   const page = Math.max(1, Number(params.page) || 1);
 
-  const HISTORY_LIMIT = PAGE_SIZE;
   const historySkip = (page - 1) * PAGE_SIZE;
 
   const baseWhere = {
@@ -42,7 +40,7 @@ export default async function ControlesPage({
     ...(year ? { year } : {}),
   };
 
-  const [pending, drafts, others, othersTotal, departments, years] = await Promise.all([
+  const [pending, drafts, draftsTotal, others, othersTotal, departments, years] = await Promise.all([
     prisma.timeSheet.findMany({
       where: { status: "FIRMADO_EMPLEADO", ...baseWhere },
       include: { user: { include: { department: true } } },
@@ -52,13 +50,16 @@ export default async function ControlesPage({
       where: { status: "BORRADOR", ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
-      take: 30,
+      take: DRAFTS_TAKE,
+    }),
+    prisma.timeSheet.count({
+      where: { status: "BORRADOR", ...baseWhere },
     }),
     prisma.timeSheet.findMany({
       where: { status: { in: ["FIRMADO_RESPONSABLE", "RECHAZADO"] }, ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
-      take: HISTORY_LIMIT,
+      take: PAGE_SIZE,
       skip: historySkip,
     }),
     prisma.timeSheet.count({
@@ -73,13 +74,20 @@ export default async function ControlesPage({
   ]);
 
   const hasFilters = Boolean(departmentId || month || year);
-  const isFullyEmpty = pending.length === 0 && drafts.length === 0 && othersTotal === 0;
+  const isFullyEmpty = pending.length === 0 && draftsTotal === 0 && othersTotal === 0;
   const totalPages = Math.max(1, Math.ceil(othersTotal / PAGE_SIZE));
 
   const queryBase = new URLSearchParams();
   if (departmentId) queryBase.set("department", departmentId);
   if (month) queryBase.set("month", String(month));
   if (year) queryBase.set("year", String(year));
+
+  function pageHref(p: number) {
+    const q = new URLSearchParams(queryBase);
+    if (p > 1) q.set("page", String(p));
+    const s = q.toString();
+    return s ? `/jefa/controles?${s}` : "/jefa/controles";
+  }
 
   return (
     <div className="space-y-8">
@@ -112,7 +120,7 @@ export default async function ControlesPage({
             </label>
             <Select id="filter-month" name="month" defaultValue={month ?? ""}>
               <option value="">Todos</option>
-              {MONTH_NAMES.map((name, i) => (
+              {MONTH_NAMES_ES.map((name, i) => (
                 <option key={name} value={i + 1}>
                   {name}
                 </option>
@@ -167,11 +175,9 @@ export default async function ControlesPage({
       <section>
         <SectionEyebrow>Pendientes de firma ({pending.length})</SectionEyebrow>
         {pending.length === 0 ? (
-          <EmptyState
-            icon={ClipboardList}
-            title="No hay controles pendientes"
-            description="Cuando un empleado envíe su control, aparecerá aquí para firmar."
-          />
+          <InlineEmpty>
+            No hay controles con estado «{TIMESHEET_STATUS_LABEL.FIRMADO_EMPLEADO}».
+          </InlineEmpty>
         ) : (
           <ListSurface>
             {pending.map((t) => (
@@ -181,9 +187,16 @@ export default async function ControlesPage({
         )}
       </section>
 
-      {drafts.length > 0 && (
+      {(drafts.length > 0 || draftsTotal > 0) && (
         <section>
-          <SectionEyebrow>Sin enviar (borrador) ({drafts.length})</SectionEyebrow>
+          <SectionEyebrow>
+            {TIMESHEET_STATUS_DESCRIPTION.BORRADOR} ({draftsTotal})
+          </SectionEyebrow>
+          {draftsTotal > DRAFTS_TAKE && (
+            <p className="mb-3 text-xs text-slate-500">
+              Mostrando {drafts.length} de {draftsTotal}
+            </p>
+          )}
           <ListSurface>
             {drafts.map((t) => (
               <TimeSheetRow key={t.id} t={t} />
@@ -192,34 +205,32 @@ export default async function ControlesPage({
         </section>
       )}
 
-      {others.length > 0 && (
+      {othersTotal > 0 && (
         <section>
           <SectionEyebrow>Historial</SectionEyebrow>
-          {others.length === HISTORY_LIMIT && othersTotal > HISTORY_LIMIT && (
+          {totalPages > 1 && (
             <p className="mb-3 text-xs text-slate-500">
               Página {page} de {totalPages} · {othersTotal} registros en total
             </p>
           )}
-          <ListSurface>
-            {others.map((t) => (
-              <TimeSheetRow key={t.id} t={t} />
-            ))}
-          </ListSurface>
+          {others.length === 0 ? (
+            <InlineEmpty>No hay registros en esta página.</InlineEmpty>
+          ) : (
+            <ListSurface>
+              {others.map((t) => (
+                <TimeSheetRow key={t.id} t={t} />
+              ))}
+            </ListSurface>
+          )}
           {totalPages > 1 && (
             <div className="mt-4 flex justify-center gap-2">
               {page > 1 && (
-                <Link
-                  href={`/jefa/controles?${queryBase.toString()}&page=${page - 1}`}
-                  className="btn-sm btn-ghost"
-                >
+                <Link href={pageHref(page - 1)} className="btn-sm btn-ghost">
                   ← Anterior
                 </Link>
               )}
               {page < totalPages && (
-                <Link
-                  href={`/jefa/controles?${queryBase.toString()}&page=${page + 1}`}
-                  className="btn-sm btn-ghost"
-                >
+                <Link href={pageHref(page + 1)} className="btn-sm btn-ghost">
                   Siguiente →
                 </Link>
               )}
@@ -253,7 +264,7 @@ function TimeSheetRow({
       <div>
         <p className="font-medium text-brand-navy">{t.user.name}</p>
         <p className="text-sm text-slate-500">
-          {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
+          {t.user.department?.name ?? "—"} · {MONTH_NAMES_ES[t.month - 1]} de {t.year}
         </p>
       </div>
       <StatusBadge status={t.status} />

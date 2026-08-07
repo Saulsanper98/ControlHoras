@@ -11,7 +11,7 @@ import { YearSwitcher } from "@/components/ui/year-switcher";
 import { VacationProgressBar } from "@/components/vacaciones/vacation-progress";
 import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
-import { formatDate, formatDateShort } from "@/lib/format-date";
+import { formatDateShort } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { CalendarDays } from "lucide-react";
 
@@ -75,15 +75,15 @@ export default async function VacationDetailPage({
           <PageHeader
             title={employee.name}
             description={`${employee.department?.name ?? "—"} · Saldo y bolsa ${year}`}
-          />
-          <YearSwitcher
-            className="mt-3"
-            year={year}
-            options={years.map((y) => ({
-              year: y,
-              href: `/jefa/vacaciones/${userId}?year=${y}`,
-            }))}
-          />
+          >
+            <YearSwitcher
+              year={year}
+              options={years.map((y) => ({
+                year: y,
+                href: `/jefa/vacaciones/${userId}?year=${y}`,
+              }))}
+            />
+          </PageHeader>
         </div>
       </Stagger>
 
@@ -124,7 +124,7 @@ export default async function VacationDetailPage({
               >
                 <div className="min-w-0">
                   <p className="font-medium text-brand-navy">
-                    {formatDateShort(r.startDate)} – {formatDate(r.endDate)}
+                    {formatDateShort(r.startDate)} – {formatDateShort(r.endDate)}
                     <span className="ml-2 font-normal tabular-nums text-slate-500">
                       {Number(r.days)} día{Number(r.days) === 1 ? "" : "s"}
                     </span>

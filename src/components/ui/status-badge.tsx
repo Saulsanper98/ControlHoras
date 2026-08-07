@@ -4,6 +4,7 @@ import {
   ACTIVE_STATUS_LABEL,
   LEAVE_STATUS_COLOR,
   LEAVE_STATUS_LABEL,
+  LEAVE_TYPE_COLOR,
   LEAVE_TYPE_LABEL,
   NEWS_STATUS_COLOR,
   NEWS_STATUS_LABEL,
@@ -21,12 +22,6 @@ const PRESETS = {
   news: { label: NEWS_STATUS_LABEL, color: NEWS_STATUS_COLOR },
   schedule: { label: SCHEDULE_STATUS_LABEL, color: SCHEDULE_STATUS_COLOR },
 } as const;
-
-const LEAVE_TYPE_COLOR: Record<string, string> = {
-  VACACIONES: "bg-brand-blue/12 text-brand-blue",
-  ASUNTOS_PROPIOS: "bg-brand-navy/[0.06] text-slate-600",
-  MEDIO_DIA: "bg-amber-500/12 text-amber-800",
-};
 
 export function StatusBadge({
   status,

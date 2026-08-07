@@ -14,6 +14,22 @@ import { YearSwitcher } from "@/components/ui/year-switcher";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { buildInformeHoras } from "@/lib/informe-horas";
+import {
+  TIMESHEET_STATUS_DESCRIPTION,
+  TIMESHEET_STATUS_LABEL,
+} from "@/lib/labels";
+
+function controlesHref(
+  month: number,
+  year: number,
+  departmentId: string | null | undefined
+) {
+  const q = new URLSearchParams();
+  q.set("month", String(month));
+  q.set("year", String(year));
+  if (departmentId) q.set("department", departmentId);
+  return `/jefa/controles?${q.toString()}`;
+}
 
 export default async function InformeHorasPage({
   searchParams,
@@ -104,15 +120,7 @@ export default async function InformeHorasPage({
               ))}
             </Select>
           </div>
-          <div className="w-28">
-            <label htmlFor="inf-year" className="mb-1 block text-xs font-medium text-slate-500">
-              Año
-            </label>
-            <input type="hidden" name="year" value={year} />
-            <p id="inf-year" className="field-control px-3 py-2 text-sm tabular-nums text-brand-navy">
-              {year}
-            </p>
-          </div>
+          <input type="hidden" name="year" value={year} />
           <div className="w-44">
             <label htmlFor="inf-dept" className="mb-1 block text-xs font-medium text-slate-500">
               Departamento
@@ -132,11 +140,11 @@ export default async function InformeHorasPage({
             </label>
             <Select id="inf-status" name="status" defaultValue={status ?? ""}>
               <option value="">Todos</option>
-              <option value="SIN_CONTROL">Sin control</option>
-              <option value="BORRADOR">Borrador / sin enviar</option>
-              <option value="FIRMADO_EMPLEADO">Pendiente de firma</option>
-              <option value="FIRMADO_RESPONSABLE">Firmado</option>
-              <option value="RECHAZADO">Rechazado</option>
+              <option value="SIN_CONTROL">{TIMESHEET_STATUS_LABEL.SIN_CONTROL}</option>
+              <option value="BORRADOR">{TIMESHEET_STATUS_DESCRIPTION.BORRADOR}</option>
+              <option value="FIRMADO_EMPLEADO">{TIMESHEET_STATUS_LABEL.FIRMADO_EMPLEADO}</option>
+              <option value="FIRMADO_RESPONSABLE">{TIMESHEET_STATUS_LABEL.FIRMADO_RESPONSABLE}</option>
+              <option value="RECHAZADO">{TIMESHEET_STATUS_LABEL.RECHAZADO}</option>
             </Select>
           </div>
           <button type="submit" className="btn-primary">
@@ -152,7 +160,11 @@ export default async function InformeHorasPage({
           )}
         </form>
         <div className="mt-4 border-t border-[color:var(--surface-divider)] pt-3">
+          <label htmlFor="inf-year-switcher" className="mb-2 block text-xs font-medium text-slate-500">
+            Año
+          </label>
           <YearSwitcher
+            id="inf-year-switcher"
             year={year}
             options={yearOptions.map((y) => ({
               year: y,
@@ -192,7 +204,7 @@ export default async function InformeHorasPage({
                 <div>
                   <p className="font-medium text-brand-navy">
                     <Link
-                      href="/jefa/controles"
+                      href={controlesHref(month, year, r.departmentId)}
                       className="hover:text-brand-blue hover:underline"
                     >
                       {r.name}
@@ -248,7 +260,7 @@ export default async function InformeHorasPage({
                             </Link>
                           ) : (
                             <Link
-                              href="/jefa/controles"
+                              href={controlesHref(month, year, r.departmentId)}
                               className="hover:text-brand-blue hover:underline"
                             >
                               {r.name}
@@ -303,7 +315,7 @@ export default async function InformeHorasPage({
             hasFilters ? (
               <Link
                 href={`/jefa/informes?month=${month}&year=${year}`}
-                className="btn-ghost"
+                className="btn-primary"
               >
                 Limpiar filtros
               </Link>

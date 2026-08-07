@@ -62,19 +62,21 @@ export async function resetEmployeePasswordAction(
 export async function createEmployeeAction(input: {
   name: string;
   email: string;
-  departmentId: string;
+  departmentId: string | null;
 }): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
 
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
-  if (!name || !email || !input.departmentId) {
-    return { ok: false, error: "Nombre, email y departamento son obligatorios." };
+  if (!name || !email) {
+    return { ok: false, error: "Nombre y email son obligatorios." };
   }
 
-  const dept = await prisma.department.findUnique({ where: { id: input.departmentId } });
-  if (!dept) return { ok: false, error: "Departamento no encontrado." };
+  if (input.departmentId) {
+    const dept = await prisma.department.findUnique({ where: { id: input.departmentId } });
+    if (!dept) return { ok: false, error: "Departamento no encontrado." };
+  }
 
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) return { ok: false, error: "Ya existe un usuario con ese email." };
@@ -113,7 +115,7 @@ export async function updateEmployeeAction(input: {
   userId: string;
   name: string;
   email: string;
-  departmentId: string;
+  departmentId: string | null;
 }): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
@@ -125,8 +127,13 @@ export async function updateEmployeeAction(input: {
 
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
-  if (!name || !email || !input.departmentId) {
-    return { ok: false, error: "Nombre, email y departamento son obligatorios." };
+  if (!name || !email) {
+    return { ok: false, error: "Nombre y email son obligatorios." };
+  }
+
+  if (input.departmentId) {
+    const dept = await prisma.department.findUnique({ where: { id: input.departmentId } });
+    if (!dept) return { ok: false, error: "Departamento no encontrado." };
   }
 
   const emailTaken = await prisma.user.findFirst({

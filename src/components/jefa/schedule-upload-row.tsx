@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { formatDate } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
+import { SchedulePdfPreview } from "@/components/horario/schedule-pdf-preview";
 import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/horarios/actions";
 
 type Schedule = {
@@ -136,7 +137,8 @@ export function ScheduleUploadRow({
             <button
               type="button"
               onClick={() => setShowHistory((v) => !v)}
-              className="btn-sm btn-ghost"
+              disabled={history.length <= 1}
+              className="btn-sm btn-ghost disabled:opacity-50"
             >
               {showHistory ? "Ocultar historial" : `Historial (${history.length})`}
             </button>
@@ -145,13 +147,10 @@ export function ScheduleUploadRow({
       </div>
 
       {showPreview && canPreview && schedule && (
-        <div className="overflow-hidden rounded-lg border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
-          <iframe
-            src={`/api/uploads/${schedule.filePath}`}
-            title={`Vista previa ${schedule.fileName}`}
-            className="h-72 w-full"
-          />
-        </div>
+        <SchedulePdfPreview
+          src={`/api/uploads/${schedule.filePath}`}
+          title={`Vista previa ${schedule.fileName}`}
+        />
       )}
 
       <div className="flex flex-col gap-3 border-t border-[color:var(--surface-divider)] pt-4 sm:flex-row sm:items-end">

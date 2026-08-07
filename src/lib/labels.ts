@@ -6,6 +6,12 @@ export const LEAVE_TYPE_LABEL: Record<string, string> = {
   MEDIO_DIA: "Medio día",
 };
 
+export const LEAVE_TYPE_COLOR: Record<string, string> = {
+  VACACIONES: "bg-brand-blue/12 text-brand-blue",
+  ASUNTOS_PROPIOS: "bg-brand-navy/[0.06] text-slate-600",
+  MEDIO_DIA: "bg-amber-500/12 text-amber-800",
+};
+
 /** Texto corto para badges y stats. */
 export const TIMESHEET_STATUS_LABEL: Record<string, string> = {
   BORRADOR: "Borrador",

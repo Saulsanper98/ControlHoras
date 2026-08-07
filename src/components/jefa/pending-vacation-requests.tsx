@@ -13,7 +13,7 @@ import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
 } from "@/app/(app)/jefa/vacaciones/request-actions";
-import { formatDateNumeric } from "@/lib/format-date";
+import { formatDateShort } from "@/lib/format-date";
 
 type PendingRequest = {
   id: string;
@@ -97,8 +97,8 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 </div>
                 <p className="text-sm text-slate-500">
                   {r.departmentName ?? "—"} ·{" "}
-                  {formatDateNumeric(r.startDate)} – {formatDateNumeric(r.endDate)} ({r.days}{" "}
-                  días)
+                  {formatDateShort(r.startDate)} – {formatDateShort(r.endDate)} ({r.days}{" "}
+                  día{r.days === 1 ? "" : "s"})
                 </p>
                 {r.employeeNotes ? (
                   <p className="text-xs text-slate-500">{r.employeeNotes}</p>
@@ -108,7 +108,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 <button
                   type="button"
                   onClick={() => handleApprove(r.id)}
-                  disabled={busy || pendingId !== null}
+                  disabled={busy}
                   className="btn-success"
                 >
                   <Check className="h-4 w-4" />
@@ -117,7 +117,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 <button
                   type="button"
                   onClick={() => setRejectId(r.id)}
-                  disabled={busy || pendingId !== null}
+                  disabled={busy}
                   className="btn-danger"
                 >
                   <XCircle className="h-4 w-4" />
@@ -140,7 +140,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
             <ul className="mb-4 max-h-40 space-y-1 overflow-y-auto text-sm text-slate-600">
               {overlapPrompt.overlaps.map((o, idx) => (
                 <li key={`${o.userName}-${idx}`}>
-                  {o.userName}: {formatDateNumeric(o.startDate)} – {formatDateNumeric(o.endDate)}
+                  {o.userName}: {formatDateShort(o.startDate)} – {formatDateShort(o.endDate)}
                 </li>
               ))}
             </ul>

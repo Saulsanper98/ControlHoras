@@ -1,6 +1,6 @@
 import { TableSurface } from "@/components/ui/list-surface";
 import { formatWeekdayShort } from "@/lib/format-date";
-import { sumDayHours } from "@/lib/timesheet-calc";
+import { daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 
 type GridEntry = {
   day: number;
@@ -17,11 +17,34 @@ export function TimeSheetGrid({
   month,
   year,
   entries,
+  showAllDays = false,
 }: {
   month: number;
   year: number;
   entries: GridEntry[];
+  /** Si true, muestra todos los días del mes (incluidos vacíos). */
+  showAllDays?: boolean;
 }) {
+  const entryByDay = new Map(entries.map((e) => [e.day, e]));
+  const totalDays = daysInMonth(month, year);
+  const displayEntries = showAllDays
+    ? Array.from({ length: totalDays }, (_, i) => {
+        const day = i + 1;
+        return (
+          entryByDay.get(day) ?? {
+            day,
+            checkIn: null,
+            checkOut: null,
+            totalHours: 0,
+            normalHours: 0,
+            overtimeHours: 0,
+            nightHours: 0,
+            notes: null,
+          }
+        );
+      })
+    : entries.filter((e) => e.checkIn || e.checkOut || e.notes);
+
   const totals = sumDayHours(
     entries.map((e) => ({
       totalHours: e.totalHours,
@@ -47,9 +70,7 @@ export function TimeSheetGrid({
           </tr>
         </thead>
         <tbody>
-          {entries
-            .filter((e) => e.checkIn || e.checkOut || e.notes)
-            .map((entry) => {
+          {displayEntries.map((entry) => {
               const weekday = formatWeekdayShort(year, month, entry.day);
               return (
                 <tr key={entry.day} className="border-b border-brand-navy/5 last:border-0">
@@ -66,7 +87,7 @@ export function TimeSheetGrid({
                 </tr>
               );
             })}
-          {entries.every((e) => !e.checkIn && !e.checkOut && !e.notes) && (
+          {displayEntries.length === 0 && (
             <tr>
               <td colSpan={8} className="px-3 py-4 text-center text-slate-500">
                 Sin registros diarios (puede que se haya adjuntado un archivo).

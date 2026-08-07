@@ -26,6 +26,8 @@ export function VacationProgressBar({
           "flex overflow-hidden rounded-full bg-brand-navy/8",
           compact ? "h-1.5" : "h-2.5"
         )}
+        role="img"
+        aria-label={`${used} días usados, ${pending} pendientes, ${remaining} disponibles de ${total}`}
       >
         <div
           className="bg-brand-blue transition-all duration-500"
@@ -51,6 +53,22 @@ export function VacationProgressBar({
           <span className="inline-flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-brand-navy/15" />
             Disponibles: <strong className="tabular-nums text-brand-navy">{remaining}</strong>
+          </span>
+        </div>
+      )}
+      {compact && (
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-blue" />
+            Usados
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            Pendientes
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-navy/15" />
+            Disponibles
           </span>
         </div>
       )}
@@ -96,7 +114,7 @@ export function VacationTimeline({
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
         Línea temporal {year}
       </p>
-      <div className="grid grid-cols-12 gap-1">
+      <div className="grid grid-cols-6 gap-1 sm:grid-cols-12">
         {months.map((m, i) => {
           const monthRequests = byMonth[i];
           const count = monthRequests.length;
@@ -104,6 +122,7 @@ export function VacationTimeline({
           const hasPending = monthRequests.some((r) => r.status === "PENDIENTE");
           const hasRejected = monthRequests.some((r) => r.status === "RECHAZADA");
           const hasCancelled = monthRequests.some((r) => r.status === "CANCELADA");
+          const monthLabel = MONTH_SHORT_ES[i];
           return (
             <div key={m} className="text-center">
               <div
@@ -116,12 +135,13 @@ export function VacationTimeline({
                     "bg-brand-navy/10 text-slate-500",
                   count === 0 && "bg-brand-navy/5 text-slate-400"
                 )}
-                title={`${MONTH_SHORT_ES[i]} · ${count} solicitud${count === 1 ? "" : "es"}`}
+                title={`${monthLabel} · ${count} solicitud${count === 1 ? "" : "es"}`}
+                aria-label={`${monthLabel}: ${count} solicitud${count === 1 ? "" : "es"}`}
               >
                 {count || "·"}
               </div>
-              <span className="text-[10px] font-medium text-slate-500">
-                {MONTH_SHORT_ES[i]}
+              <span className="text-[10px] font-medium text-slate-500" aria-hidden="true">
+                {monthLabel}
               </span>
             </div>
           );

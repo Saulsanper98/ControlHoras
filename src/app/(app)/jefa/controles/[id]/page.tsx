@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { TimeSheetGrid } from "@/components/control-horario/timesheet-grid";
+import { TimeSheetGridSection } from "@/components/jefa/timesheet-grid-section";
 import { ReviewActions } from "@/components/jefa/review-actions";
 import { Alert } from "@/components/ui/alert";
 import { PageHeader } from "@/components/ui/page-header";
@@ -117,7 +117,7 @@ export default async function ControlDetailPage({
       )}
 
       <ScrollShadow>
-        <TimeSheetGrid
+        <TimeSheetGridSection
           month={timeSheet.month}
           year={timeSheet.year}
           entries={gridEntries}
