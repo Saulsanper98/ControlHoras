@@ -50,7 +50,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
           type="button"
           onClick={() => setShowSignPad(true)}
           disabled={pending}
-          className="btn-primary disabled:opacity-60"
+          className="btn-primary"
         >
           <PenLine className="h-4 w-4" />
           Firmar como responsable
@@ -59,7 +59,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
           type="button"
           onClick={() => setShowReject(true)}
           disabled={pending}
-          className="btn-danger disabled:opacity-60"
+          className="btn-danger"
         >
           <XCircle className="h-4 w-4" />
           Rechazar
@@ -72,7 +72,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
             type="button"
             onClick={() => setShowSignPad(true)}
             disabled={pending}
-            className="btn-primary flex-1 disabled:opacity-60"
+            className="btn-primary flex-1"
           >
             <PenLine className="h-4 w-4" />
             Firmar
@@ -81,7 +81,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
             type="button"
             onClick={() => setShowReject(true)}
             disabled={pending}
-            className="btn-danger flex-1 disabled:opacity-60"
+            className="btn-danger flex-1"
           >
             <XCircle className="h-4 w-4" />
             Rechazar

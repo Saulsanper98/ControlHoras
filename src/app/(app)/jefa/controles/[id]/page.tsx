@@ -8,15 +8,11 @@ import { PageHeader } from "@/components/ui/page-header";
 import { BackLink } from "@/components/ui/back-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
+import { Stagger } from "@/components/ui/stagger";
 import { SignaturePreview } from "@/components/ui/signature-preview";
 import { requireManagerSession } from "@/lib/auth-helpers";
-import { formatDateTimeShort } from "@/lib/format-date";
+import { formatDateTimeShort, MONTH_NAMES_ES } from "@/lib/format-date";
 import { sumDayHours } from "@/lib/timesheet-calc";
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
 
 export default async function ControlDetailPage({
   params,
@@ -68,26 +64,28 @@ export default async function ControlDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <BackLink href="/jefa/controles">Volver a controles</BackLink>
-        <PageHeader
-          title={timeSheet.user.name}
-          description={`${timeSheet.user.department?.name ?? "—"} · ${MONTH_NAMES[timeSheet.month - 1]} de ${timeSheet.year}`}
-        >
-          <div className="flex flex-wrap items-center gap-3">
-            <StatusBadge status={timeSheet.status} />
-            <a
-              href={`/api/timesheets/${timeSheet.id}/pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary"
-            >
-              <Download className="h-4 w-4" />
-              Descargar PDF
-            </a>
-          </div>
-        </PageHeader>
-      </div>
+      <Stagger>
+        <div>
+          <BackLink href="/jefa/controles">Volver a controles</BackLink>
+          <PageHeader
+            title={timeSheet.user.name}
+            description={`${timeSheet.user.department?.name ?? "—"} · ${MONTH_NAMES_ES[timeSheet.month - 1]} de ${timeSheet.year}`}
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <StatusBadge status={timeSheet.status} />
+              <a
+                href={`/api/timesheets/${timeSheet.id}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+              >
+                <Download className="h-4 w-4" />
+                Descargar PDF
+              </a>
+            </div>
+          </PageHeader>
+        </div>
+      </Stagger>
 
       {monthTotals && (
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">

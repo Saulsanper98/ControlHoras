@@ -36,7 +36,7 @@ export default async function ControlHorarioPage({
       <Stagger>
         <PageHeader
           title="Control horario"
-          description={`${MONTH_NAMES_ES[month - 1]} de ${year} · ${TIMESHEET_STATUS_DESCRIPTION[status] ?? status}`}
+          description={TIMESHEET_STATUS_DESCRIPTION[status] ?? status}
         />
       </Stagger>
 

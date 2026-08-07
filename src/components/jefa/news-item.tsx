@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Pin, Pencil, Trash2, X, Check, ExternalLink } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
@@ -45,6 +46,7 @@ export function NewsItem({
   imagePath: string | null;
   status: string;
 }) {
+  const router = useRouter();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [editing, setEditing] = useState(false);
@@ -75,6 +77,7 @@ export function NewsItem({
         setEditing(false);
         setImageFile(null);
         showToast("Noticia actualizada.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al guardar.", "error");
       }
@@ -93,6 +96,7 @@ export function NewsItem({
       const result = await deleteNewsAction(id);
       if (result.ok) {
         showToast("Noticia eliminada.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al eliminar la noticia.", "error");
       }
@@ -201,7 +205,7 @@ export function NewsItem({
             <img
               src={`/api/uploads/${imagePath}`}
               alt={title}
-              className="mt-2 max-h-48 rounded-md"
+              className="mt-2 max-h-48 rounded-lg object-cover"
             />
           )}
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">

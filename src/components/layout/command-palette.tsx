@@ -103,8 +103,8 @@ export function CommandPalette({ role }: { role: AppRole }) {
     }
     const seen = new Set<string>();
     return base.filter((item) => {
-      if (seen.has(item.id)) return false;
-      seen.add(item.id);
+      if (seen.has(item.href)) return false;
+      seen.add(item.href);
       return true;
     });
   }, [role]);

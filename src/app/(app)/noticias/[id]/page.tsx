@@ -5,7 +5,6 @@ import { SectionBlock } from "@/components/ui/list-surface";
 import { BackLink } from "@/components/ui/back-link";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stagger } from "@/components/ui/stagger";
-import { formatDate } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 
 export default async function NoticiaDetallePage({
@@ -32,7 +31,7 @@ export default async function NoticiaDetallePage({
           <BackLink href="/noticias">Volver a noticias</BackLink>
           <PageHeader
             title={news.title}
-            description={`${formatRelativeTime(news.publishedAt)} · ${formatDate(news.publishedAt)} · ${news.publishedBy.name}`}
+            description={`${formatRelativeTime(news.publishedAt)} · ${news.publishedBy.name}`}
           />
         </div>
       </Stagger>

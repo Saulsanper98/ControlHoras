@@ -36,7 +36,7 @@ function NavLink({
         <span
           className={cn(
             "min-w-5 rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold tabular-nums",
-            active ? "bg-brand-navy/15 text-brand-navy" : "bg-red-500 text-white"
+            active ? "bg-brand-navy/15 text-brand-navy" : "bg-red-500/90 text-white"
           )}
         >
           {badge > 99 ? "99+" : badge}

@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { Select } from "@/components/ui/select";
 import { YearSwitcher } from "@/components/ui/year-switcher";
+import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { daysInMonth } from "@/lib/timesheet-calc";
@@ -104,21 +105,23 @@ export default async function VacationCalendarPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <BackLink href="/jefa/vacaciones">Volver a vacaciones</BackLink>
-        <PageHeader
-          title="Calendario de vacaciones"
-          description="Cobertura del equipo por día del mes."
-        >
-          <YearSwitcher
-            year={year}
-            options={yearOptions.map((y) => ({
-              year: y,
-              href: calendarHref({ year: y, month: 1 }),
-            }))}
-          />
-        </PageHeader>
-      </div>
+      <Stagger>
+        <div>
+          <BackLink href="/jefa/vacaciones">Volver a vacaciones</BackLink>
+          <PageHeader
+            title="Calendario de vacaciones"
+            description="Cobertura del equipo por día del mes."
+          >
+            <YearSwitcher
+              year={year}
+              options={yearOptions.map((y) => ({
+                year: y,
+                href: calendarHref({ year: y, month: 1 }),
+              }))}
+            />
+          </PageHeader>
+        </div>
+      </Stagger>
 
       <SectionBlock className="flex flex-wrap items-center justify-between gap-3">
         <Link href={calendarHref({ month: prev.month, year: prev.year })} className="btn-ghost">
@@ -189,15 +192,15 @@ export default async function VacationCalendarPage({
           {showAllTypes ? "Solo vacaciones" : "Incluir todos los tipos"}
         </Link>
         <span className="inline-flex items-center gap-1.5">
-          <span className="rounded-md bg-amber-500/15 px-2 py-0.5 font-medium text-amber-900">
+          <span className="rounded-lg bg-amber-500/15 px-2 py-0.5 font-medium text-amber-900">
             {LEAVE_TYPE_LABEL.VACACIONES}
           </span>
           {showAllTypes && (
             <>
-              <span className="rounded-md bg-brand-navy/10 px-2 py-0.5 font-medium text-brand-navy">
+              <span className="rounded-lg bg-brand-navy/10 px-2 py-0.5 font-medium text-brand-navy">
                 {LEAVE_TYPE_LABEL.ASUNTOS_PROPIOS}
               </span>
-              <span className="rounded-md bg-sky-500/15 px-2 py-0.5 font-medium text-sky-900">
+              <span className="rounded-lg bg-sky-500/15 px-2 py-0.5 font-medium text-sky-900">
                 {LEAVE_TYPE_LABEL.MEDIO_DIA}
               </span>
             </>
@@ -269,7 +272,7 @@ export default async function VacationCalendarPage({
                         <p
                           key={`${day}-${p.name}-${idx}`}
                           className={cn(
-                            "truncate rounded-md px-1 text-[10px] font-medium",
+                            "truncate rounded-lg px-1 text-[10px] font-medium",
                             chipClass(p.leaveType)
                           )}
                           title={`${p.name} · ${p.dept} · ${LEAVE_TYPE_LABEL[p.leaveType] ?? p.leaveType}`}

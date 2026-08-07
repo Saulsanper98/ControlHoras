@@ -87,6 +87,10 @@ export function VacationTimeline({
 
   if (requests.length === 0) return null;
 
+  const hasRejectedOrCancelled = requests.some(
+    (r) => r.status === "RECHAZADA" || r.status === "CANCELADA"
+  );
+
   return (
     <div>
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -94,9 +98,12 @@ export function VacationTimeline({
       </p>
       <div className="grid grid-cols-12 gap-1">
         {months.map((m, i) => {
-          const count = byMonth[i].length;
-          const hasApproved = byMonth[i].some((r) => r.status === "APROBADA");
-          const hasPending = byMonth[i].some((r) => r.status === "PENDIENTE");
+          const monthRequests = byMonth[i];
+          const count = monthRequests.length;
+          const hasApproved = monthRequests.some((r) => r.status === "APROBADA");
+          const hasPending = monthRequests.some((r) => r.status === "PENDIENTE");
+          const hasRejected = monthRequests.some((r) => r.status === "RECHAZADA");
+          const hasCancelled = monthRequests.some((r) => r.status === "CANCELADA");
           return (
             <div key={m} className="text-center">
               <div
@@ -104,6 +111,9 @@ export function VacationTimeline({
                   "mx-auto mb-1 flex h-8 w-full max-w-[2rem] items-center justify-center rounded-md text-[10px] font-semibold tabular-nums transition",
                   hasApproved && "bg-emerald-500/20 text-emerald-800",
                   !hasApproved && hasPending && "bg-amber-500/20 text-amber-800",
+                  !hasApproved && !hasPending && hasRejected && "bg-red-500/20 text-red-800",
+                  !hasApproved && !hasPending && !hasRejected && hasCancelled &&
+                    "bg-brand-navy/10 text-slate-500",
                   count === 0 && "bg-brand-navy/5 text-slate-400"
                 )}
                 title={`${MONTH_SHORT_ES[i]} · ${count} solicitud${count === 1 ? "" : "es"}`}
@@ -117,6 +127,18 @@ export function VacationTimeline({
           );
         })}
       </div>
+      {hasRejectedOrCancelled && (
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-500">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded bg-red-500/20 ring-1 ring-red-500/30" />
+            Rechazada
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded bg-brand-navy/10 ring-1 ring-brand-navy/20" />
+            Cancelada
+          </span>
+        </div>
+      )}
     </div>
   );
 }

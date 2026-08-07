@@ -109,7 +109,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   type="button"
                   onClick={() => handleApprove(r.id)}
                   disabled={busy || pendingId !== null}
-                  className="btn-success disabled:opacity-60"
+                  className="btn-success"
                 >
                   <Check className="h-4 w-4" />
                   {busy ? "…" : "Aprobar"}
@@ -118,7 +118,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   type="button"
                   onClick={() => setRejectId(r.id)}
                   disabled={busy || pendingId !== null}
-                  className="btn-danger disabled:opacity-60"
+                  className="btn-danger"
                 >
                   <XCircle className="h-4 w-4" />
                   Rechazar
@@ -156,7 +156,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 disabled={pendingId !== null}
                 onClick={() => handleApprove(overlapPrompt.id, true)}
-                className="btn-warning disabled:opacity-60"
+                className="btn-warning"
               >
                 Aprobar igual
               </button>

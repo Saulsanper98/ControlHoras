@@ -192,7 +192,7 @@ export default async function InformeHorasPage({
                 <div>
                   <p className="font-medium text-brand-navy">
                     <Link
-                      href={`/jefa/vacaciones/${r.userId}?year=${year}`}
+                      href="/jefa/controles"
                       className="hover:text-brand-blue hover:underline"
                     >
                       {r.name}
@@ -248,7 +248,7 @@ export default async function InformeHorasPage({
                             </Link>
                           ) : (
                             <Link
-                              href={`/jefa/vacaciones/${r.userId}?year=${year}`}
+                              href="/jefa/controles"
                               className="hover:text-brand-blue hover:underline"
                             >
                               {r.name}

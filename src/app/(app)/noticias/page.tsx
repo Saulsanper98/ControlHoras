@@ -53,7 +53,10 @@ export default async function NoticiasPage() {
             >
               <div className="flex items-center gap-2">
                 {n.pinned && (
-                  <Pin className="h-3.5 w-3.5 shrink-0 text-brand-blue" aria-hidden />
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-blue">
+                    <Pin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    Fijada
+                  </span>
                 )}
                 <p className="font-medium text-brand-navy">{n.title}</p>
               </div>
@@ -63,7 +66,7 @@ export default async function NoticiasPage() {
                 <img
                   src={`/api/uploads/${n.imagePath}`}
                   alt={n.title}
-                  className="mt-3 h-36 w-full rounded-lg object-cover"
+                  className="mt-3 h-36 w-full object-cover"
                 />
               )}
               <p className="mt-2 text-xs text-slate-500">

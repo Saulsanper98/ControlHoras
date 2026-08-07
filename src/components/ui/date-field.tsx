@@ -5,13 +5,9 @@ import { createPortal } from "react-dom";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { holidaysInMonth } from "@/lib/holidays";
-import { formatDate } from "@/lib/format-date";
+import { formatDate, MONTH_NAMES_ES } from "@/lib/format-date";
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
 
 const POPOVER_WIDTH = 280; // 17.5rem
 
@@ -191,7 +187,7 @@ export function DateField({
             <ChevronLeft className="h-4 w-4" />
           </button>
           <p className="text-sm font-semibold capitalize text-brand-navy">
-            {MONTH_NAMES[viewMonth - 1]} {viewYear}
+            {MONTH_NAMES_ES[viewMonth - 1]} {viewYear}
           </p>
           <button
             type="button"

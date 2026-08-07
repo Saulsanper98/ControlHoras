@@ -208,7 +208,7 @@ export function TimeSheetForm({
       setEntries((prev) =>
         prev.map((e) => {
           const isWeekend = [0, 6].includes(new Date(year, month - 1, e.day).getDay());
-          if (weekdaysOnly && isWeekend) return e;
+          if (weekdaysOnly && (isWeekend || monthHolidays.has(e.day))) return e;
           const s = SHIFTS[bulkShift];
           return { ...e, checkIn: s.checkIn, checkOut: s.checkOut };
         })
@@ -352,7 +352,7 @@ export function TimeSheetForm({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden border-y border-[color:var(--surface-divider)]">
+      <div className="border-y border-[color:var(--surface-divider)]">
         {/* Cabecera + resumen */}
         <div className="border-b border-[color:var(--surface-divider)] py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -406,10 +406,11 @@ export function TimeSheetForm({
               )}
               <StatusBadge status={status} />
               {isDirty && editable && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-800">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                  Sin guardar
-                </span>
+                <StatusBadge
+                  status="Sin guardar"
+                  preset="timesheet"
+                  className="bg-amber-500/12 text-amber-800"
+                />
               )}
             </div>
           </div>
@@ -546,6 +547,9 @@ export function TimeSheetForm({
         />
 
         <ScrollShadow className="hidden md:block">
+          {filteredEntries.length === 0 ? (
+            <InlineEmpty>No hay días que coincidan con el filtro.</InlineEmpty>
+          ) : (
           <table className="w-full min-w-[720px] text-sm">
             <thead className="sticky top-0 z-10 bg-[color:var(--app-gradient-top)]">
               <tr className="border-b border-[color:var(--surface-divider)] text-left text-[11px] uppercase tracking-wide text-slate-500">
@@ -587,11 +591,16 @@ export function TimeSheetForm({
                     key={entry.day}
                     className={`border-b border-[color:var(--surface-divider)] last:border-0 ${
                       holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
-                    } ${todayDay === entry.day ? "ring-1 ring-inset ring-brand-blue/25" : ""}`}
+                    } ${todayDay === entry.day ? "bg-brand-blue/[0.04]" : ""}`}
                   >
                     <td className={`${tableCell} whitespace-nowrap`}>
                       <span className="font-medium text-brand-navy">{entry.day}</span>{" "}
                       <span className="text-xs text-slate-500">{weekday}</span>
+                      {todayDay === entry.day && (
+                        <span className="ml-2 text-[10px] font-medium uppercase text-brand-blue">
+                          Hoy
+                        </span>
+                      )}
                       {holidayName && (
                         <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wide text-amber-700">
                           {holidayName}
@@ -666,6 +675,7 @@ export function TimeSheetForm({
               </tr>
             </tfoot>
           </table>
+          )}
         </ScrollShadow>
 
         {editable && (

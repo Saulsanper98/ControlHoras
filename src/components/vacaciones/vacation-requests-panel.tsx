@@ -15,7 +15,6 @@ import { useToast } from "@/components/ui/toast";
 import { countVacationDays } from "@/lib/holidays";
 import { formatDate, yearFromDateKey } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
-import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   cancelVacationRequestAction,
@@ -155,11 +154,10 @@ export function VacationRequestsPanel({
                     {r.days} día{r.days === 1 ? "" : "s"}
                   </span>
                 </p>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  {LEAVE_TYPE_LABEL[r.leaveType ?? "VACACIONES"] ?? r.leaveType}
-                  {r.employeeNotes ? ` · ${r.employeeNotes}` : ""}
-                  {" · "}
-                  {formatRelativeTime(r.createdAt)}
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
+                  <StatusBadge status={r.leaveType ?? "VACACIONES"} preset="leaveType" />
+                  {r.employeeNotes ? <span>· {r.employeeNotes}</span> : null}
+                  <span>· {formatRelativeTime(r.createdAt)}</span>
                 </p>
                 {r.rejectionReason && (
                   <Alert variant="danger" className="mt-2 rounded-md border">

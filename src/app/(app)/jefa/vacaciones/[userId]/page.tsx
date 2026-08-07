@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { YearSwitcher } from "@/components/ui/year-switcher";
 import { VacationProgressBar } from "@/components/vacaciones/vacation-progress";
+import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { formatDate, formatDateShort } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
@@ -68,21 +69,23 @@ export default async function VacationDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <BackLink href={`/jefa/vacaciones?year=${year}`}>Volver al listado</BackLink>
-        <PageHeader
-          title={employee.name}
-          description={`${employee.department?.name ?? "—"} · Saldo y bolsa ${year}`}
-        />
-        <YearSwitcher
-          className="mt-3"
-          year={year}
-          options={years.map((y) => ({
-            year: y,
-            href: `/jefa/vacaciones/${userId}?year=${y}`,
-          }))}
-        />
-      </div>
+      <Stagger>
+        <div>
+          <BackLink href={`/jefa/vacaciones?year=${year}`}>Volver al listado</BackLink>
+          <PageHeader
+            title={employee.name}
+            description={`${employee.department?.name ?? "—"} · Saldo y bolsa ${year}`}
+          />
+          <YearSwitcher
+            className="mt-3"
+            year={year}
+            options={years.map((y) => ({
+              year: y,
+              href: `/jefa/vacaciones/${userId}?year=${y}`,
+            }))}
+          />
+        </div>
+      </Stagger>
 
       {totalDays > 0 && (
         <VacationProgressBar total={totalDays} used={usedDays} pending={pendingDays} />

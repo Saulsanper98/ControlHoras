@@ -111,9 +111,7 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
             />
           </div>
           <p className="text-xs text-slate-500">
-            Se generará la contraseña temporal{" "}
-            <span className="font-medium text-brand-navy">{TEMP_EMPLOYEE_PASSWORD}</span>. El
-            empleado deberá cambiarla al iniciar sesión.
+            Se generará una contraseña temporal. El empleado deberá cambiarla al iniciar sesión.
           </p>
           <button
             type="button"
@@ -170,7 +168,7 @@ export function EmployeeRowActions({
   async function handleResetPassword() {
     const ok = await confirm({
       title: "Restablecer contraseña",
-      message: `Se generará la contraseña temporal ${TEMP_EMPLOYEE_PASSWORD} para ${user.name}. Deberá cambiarla al entrar.`,
+      message: `Se generará una contraseña temporal para ${user.name}. Deberá cambiarla al entrar.`,
       confirmLabel: "Restablecer",
     });
     if (!ok) return;
@@ -209,7 +207,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => setEditOpen(true)}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60 sm:px-3"
+        className="btn-sm btn-ghost"
       >
         <Pencil className="h-4 w-4" />
         Editar
@@ -218,7 +216,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => void handleToggle()}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60 sm:px-3"
+        className="btn-sm btn-ghost"
       >
         {user.active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
         {user.active ? "Desactivar" : "Activar"}
@@ -227,7 +225,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => void handleResetPassword()}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-60 sm:px-3"
+        className="btn-sm btn-ghost text-brand-blue hover:text-brand-blue"
       >
         <KeyRound className="h-4 w-4 shrink-0" />
         <span className="whitespace-nowrap">Restablecer contraseña</span>

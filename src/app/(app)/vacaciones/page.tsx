@@ -32,7 +32,7 @@ export default async function VacacionesPage({
 
   const deptId = session.user.departmentId;
 
-  const [balance, adjustments, availableYears, vacationRequests, pendingDaysAgg, teamApproved] =
+  const [balance, adjustments, availableYears, adjustmentYears, vacationRequests, pendingDaysAgg, teamApproved] =
     await Promise.all([
       prisma.vacationBalance.findUnique({
         where: { userId_year: { userId: session.user.id, year } },
@@ -46,6 +46,11 @@ export default async function VacacionesPage({
         where: { userId: session.user.id },
         select: { year: true },
         orderBy: { year: "desc" },
+      }),
+      prisma.hourAdjustment.findMany({
+        where: { userId: session.user.id },
+        select: { year: true },
+        distinct: ["year"],
       }),
       prisma.vacationRequest.findMany({
         where: { userId: session.user.id },
@@ -77,7 +82,16 @@ export default async function VacacionesPage({
     ]);
 
   const years = [
-    ...new Set([currentYear, ...availableYears.map((b) => b.year)]),
+    ...new Set([
+      currentYear,
+      currentYear - 1,
+      ...availableYears.map((b) => b.year),
+      ...adjustmentYears.map((a) => a.year),
+      ...vacationRequests.flatMap((r) => [
+        yearFromDateKey(toDateKey(r.startDate)),
+        yearFromDateKey(toDateKey(r.endDate)),
+      ]),
+    ]),
   ].sort((a, b) => b - a);
 
   const totalDays = balance ? Number(balance.totalDays) : 0;

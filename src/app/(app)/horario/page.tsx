@@ -3,12 +3,13 @@ import { CalendarClock, Download, ExternalLink, FileSpreadsheet, FileText } from
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { InlineEmpty } from "@/components/ui/inline-empty";
 import { SectionBlock } from "@/components/ui/list-surface";
 import { SectionTitle } from "@/components/ui/section-title";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Stagger } from "@/components/ui/stagger";
 import { SchedulePdfPreview } from "@/components/horario/schedule-pdf-preview";
-import { formatDate } from "@/lib/format-date";
+import { formatDate, toDateKey } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 
@@ -36,6 +37,8 @@ export default async function HorarioPage() {
   const isExcel = [".xlsx", ".xls"].includes(ext);
   const isNew =
     schedule != null && Date.now() - schedule.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000;
+  const isCurrent =
+    schedule != null && toDateKey(schedule.validFrom) <= toDateKey(new Date());
   const fileHref = schedule ? `/api/uploads/${schedule.filePath}` : null;
 
   return (
@@ -94,7 +97,7 @@ export default async function HorarioPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium text-brand-navy">{schedule.fileName}</p>
-                    <StatusBadge status="CURRENT" preset="schedule" />
+                    {isCurrent && <StatusBadge status="CURRENT" preset="schedule" />}
                     {isNew && <StatusBadge status="NEW" preset="schedule" />}
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
@@ -149,14 +152,14 @@ export default async function HorarioPage() {
               <SchedulePdfPreview src={fileHref!} title="Horario asignado" />
             </section>
           ) : (
-            <p className="flex items-start gap-3 border-y border-[color:var(--surface-divider)] py-5 text-sm text-slate-600">
+            <InlineEmpty className="flex items-start gap-3 border-y border-[color:var(--surface-divider)] py-5 text-left">
               <FileSpreadsheet className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
               <span>
                 Este archivo es un Excel y no se puede previsualizar en el navegador. Usa{" "}
                 <strong className="font-semibold text-brand-navy">Descargar</strong> para abrirlo
                 en tu equipo.
               </span>
-            </p>
+            </InlineEmpty>
           )}
         </>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, FileText, Trash2 } from "lucide-react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { DateField } from "@/components/ui/date-field";
@@ -35,6 +36,7 @@ export function ScheduleUploadRow({
   schedule: Schedule | null;
   history?: Schedule[];
 }) {
+  const router = useRouter();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [pending, startTransition] = useTransition();
@@ -53,6 +55,7 @@ export function ScheduleUploadRow({
       const result = await uploadScheduleAction(departmentId, formData);
       if (result.ok) {
         showToast("Horario subido. Se conserva el historial.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al subir el archivo.", "error");
       }
@@ -71,6 +74,7 @@ export function ScheduleUploadRow({
       const result = await deleteScheduleAction(id);
       if (result.ok) {
         showToast("Versión eliminada.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al eliminar el horario.", "error");
       }
@@ -141,7 +145,7 @@ export function ScheduleUploadRow({
       </div>
 
       {showPreview && canPreview && schedule && (
-        <div className="overflow-hidden border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
+        <div className="overflow-hidden rounded-lg border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
           <iframe
             src={`/api/uploads/${schedule.filePath}`}
             title={`Vista previa ${schedule.fileName}`}
