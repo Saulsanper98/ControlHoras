@@ -21,6 +21,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Acceso al dev server desde la LAN (p. ej. http://192.168.12.45:3000)
+  allowedDevOrigins: ["192.168.12.45"],
   async headers() {
     return [
       {
