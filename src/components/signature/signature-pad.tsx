@@ -34,7 +34,14 @@ export function SignatureModal({
   useLayoutEffect(() => {
     const pad = padRef.current;
     if (!pad) return;
-    setupHiDpiCanvas(pad);
+
+    function resize() {
+      if (padRef.current) setupHiDpiCanvas(padRef.current);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
   }, []);
 
   function handleClear() {

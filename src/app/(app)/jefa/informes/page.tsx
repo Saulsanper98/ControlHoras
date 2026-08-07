@@ -15,7 +15,6 @@ import { requireManagerSession } from "@/lib/auth-helpers";
 import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { buildInformeHoras } from "@/lib/informe-horas";
 import {
-  TIMESHEET_STATUS_DESCRIPTION,
   TIMESHEET_STATUS_LABEL,
 } from "@/lib/labels";
 
@@ -98,7 +97,7 @@ export default async function InformeHorasPage({
               Exportar CSV
             </a>
           ) : (
-            <button type="button" disabled className="btn-primary disabled:opacity-50">
+            <button type="button" disabled className="btn-primary">
               <Download className="h-4 w-4" />
               Exportar CSV
             </button>
@@ -141,7 +140,7 @@ export default async function InformeHorasPage({
             <Select id="inf-status" name="status" defaultValue={status ?? ""}>
               <option value="">Todos</option>
               <option value="SIN_CONTROL">{TIMESHEET_STATUS_LABEL.SIN_CONTROL}</option>
-              <option value="BORRADOR">{TIMESHEET_STATUS_DESCRIPTION.BORRADOR}</option>
+              <option value="BORRADOR">{TIMESHEET_STATUS_LABEL.BORRADOR}</option>
               <option value="FIRMADO_EMPLEADO">{TIMESHEET_STATUS_LABEL.FIRMADO_EMPLEADO}</option>
               <option value="FIRMADO_RESPONSABLE">{TIMESHEET_STATUS_LABEL.FIRMADO_RESPONSABLE}</option>
               <option value="RECHAZADO">{TIMESHEET_STATUS_LABEL.RECHAZADO}</option>

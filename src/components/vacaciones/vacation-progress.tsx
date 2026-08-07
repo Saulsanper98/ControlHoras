@@ -105,9 +105,12 @@ export function VacationTimeline({
 
   if (requests.length === 0) return null;
 
-  const hasRejectedOrCancelled = requests.some(
-    (r) => r.status === "RECHAZADA" || r.status === "CANCELADA"
-  );
+  const legendItems = [
+    { label: "Aprobada", className: "bg-emerald-500/20 ring-1 ring-emerald-500/30" },
+    { label: "Pendiente", className: "bg-amber-500/20 ring-1 ring-amber-500/30" },
+    { label: "Rechazada", className: "bg-red-500/20 ring-1 ring-red-500/30" },
+    { label: "Cancelada", className: "bg-brand-navy/10 ring-1 ring-brand-navy/20" },
+  ] as const;
 
   return (
     <div>
@@ -147,18 +150,14 @@ export function VacationTimeline({
           );
         })}
       </div>
-      {hasRejectedOrCancelled && (
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-500">
-          <span className="inline-flex items-center gap-1">
-            <span className="h-2 w-2 rounded bg-red-500/20 ring-1 ring-red-500/30" />
-            Rechazada
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-500">
+        {legendItems.map((item) => (
+          <span key={item.label} className="inline-flex items-center gap-1">
+            <span className={cn("h-2 w-2 rounded", item.className)} />
+            {item.label}
           </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="h-2 w-2 rounded bg-brand-navy/10 ring-1 ring-brand-navy/20" />
-            Cancelada
-          </span>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

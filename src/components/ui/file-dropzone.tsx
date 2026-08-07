@@ -43,7 +43,7 @@ export function FileDropzone({
         if (!disabled) handleFiles(e.dataTransfer.files);
       }}
       className={cn(
-        "flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-blue/30",
+        "flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-blue/30",
         dragOver
           ? "border-brand-blue bg-brand-blue/10 text-brand-blue"
           : "border-brand-navy/18 bg-brand-navy/[0.03] hover:border-brand-blue/45 hover:bg-brand-navy/[0.055]",

@@ -166,7 +166,9 @@ export function NotificationPanel({
         aria-label={
           total > 0
             ? `${total} notificaciones pendientes`
-            : "Sin notificaciones"
+            : readInbox.length > 0
+              ? "Sin pendientes"
+              : "Sin notificaciones"
         }
         aria-expanded={open}
         aria-controls={panelId}

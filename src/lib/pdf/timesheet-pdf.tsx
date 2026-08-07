@@ -1,6 +1,14 @@
 import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 
+const STATUS_PDF_STYLE: Record<string, { backgroundColor: string; color: string }> = {
+  BORRADOR: { backgroundColor: "#f1f5f9", color: "#475569" },
+  FIRMADO_EMPLEADO: { backgroundColor: "#fef3c7", color: "#92400e" },
+  FIRMADO_RESPONSABLE: { backgroundColor: "#d1fae5", color: "#065f46" },
+  RECHAZADO: { backgroundColor: "#fee2e2", color: "#991b1b" },
+  SIN_CONTROL: { backgroundColor: "#f8fafc", color: "#64748b" },
+};
+
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -212,7 +220,14 @@ export function TimeSheetPdf({
               </Text>
             </View>
           </View>
-          <Text style={styles.statusBadge}>{TIMESHEET_STATUS_LABEL[status] ?? status}</Text>
+          <Text
+            style={[
+              styles.statusBadge,
+              STATUS_PDF_STYLE[status] ?? { backgroundColor: "#f1f5f9", color: "#475569" },
+            ]}
+          >
+            {TIMESHEET_STATUS_LABEL[status] ?? status}
+          </Text>
         </View>
 
         <View style={styles.table}>

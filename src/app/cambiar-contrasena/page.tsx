@@ -44,7 +44,7 @@ export default async function CambiarContrasenaPage() {
           <ChangePasswordForm />
           {mustChange && (
             <div className="mt-4 border-t border-white/15 pt-4">
-              <SignOutButton />
+              <SignOutButton variant="glass" />
             </div>
           )}
         </div>

@@ -12,17 +12,19 @@ import { Stagger } from "@/components/ui/stagger";
 import { SignaturePreview } from "@/components/ui/signature-preview";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { formatDateTimeShort, MONTH_NAMES_ES } from "@/lib/format-date";
-import { sumDayHours } from "@/lib/timesheet-calc";
 
 export default async function ControlDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ month?: string; year?: string; department?: string }>;
 }) {
   const session = await requireManagerSession();
   if (!session) redirect("/");
 
   const { id } = await params;
+  const sp = await searchParams;
 
   const timeSheet = await prisma.timeSheet.findUnique({
     where: { id },
@@ -50,23 +52,19 @@ export default async function ControlDetailPage({
     notes: e.notes,
   }));
 
-  const monthTotals =
-    gridEntries.length > 0
-      ? sumDayHours(
-          gridEntries.map((e) => ({
-            totalHours: e.totalHours,
-            normalHours: e.normalHours,
-            overtimeHours: e.overtimeHours,
-            nightHours: e.nightHours,
-          }))
-        )
-      : null;
+  const backQuery = new URLSearchParams();
+  if (sp.month ?? timeSheet.month) backQuery.set("month", String(sp.month ?? timeSheet.month));
+  if (sp.year ?? timeSheet.year) backQuery.set("year", String(sp.year ?? timeSheet.year));
+  if (sp.department) backQuery.set("department", sp.department);
+  const backHref = backQuery.toString()
+    ? `/jefa/controles?${backQuery.toString()}`
+    : "/jefa/controles";
 
   return (
     <div className="space-y-6">
       <Stagger>
         <div>
-          <BackLink href="/jefa/controles">Volver a controles</BackLink>
+          <BackLink href={backHref}>Volver a controles</BackLink>
           <PageHeader
             title={timeSheet.user.name}
             description={`${timeSheet.user.department?.name ?? "—"} · ${MONTH_NAMES_ES[timeSheet.month - 1]} de ${timeSheet.year}`}
@@ -86,35 +84,6 @@ export default async function ControlDetailPage({
           </PageHeader>
         </div>
       </Stagger>
-
-      {monthTotals && (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate-500">Total</p>
-            <p className="text-lg font-semibold tabular-nums text-brand-navy">
-              {monthTotals.totalHours.toFixed(1)} h
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate-500">Normales</p>
-            <p className="text-lg font-semibold tabular-nums text-brand-navy">
-              {monthTotals.normalHours.toFixed(1)} h
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate-500">Extra</p>
-            <p className="text-lg font-semibold tabular-nums text-brand-navy">
-              {monthTotals.overtimeHours.toFixed(1)} h
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate-500">Nocturnas</p>
-            <p className="text-lg font-semibold tabular-nums text-brand-navy">
-              {monthTotals.nightHours.toFixed(1)} h
-            </p>
-          </div>
-        </div>
-      )}
 
       <ScrollShadow>
         <TimeSheetGridSection

@@ -1,5 +1,6 @@
 import { TableSurface } from "@/components/ui/list-surface";
-import { formatWeekdayShort } from "@/lib/format-date";
+import { dateKeyToUtcNoon, formatWeekdayShort } from "@/lib/format-date";
+import { holidaysInMonth } from "@/lib/holidays";
 import { daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 
 type GridEntry = {
@@ -26,6 +27,7 @@ export function TimeSheetGrid({
   showAllDays?: boolean;
 }) {
   const entryByDay = new Map(entries.map((e) => [e.day, e]));
+  const monthHolidays = holidaysInMonth(month, year);
   const totalDays = daysInMonth(month, year);
   const displayEntries = showAllDays
     ? Array.from({ length: totalDays }, (_, i) => {
@@ -72,10 +74,23 @@ export function TimeSheetGrid({
         <tbody>
           {displayEntries.map((entry) => {
               const weekday = formatWeekdayShort(year, month, entry.day);
+              const dayKey = `${year}-${String(month).padStart(2, "0")}-${String(entry.day).padStart(2, "0")}`;
+              const isWeekend = [0, 6].includes(dateKeyToUtcNoon(dayKey).getUTCDay());
+              const holidayName = monthHolidays.get(entry.day);
               return (
-                <tr key={entry.day} className="border-b border-brand-navy/5 last:border-0">
+                <tr
+                  key={entry.day}
+                  className={`border-b border-brand-navy/5 last:border-0 ${
+                    holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
+                  }`}
+                >
                   <td className="whitespace-nowrap px-0 py-1.5 text-slate-600 sm:px-3">
                     {entry.day} <span className="text-xs text-slate-500">{weekday}</span>
+                    {holidayName && (
+                      <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wide text-amber-700">
+                        {holidayName}
+                      </span>
+                    )}
                   </td>
                   <td className="px-3 py-1.5 text-slate-600">{entry.checkIn || "—"}</td>
                   <td className="px-3 py-1.5 text-slate-600">{entry.checkOut || "—"}</td>

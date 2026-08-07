@@ -138,7 +138,7 @@ export function ScheduleUploadRow({
               type="button"
               onClick={() => setShowHistory((v) => !v)}
               disabled={history.length <= 1}
-              className="btn-sm btn-ghost disabled:opacity-50"
+              className="btn-sm btn-ghost"
             >
               {showHistory ? "Ocultar historial" : `Historial (${history.length})`}
             </button>

@@ -21,7 +21,13 @@ const DRAFTS_TAKE = 30;
 export default async function ControlesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ department?: string; month?: string; year?: string; page?: string }>;
+  searchParams: Promise<{
+    department?: string;
+    month?: string;
+    year?: string;
+    page?: string;
+    drafts?: string;
+  }>;
 }) {
   const session = await requireManagerSession();
   if (!session) redirect("/");
@@ -31,6 +37,7 @@ export default async function ControlesPage({
   const month = params.month ? Number(params.month) : undefined;
   const year = params.year ? Number(params.year) : undefined;
   const page = Math.max(1, Number(params.page) || 1);
+  const showAllDrafts = params.drafts === "all";
 
   const historySkip = (page - 1) * PAGE_SIZE;
 
@@ -50,7 +57,7 @@ export default async function ControlesPage({
       where: { status: "BORRADOR", ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
-      take: DRAFTS_TAKE,
+      ...(showAllDrafts ? {} : { take: DRAFTS_TAKE }),
     }),
     prisma.timeSheet.count({
       where: { status: "BORRADOR", ...baseWhere },
@@ -85,8 +92,22 @@ export default async function ControlesPage({
   function pageHref(p: number) {
     const q = new URLSearchParams(queryBase);
     if (p > 1) q.set("page", String(p));
+    if (showAllDrafts) q.set("drafts", "all");
     const s = q.toString();
     return s ? `/jefa/controles?${s}` : "/jefa/controles";
+  }
+
+  function detailHref(id: string) {
+    const q = new URLSearchParams(queryBase);
+    if (showAllDrafts) q.set("drafts", "all");
+    const s = q.toString();
+    return s ? `/jefa/controles/${id}?${s}` : `/jefa/controles/${id}`;
+  }
+
+  function draftsAllHref() {
+    const q = new URLSearchParams(queryBase);
+    q.set("drafts", "all");
+    return `/jefa/controles?${q.toString()}`;
   }
 
   return (
@@ -181,7 +202,7 @@ export default async function ControlesPage({
         ) : (
           <ListSurface>
             {pending.map((t) => (
-              <TimeSheetRow key={t.id} t={t} />
+              <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
             ))}
           </ListSurface>
         )}
@@ -192,14 +213,19 @@ export default async function ControlesPage({
           <SectionEyebrow>
             {TIMESHEET_STATUS_DESCRIPTION.BORRADOR} ({draftsTotal})
           </SectionEyebrow>
-          {draftsTotal > DRAFTS_TAKE && (
-            <p className="mb-3 text-xs text-slate-500">
-              Mostrando {drafts.length} de {draftsTotal}
-            </p>
+          {draftsTotal > DRAFTS_TAKE && !showAllDrafts && (
+            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className="text-xs text-slate-500">
+                Mostrando {drafts.length} de {draftsTotal}
+              </p>
+              <Link href={draftsAllHref()} className="btn-sm btn-ghost">
+                Mostrar todos
+              </Link>
+            </div>
           )}
           <ListSurface>
             {drafts.map((t) => (
-              <TimeSheetRow key={t.id} t={t} />
+              <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
             ))}
           </ListSurface>
         </section>
@@ -218,7 +244,7 @@ export default async function ControlesPage({
           ) : (
             <ListSurface>
               {others.map((t) => (
-                <TimeSheetRow key={t.id} t={t} />
+                <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
               ))}
             </ListSurface>
           )}
@@ -246,6 +272,7 @@ export default async function ControlesPage({
 
 function TimeSheetRow({
   t,
+  href,
 }: {
   t: {
     id: string;
@@ -254,11 +281,12 @@ function TimeSheetRow({
     status: string;
     user: { name: string; department: { name: string } | null };
   };
+  href: string;
 }) {
   return (
     <ListRow className="!py-0">
       <Link
-        href={`/jefa/controles/${t.id}`}
+        href={href}
         className="flex items-center justify-between gap-3 py-3"
       >
       <div>

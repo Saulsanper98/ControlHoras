@@ -10,15 +10,21 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionTitle } from "@/components/ui/section-title";
 import { ListSurface, ListRow } from "@/components/ui/list-surface";
 import { formatRelativeTime } from "@/lib/format-relative-time";
-import { MONTH_NAMES_ES } from "@/lib/format-date";
+import { MONTH_NAMES_ES, APP_TIMEZONE } from "@/lib/format-date";
 import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 
 function greeting(date: Date): string {
-  const h = date.getHours();
-  if (h < 6) return "Buenas noches";
-  if (h < 13) return "Buenos días";
-  if (h < 20) return "Buenas tardes";
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: APP_TIMEZONE,
+      hour: "numeric",
+      hour12: false,
+    }).format(date)
+  );
+  if (hour < 6) return "Buenas noches";
+  if (hour < 13) return "Buenos días";
+  if (hour < 20) return "Buenas tardes";
   return "Buenas noches";
 }
 

@@ -264,7 +264,12 @@ export function VacationRequestsPanel({
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
+            {estimatedDays === 0 && startDate && endDate && (
+              <p className="mr-auto text-xs text-amber-700">
+                El rango seleccionado no incluye días laborables.
+              </p>
+            )}
             <button type="button" onClick={closeModal} className="btn-ghost">
               Cancelar
             </button>

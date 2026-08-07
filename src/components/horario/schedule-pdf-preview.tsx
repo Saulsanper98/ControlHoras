@@ -18,7 +18,7 @@ export function SchedulePdfPreview({ src, title }: { src: string; title: string 
   // PDF embebido: muchos navegadores no disparan onLoad de forma fiable.
   // Mostramos el iframe siempre y solo ocultamos el skeleton al cargar o al timeout.
   return (
-    <div className="relative mx-auto max-w-4xl overflow-hidden border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
+    <div className="relative mx-auto max-w-4xl overflow-hidden border-y border-[color:var(--surface-divider)] bg-[color:var(--surface-panel)]">
       {showSkeleton && (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col gap-3 p-6">
           <Skeleton className="h-4 w-1/3" />

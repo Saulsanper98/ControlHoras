@@ -110,11 +110,19 @@ export default async function VacationCalendarPage({
     return LEAVE_TYPE_COLOR[leaveType] ?? "bg-brand-navy/[0.06] text-slate-600";
   }
 
+  function vacacionesBackHref() {
+    const qs = new URLSearchParams();
+    qs.set("year", String(year));
+    if (departmentId) qs.set("department", departmentId);
+    if (month) qs.set("month", String(month));
+    return `/jefa/vacaciones?${qs.toString()}`;
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Stagger>
         <div>
-          <BackLink href={`/jefa/vacaciones?year=${year}`}>Volver a vacaciones</BackLink>
+          <BackLink href={vacacionesBackHref()}>Volver a vacaciones</BackLink>
           <PageHeader
             title="Calendario de vacaciones"
             description="Cobertura del equipo por día del mes."

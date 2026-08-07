@@ -39,7 +39,7 @@ export function SignaturePreview({
           src={src}
           alt={alt}
           onError={() => setFailed(true)}
-          className="h-16 rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] p-2"
+          className="h-16 max-w-full rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] object-contain p-2"
         />
       )}
     </div>

@@ -134,7 +134,7 @@ export default async function AuditoriaPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Stagger>
         <PageHeader
           title="Auditoría"

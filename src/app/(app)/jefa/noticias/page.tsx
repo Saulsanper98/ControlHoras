@@ -22,7 +22,7 @@ export default async function JefaNoticiasPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Stagger>
         <PageHeader
           title="Noticias"
