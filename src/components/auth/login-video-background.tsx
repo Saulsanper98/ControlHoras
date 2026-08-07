@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
+const VIDEO_SRC = "/brand/login-loop.mp4";
+
 /**
- * Fondo en bucle del login. Fade-in al estar listo el vídeo.
- * Con `revealed`, el velo se aclara en la transición de acceso.
+ * Fondo en bucle del login.
+ * El vídeo permanece visible (no opacity-0): un velo navy se retira al estar listo.
+ * Así se evita el deadlock de algunos navegadores que no cargan media invisible.
  */
 export function LoginVideoBackground({ revealed = false }: { revealed?: boolean }) {
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -21,9 +24,33 @@ export function LoginVideoBackground({ revealed = false }: { revealed?: boolean 
   }, []);
 
   useEffect(() => {
+    if (reduceMotion) return;
     const el = videoRef.current;
     if (!el) return;
-    if (el.readyState >= 3) setReady(true);
+
+    const markReady = () => setReady(true);
+
+    if (el.readyState >= 2) markReady();
+
+    const tryPlay = () => {
+      void el.play().then(markReady).catch(() => {
+        // Autoplay bloqueado: el frame estático sigue visible bajo el velo.
+        markReady();
+      });
+    };
+
+    el.addEventListener("loadeddata", markReady);
+    el.addEventListener("canplay", tryPlay);
+    el.addEventListener("playing", markReady);
+
+    // Si el navegador ya tenía el recurso en caché.
+    if (el.readyState >= 3) tryPlay();
+
+    return () => {
+      el.removeEventListener("loadeddata", markReady);
+      el.removeEventListener("canplay", tryPlay);
+      el.removeEventListener("playing", markReady);
+    };
   }, [reduceMotion]);
 
   return (
@@ -32,20 +59,26 @@ export function LoginVideoBackground({ revealed = false }: { revealed?: boolean 
         <video
           ref={videoRef}
           className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-[opacity,transform,filter] duration-[1200ms] ease-out",
-            ready ? "opacity-100" : "opacity-0",
+            "absolute inset-0 h-full w-full object-cover transition-[transform,filter] duration-[1200ms] ease-out",
             revealed ? "scale-105 brightness-110" : "scale-100 brightness-100"
           )}
+          src={VIDEO_SRC}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          onCanPlay={() => setReady(true)}
-        >
-          <source src="/brand/login-loop.mp4" type="video/mp4" />
-        </video>
+          onError={() => setReady(true)}
+        />
       )}
+
+      {/* Velo que se retira al cargar (en lugar de ocultar el <video>) */}
+      <div
+        className={cn(
+          "absolute inset-0 bg-brand-navy transition-opacity duration-700 ease-out",
+          ready || reduceMotion ? "opacity-0" : "opacity-100"
+        )}
+      />
 
       <div
         className={cn(
