@@ -16,15 +16,19 @@ export function SignatureModal({
   onConfirm: (dataUrl: string) => void;
 }) {
   const padRef = useRef<SignatureCanvas>(null);
-  const [empty, setEmpty] = useState(true);
+  const [emptyWarning, setEmptyWarning] = useState(false);
 
   function handleClear() {
     padRef.current?.clear();
-    setEmpty(true);
+    setEmptyWarning(false);
   }
 
   function handleConfirm() {
-    if (!padRef.current || padRef.current.isEmpty()) return;
+    if (!padRef.current || padRef.current.isEmpty()) {
+      setEmptyWarning(true);
+      return;
+    }
+    setEmptyWarning(false);
     const dataUrl = padRef.current.getTrimmedCanvas().toDataURL("image/png");
     onConfirm(dataUrl);
   }
@@ -37,10 +41,18 @@ export function SignatureModal({
         <SignatureCanvas
           ref={padRef}
           penColor="#0a2240"
-          canvasProps={{ className: "w-full h-48 rounded-md" }}
-          onBegin={() => setEmpty(false)}
+          canvasProps={{
+            className: "w-full min-h-40 h-[min(40vw,12rem)] sm:h-48 rounded-md touch-none",
+          }}
+          onBegin={() => setEmptyWarning(false)}
         />
       </div>
+
+      {emptyWarning && (
+        <p role="alert" className="mt-2 text-sm text-amber-700">
+          Dibuja tu firma antes de confirmar.
+        </p>
+      )}
 
       <div className="mt-4 flex items-center justify-between">
         <button
@@ -60,7 +72,7 @@ export function SignatureModal({
           </button>
           <button
             type="button"
-            disabled={empty || pending}
+            disabled={pending}
             onClick={handleConfirm}
             className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
           >

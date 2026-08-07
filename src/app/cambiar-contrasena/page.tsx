@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ChangePasswordForm } from "./change-password-form";
@@ -13,6 +15,8 @@ export default async function CambiarContrasenaPage() {
     select: { mustChangePassword: true },
   });
 
+  const mustChange = Boolean(user?.mustChangePassword);
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-navy px-4">
       <LoginVideoBackground />
@@ -21,9 +25,18 @@ export default async function CambiarContrasenaPage() {
           <img src="/brand/logo.svg" alt="Logo de la empresa" className="h-16 w-auto" />
         </div>
         <div className="rounded-2xl border border-white/25 bg-white/12 p-8 shadow-[0_24px_64px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-150">
+          {!mustChange && (
+            <Link
+              href="/"
+              className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-white/70 transition hover:text-white"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+              Volver al portal
+            </Link>
+          )}
           <h1 className="mb-1 text-xl font-semibold text-white">Cambiar contraseña</h1>
           <p className="mb-6 text-sm text-slate-300">
-            {user?.mustChangePassword
+            {mustChange
               ? "Por seguridad, debes cambiar tu contraseña antes de continuar."
               : "Actualiza tu contraseña de acceso."}
           </p>

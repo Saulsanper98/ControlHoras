@@ -20,10 +20,20 @@ type CommandItem = {
   keywords?: string;
 };
 
+function useIsMac() {
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/i.test(navigator.platform) || /Mac/i.test(navigator.userAgent));
+  }, []);
+  return isMac;
+}
+
 export function CommandPalette({ role }: { role: AppRole }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const isMac = useIsMac();
+  const shortcutLabel = isMac ? "⌘K" : "Ctrl+K";
 
   const items = useMemo<CommandItem[]>(() => {
     const nav = role === "JEFA" ? jefaNav : employeeNav;
@@ -108,7 +118,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
         type="button"
         onClick={() => setOpen(true)}
         className="rounded-lg p-2 text-brand-navy transition hover:bg-brand-navy/10 md:hidden"
-        aria-label="Buscar páginas"
+        aria-label={`Buscar páginas (${shortcutLabel})`}
       >
         <Search className="h-5 w-5" />
       </button>
@@ -116,12 +126,12 @@ export function CommandPalette({ role }: { role: AppRole }) {
         type="button"
         onClick={() => setOpen(true)}
         className="hidden h-10 min-w-[200px] items-center gap-2 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.05] px-3.5 text-sm text-slate-600 transition hover:bg-brand-navy/[0.08] md:flex"
-        title="Buscar (Ctrl+K)"
+        title={`Buscar (${shortcutLabel})`}
       >
         <Search className="h-4 w-4 text-brand-blue/85" />
         <span className="flex-1 text-left">Buscar…</span>
         <kbd className="rounded-md border border-brand-navy/10 bg-brand-navy/[0.04] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
-          ⌘K
+          {shortcutLabel}
         </kbd>
       </button>
 
@@ -133,7 +143,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
           placeholder="Escribe para buscar páginas…"
           className="field-control mb-3 w-full px-3 py-2 text-sm"
         />
-        <ul className="surface-menu max-h-64 overflow-y-auto rounded-xl px-1 py-1.5">
+        <ul className="max-h-64 overflow-y-auto px-0.5">
           {filtered.map((item) => {
             const Icon = item.icon;
             return (

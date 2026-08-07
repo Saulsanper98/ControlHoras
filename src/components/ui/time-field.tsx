@@ -67,9 +67,16 @@ export function TimeField({
           onClick={() => !disabled && setOpen(true)}
           onChange={(e) => onChange(e.target.value)}
           onBlur={() => {
+            if (!value.trim()) {
+              if (value !== "") onChange("");
+              return;
+            }
             const normalized = normalizeTime(value);
-            if (!value) return;
-            if (normalized) onChange(normalized);
+            if (normalized) {
+              if (normalized !== value) onChange(normalized);
+            } else {
+              onChange("");
+            }
           }}
           className={cn(
             "field-time w-full min-h-8 pr-10 pl-2 py-1 text-sm font-medium tabular-nums text-brand-navy disabled:opacity-50",

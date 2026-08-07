@@ -1,4 +1,5 @@
-import { Document, Page, View, Text, Image, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -127,13 +128,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Pendiente de firma",
-  FIRMADO_RESPONSABLE: "Firmado",
-  RECHAZADO: "Rechazado",
-};
-
 export type TimeSheetPdfEntry = {
   day: number;
   checkIn: string | null;
@@ -218,7 +212,7 @@ export function TimeSheetPdf({
               </Text>
             </View>
           </View>
-          <Text style={styles.statusBadge}>{STATUS_LABEL[status] ?? status}</Text>
+          <Text style={styles.statusBadge}>{TIMESHEET_STATUS_LABEL[status] ?? status}</Text>
         </View>
 
         <View style={styles.table}>

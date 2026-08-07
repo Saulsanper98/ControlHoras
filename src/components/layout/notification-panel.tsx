@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { Bell, ClipboardList, Umbrella } from "lucide-react";
+import { Bell, ClipboardList, MessageSquare, Umbrella } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/app/(app)/notifications/actions";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 
 type InboxItem = {
   id: string;
@@ -18,14 +19,6 @@ type InboxItem = {
   createdAt: string;
   readAt: string | null;
 };
-
-function vacationLabel(count: number) {
-  return count === 1 ? "1 vacación por revisar" : `${count} vacaciones por revisar`;
-}
-
-function controlLabel(count: number) {
-  return count === 1 ? "1 control por firmar" : `${count} controles por firmar`;
-}
 
 export function NotificationPanel({
   pendingControls,
@@ -92,7 +85,7 @@ export function NotificationPanel({
             <button
               type="button"
               aria-label="Cerrar notificaciones"
-              className="fixed inset-0 z-[190] bg-transparent"
+              className="fixed inset-0 z-[190] bg-brand-navy/20 backdrop-blur-[1px]"
               onClick={() => setOpen(false)}
             />
             <div
@@ -125,8 +118,15 @@ export function NotificationPanel({
                         onClick={() => setOpen(false)}
                         className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-brand-navy hover:bg-brand-navy/6"
                       >
-                        <ClipboardList className="h-4 w-4 text-brand-blue" />
-                        {controlLabel(pendingControls)}
+                        <ClipboardList className="h-4 w-4 shrink-0 text-brand-blue" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-medium">Controles por firmar</span>
+                          <span className="text-xs text-slate-500">
+                            {pendingControls === 1
+                              ? "1 control pendiente"
+                              : `${pendingControls} controles pendientes`}
+                          </span>
+                        </span>
                       </Link>
                     </li>
                   )}
@@ -137,9 +137,26 @@ export function NotificationPanel({
                         onClick={() => setOpen(false)}
                         className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-brand-navy hover:bg-brand-navy/6"
                       >
-                        <Umbrella className="h-4 w-4 text-amber-600" />
-                        {vacationLabel(pendingVacations)}
+                        <Umbrella className="h-4 w-4 shrink-0 text-amber-600" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-medium">
+                            Solicitudes de vacaciones por revisar
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            {pendingVacations === 1
+                              ? "1 solicitud pendiente"
+                              : `${pendingVacations} solicitudes pendientes`}
+                          </span>
+                        </span>
                       </Link>
+                    </li>
+                  )}
+                  {inbox.length > 0 && (
+                    <li className="px-2 pb-0.5 pt-2">
+                      <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        <MessageSquare className="h-3 w-3" />
+                        Mensajes
+                      </p>
                     </li>
                   )}
                   {inbox.map((n) => (
@@ -161,6 +178,9 @@ export function NotificationPanel({
                       >
                         <p className="font-medium">{n.title}</p>
                         <p className="text-xs text-slate-500">{n.body}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-400">
+                          {formatRelativeTime(new Date(n.createdAt))}
+                        </p>
                       </Link>
                     </li>
                   ))}
