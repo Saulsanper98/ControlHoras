@@ -48,7 +48,7 @@ function entityHref(entityType: string, entityId: string | null): string | null 
     case "User":
       return `/jefa/empleados`;
     case "News":
-      return `/noticias/${entityId}`;
+      return `/jefa/noticias`;
     case "Schedule":
       return `/jefa/horarios`;
     default:
