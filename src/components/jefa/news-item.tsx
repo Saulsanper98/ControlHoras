@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pin, Pencil, Trash2, X, Check } from "lucide-react";
+import Link from "next/link";
+import { Pin, Pencil, Trash2, X, Check, ExternalLink } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { FileDropzone } from "@/components/ui/file-dropzone";
-import { formatDate } from "@/lib/format-date";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
+
+function newsBadgeStatus(status: string, scheduledAt: string | null | undefined): string {
+  if (scheduledAt && new Date(scheduledAt).getTime() > Date.now() && status !== "PUBLICADA") {
+    return "PROGRAMADA";
+  }
+  if (status === "PUBLICADA") return "PUBLICADA";
+  return "BORRADOR";
+}
 
 export function NewsItem({
   id,
@@ -36,6 +46,11 @@ export function NewsItem({
   const [draftValue, setDraftValue] = useState(status === "BORRADOR");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const badge = newsBadgeStatus(status, scheduledAt);
+  const isPublishedVisible =
+    status === "PUBLICADA" &&
+    (!scheduledAt || new Date(scheduledAt).getTime() <= Date.now());
 
   function handleSave() {
     const formData = new FormData();
@@ -150,32 +165,36 @@ export function NewsItem({
   return (
     <div className="py-4">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             {pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
-            {status === "BORRADOR" && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
-                Borrador
-              </span>
-            )}
+            <StatusBadge status={badge} preset="news" />
             <p className="font-medium text-brand-navy">{title}</p>
           </div>
           <p className="mt-1 whitespace-pre-line text-sm text-slate-600">{body}</p>
           {imagePath && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={`/api/uploads/${imagePath}`}
-              alt=""
+              alt={title}
               className="mt-2 max-h-48 rounded-md"
             />
           )}
-          <p className="mt-2 text-xs text-slate-500">
-            {formatDate(publishedAt)}
-            {scheduledAt && status === "BORRADOR" && (
-              <span className="ml-2 text-amber-700">
-                · Programada {formatDate(scheduledAt)}
-              </span>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+            <span>{formatRelativeTime(publishedAt)}</span>
+            {scheduledAt && badge === "PROGRAMADA" && (
+              <span>Programada {formatRelativeTime(scheduledAt)}</span>
             )}
-          </p>
+            {isPublishedVisible && (
+              <Link
+                href={`/noticias/${id}`}
+                className="inline-flex items-center gap-1 font-medium text-brand-blue hover:underline"
+              >
+                Ver como empleado
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            )}
+          </div>
         </div>
         <div className="flex shrink-0 gap-1">
           <button
