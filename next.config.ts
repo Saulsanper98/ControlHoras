@@ -21,8 +21,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Acceso al dev server desde la LAN (p. ej. http://192.168.12.45:3000)
-  allowedDevOrigins: ["192.168.12.45"],
+  // Acceso al dev server desde la LAN. Sin esto Next bloquea /_next/* (HMR/RSC)
+  // y la app “no carga” al abrir por IP.
+  allowedDevOrigins: ["192.168.12.45", "127.0.0.1"],
   async headers() {
     return [
       {

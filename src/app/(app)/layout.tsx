@@ -5,6 +5,23 @@ import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 import { AppShell } from "@/components/layout/app-shell";
 import { AppProviders } from "@/components/providers/app-providers";
 
+/**
+ * Si el client de Prisma no se regeneró tras un pull, los delegates nuevos
+ * (vacationRequest, notification, …) quedan `undefined` y el layout petaba
+ * con "Cannot read properties of undefined (reading 'count')".
+ */
+function assertPrismaReady() {
+  const missing: string[] = [];
+  if (typeof prisma.vacationRequest?.count !== "function") missing.push("vacationRequest");
+  if (typeof prisma.notification?.findMany !== "function") missing.push("notification");
+  if (typeof prisma.timeSheet?.count !== "function") missing.push("timeSheet");
+  if (missing.length === 0) return;
+  throw new Error(
+    `Prisma Client desactualizado (faltan: ${missing.join(", ")}). ` +
+      `En la carpeta del proyecto ejecuta: npx prisma generate && reinicia npm run dev`
+  );
+}
+
 export default async function AppLayout({
   children,
 }: {
@@ -12,6 +29,8 @@ export default async function AppLayout({
 }) {
   const session = await auth();
   if (!session) redirect("/login");
+
+  assertPrismaReady();
 
   const now = new Date();
   const month = now.getMonth() + 1;

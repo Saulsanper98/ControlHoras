@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H :: -p 3000",
+    "dev": "next dev -H 0.0.0.0 -p 3000",
     "dev:stable": "bash ./scripts/dev-stable.sh",
     "dev:watchdog": "bash ./scripts/dev-watchdog.sh",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "db:setup": "prisma generate && prisma migrate deploy && prisma db seed",
+    "db:reset": "prisma migrate reset --force",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

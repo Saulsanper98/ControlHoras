@@ -20,6 +20,9 @@ const authSecret =
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: authSecret,
+  // Obligatorio si se abre por IP LAN (p. ej. http://192.168.12.45:3000)
+  // o detrás de proxy; sin esto Auth.js/CSRF/cookies apuntan a localhost.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
