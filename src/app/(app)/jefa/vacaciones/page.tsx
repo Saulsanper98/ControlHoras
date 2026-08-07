@@ -3,37 +3,62 @@ import { redirect } from "next/navigation";
 import { Umbrella, CalendarDays } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ListSurface } from "@/components/ui/list-surface";
+import { Select } from "@/components/ui/select";
 import { PendingVacationRequests } from "@/components/jefa/pending-vacation-requests";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { toDateKey } from "@/lib/format-date";
 
-export default async function JefaVacacionesPage() {
+export default async function JefaVacacionesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ year?: string }>;
+}) {
   const session = await requireManagerSession();
   if (!session) redirect("/");
 
-  const year = new Date().getFullYear();
+  const params = await searchParams;
+  const currentYear = new Date().getFullYear();
+  const year = Number(params.year) || currentYear;
 
-  const [departments, employees, balances, adjustmentSums, pendingRequests] = await Promise.all([
-    prisma.department.findMany({ orderBy: { name: "asc" } }),
-    prisma.user.findMany({
-      where: { role: "EMPLEADO", active: true },
-      include: { department: true },
-      orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
-    }),
-    prisma.vacationBalance.findMany({ where: { year } }),
-    prisma.hourAdjustment.groupBy({
-      by: ["userId"],
-      where: { year },
-      _sum: { hours: true },
-    }),
-    prisma.vacationRequest.findMany({
-      where: { status: "PENDIENTE" },
-      include: { user: { include: { department: true } } },
-      orderBy: { createdAt: "asc" },
-    }),
-  ]);
+  const [departments, employees, balances, adjustmentSums, pendingRequests, balanceYears] =
+    await Promise.all([
+      prisma.department.findMany({ orderBy: { name: "asc" } }),
+      prisma.user.findMany({
+        where: { role: "EMPLEADO", active: true },
+        include: { department: true },
+        orderBy: [{ department: { name: "asc" } }, { name: "asc" }],
+      }),
+      prisma.vacationBalance.findMany({ where: { year } }),
+      prisma.hourAdjustment.groupBy({
+        by: ["userId"],
+        where: { year },
+        _sum: { hours: true },
+      }),
+      prisma.vacationRequest.findMany({
+        where: { status: "PENDIENTE" },
+        include: { user: { include: { department: true } } },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.vacationBalance.findMany({
+        select: { year: true },
+        distinct: ["year"],
+        orderBy: { year: "desc" },
+      }),
+    ]);
+
+  const years = [
+    ...new Set([currentYear, currentYear - 1, ...balanceYears.map((b) => b.year)]),
+  ].sort((a, b) => b - a);
 
   const balanceByUser = new Map(balances.map((b) => [b.userId, b]));
   const hoursByUser = new Map(adjustmentSums.map((a) => [a.userId, Number(a._sum.hours ?? 0)]));
+
+  const pendingByUser = new Map<string, number>();
+  for (const r of pendingRequests) {
+    if (r.year !== year) continue;
+    if (r.leaveType !== "VACACIONES" && r.leaveType !== "MEDIO_DIA") continue;
+    pendingByUser.set(r.userId, (pendingByUser.get(r.userId) ?? 0) + Number(r.days));
+  }
 
   type Emp = (typeof employees)[number];
   const byDept = new Map<string, Emp[]>();
@@ -50,20 +75,28 @@ export default async function JefaVacacionesPage() {
 
   function EmployeeLink({ e }: { e: Emp }) {
     const balance = balanceByUser.get(e.id);
-    const remaining = balance ? Number(balance.totalDays) - Number(balance.usedDays) : null;
+    const pending = pendingByUser.get(e.id) ?? 0;
+    const remaining = balance
+      ? Number(balance.totalDays) - Number(balance.usedDays) - pending
+      : null;
     const hours = hoursByUser.get(e.id) ?? 0;
     return (
       <Link
-        href={`/jefa/vacaciones/${e.id}`}
+        href={`/jefa/vacaciones/${e.id}?year=${year}`}
         className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.035]"
       >
         <div className="flex items-center gap-3">
           <Umbrella className="h-4 w-4 text-brand-blue" />
-          <p className="font-medium text-brand-navy">{e.name}</p>
+          <div>
+            <p className="font-medium text-brand-navy">{e.name}</p>
+            {pending > 0 && (
+              <p className="text-xs text-amber-700">{pending} días en trámite</p>
+            )}
+          </div>
         </div>
         <div className="flex gap-6 text-right text-sm">
           <div>
-            <p className="text-xs text-slate-500">Vacaciones</p>
+            <p className="text-xs text-slate-500">Disponibles</p>
             <p className="font-medium tabular-nums text-brand-navy">
               {remaining !== null ? `${remaining} días` : "Sin datos"}
             </p>
@@ -83,16 +116,38 @@ export default async function JefaVacacionesPage() {
         <div>
           <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
           <p className="text-brand-navy/55">
-            Gestiona los saldos de vacaciones ({year}) y la bolsa de horas de cada empleado.
+            Gestiona saldos, solicitudes pendientes y bolsa de horas ({year}).
           </p>
         </div>
-        <Link
-          href="/jefa/vacaciones/calendario"
-          className="surface-btn flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-brand-blue"
-        >
-          <CalendarDays className="h-4 w-4" />
-          Calendario del equipo
-        </Link>
+        <div className="flex flex-wrap items-end gap-3">
+          <form method="get" className="flex items-end gap-2">
+            <div className="w-28">
+              <label htmlFor="jefa-vac-year" className="mb-1 block text-xs font-medium text-slate-500">
+                Año
+              </label>
+              <Select id="jefa-vac-year" name="year" defaultValue={String(year)}>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <button
+              type="submit"
+              className="rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
+            >
+              Ver
+            </button>
+          </form>
+          <Link
+            href="/jefa/vacaciones/calendario"
+            className="surface-btn flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-brand-blue"
+          >
+            <CalendarDays className="h-4 w-4" />
+            Calendario del equipo
+          </Link>
+        </div>
       </div>
 
       <PendingVacationRequests
@@ -100,8 +155,8 @@ export default async function JefaVacacionesPage() {
           id: r.id,
           userName: r.user.name,
           departmentName: r.user.department?.name ?? null,
-          startDate: r.startDate.toISOString(),
-          endDate: r.endDate.toISOString(),
+          startDate: toDateKey(r.startDate),
+          endDate: toDateKey(r.endDate),
           days: Number(r.days),
           employeeNotes: r.employeeNotes,
           leaveType: r.leaveType,

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
+import { formatDate } from "@/lib/format-date";
 import {
   addHourAdjustmentAction,
   deleteHourAdjustmentAction,
@@ -209,7 +210,7 @@ export function VacationEditor({
                   </span>
                   <span className="ml-2 text-slate-500">{a.reason}</span>
                   <span className="ml-2 text-xs text-slate-500">
-                    {new Date(a.createdAt).toLocaleDateString("es-ES")} · {a.createdByName}
+                    {formatDate(a.createdAt)} · {a.createdByName}
                   </span>
                 </div>
                 <button

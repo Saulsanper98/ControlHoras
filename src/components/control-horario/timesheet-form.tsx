@@ -24,6 +24,7 @@ import { useDensity } from "@/lib/density";
 import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
+import { formatDateTime, formatWeekdayShort } from "@/lib/format-date";
 import { SignatureModal } from "@/components/signature/signature-pad";
 import {
   copyFromPreviousMonthAction,
@@ -510,9 +511,7 @@ export function TimeSheetForm({
             <tbody>
               {filteredEntries.map((entry) => {
                 const hours = calculateDayHours(entry.checkIn, entry.checkOut);
-                const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
-                  weekday: "short",
-                });
+                const weekday = formatWeekdayShort(year, month, entry.day);
                 const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
                 const holidayName = monthHolidays.get(entry.day);
                 const shiftKey = shiftKeyForEntry(entry);
@@ -690,8 +689,8 @@ export function TimeSheetForm({
                 <p className="mb-1 text-xs text-slate-500">
                   Empleado
                   {employeeSignedAt && (
-                    <span className="ml-1 text-slate-400">
-                      · {new Date(employeeSignedAt).toLocaleString("es-ES")}
+                    <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                      · {formatDateTime(employeeSignedAt)}
                     </span>
                   )}
                 </p>
@@ -707,8 +706,8 @@ export function TimeSheetForm({
                 <p className="mb-1 text-xs text-slate-500">
                   Responsable
                   {responsableSignedAt && (
-                    <span className="ml-1 text-slate-400">
-                      · {new Date(responsableSignedAt).toLocaleString("es-ES")}
+                    <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                      · {formatDateTime(responsableSignedAt)}
                     </span>
                   )}
                 </p>

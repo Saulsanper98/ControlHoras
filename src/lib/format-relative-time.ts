@@ -1,3 +1,5 @@
+import { APP_TIMEZONE, formatDateShort } from "@/lib/format-date";
+
 export function formatRelativeTime(date: Date): string {
   const now = Date.now();
   const diff = now - date.getTime();
@@ -8,5 +10,8 @@ export function formatRelativeTime(date: Date): string {
   if (hours < 24) return `hace ${hours} h`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `hace ${days} día${days === 1 ? "" : "s"}`;
-  return date.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+  return formatDateShort(date);
 }
+
+/** Utilidad por si algún consumidor necesita la zona explícita. */
+export { APP_TIMEZONE };

@@ -1,4 +1,5 @@
 import { TableSurface } from "@/components/ui/list-surface";
+import { formatWeekdayShort } from "@/lib/format-date";
 import { sumDayHours } from "@/lib/timesheet-calc";
 
 type GridEntry = {
@@ -49,9 +50,7 @@ export function TimeSheetGrid({
           {entries
             .filter((e) => e.checkIn || e.checkOut || e.notes)
             .map((entry) => {
-              const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
-                weekday: "short",
-              });
+              const weekday = formatWeekdayShort(year, month, entry.day);
               return (
                 <tr key={entry.day} className="border-b border-brand-navy/5 last:border-0">
                   <td className="whitespace-nowrap px-0 py-1.5 text-slate-600 sm:px-3">

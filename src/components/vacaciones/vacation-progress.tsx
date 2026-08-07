@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { monthFromDateKey, yearFromDateKey } from "@/lib/format-date";
 
 export function VacationProgressBar({
   total,
@@ -58,15 +59,27 @@ export function VacationTimeline({
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const byMonth = months.map((m) =>
     requests.filter((r) => {
-      const s = new Date(r.startDate);
-      return s.getFullYear() === year && (s.getMonth() + 1 === m || new Date(r.endDate).getMonth() + 1 === m);
+      if (yearFromDateKey(r.startDate) !== year && yearFromDateKey(r.endDate) !== year) {
+        return false;
+      }
+      const startM = monthFromDateKey(r.startDate);
+      const endM = monthFromDateKey(r.endDate);
+      const startY = yearFromDateKey(r.startDate);
+      const endY = yearFromDateKey(r.endDate);
+      // Incluye el mes si el tramo lo atraviesa dentro del año.
+      if (startY === year && endY === year) {
+        return startM <= m && endM >= m;
+      }
+      if (startY === year) return startM <= m;
+      if (endY === year) return endM >= m;
+      return false;
     })
   );
 
   if (requests.length === 0) return null;
 
   return (
-    <div className="mt-4">
+    <div>
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
         Línea temporal {year}
       </p>

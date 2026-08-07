@@ -10,6 +10,7 @@ import {
   rejectVacationRequestAction,
 } from "@/app/(app)/jefa/vacaciones/request-actions";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
+import { formatDateNumeric } from "@/lib/format-date";
 
 type PendingRequest = {
   id: string;
@@ -84,8 +85,8 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
               <p className="font-medium text-brand-navy">{r.userName}</p>
               <p className="text-sm text-slate-500">
                 {r.departmentName ?? "—"} ·{" "}
-                {new Date(r.startDate).toLocaleDateString("es-ES")} –{" "}
-                {new Date(r.endDate).toLocaleDateString("es-ES")} ({r.days} días)
+                {formatDateNumeric(r.startDate)} – {formatDateNumeric(r.endDate)} ({r.days}{" "}
+                días)
                 {r.leaveType && r.leaveType !== "VACACIONES"
                   ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
                   : ""}
@@ -129,8 +130,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
             <ul className="mb-4 max-h-40 space-y-1 overflow-y-auto text-sm text-slate-600">
               {overlapPrompt.overlaps.map((o, idx) => (
                 <li key={`${o.userName}-${idx}`}>
-                  {o.userName}: {new Date(o.startDate).toLocaleDateString("es-ES")} –{" "}
-                  {new Date(o.endDate).toLocaleDateString("es-ES")}
+                  {o.userName}: {formatDateNumeric(o.startDate)} – {formatDateNumeric(o.endDate)}
                 </li>
               ))}
             </ul>

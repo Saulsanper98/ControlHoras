@@ -8,6 +8,8 @@ import { ListSurface } from "@/components/ui/list-surface";
 import { VacationRequestsPanel } from "@/components/vacaciones/vacation-requests-panel";
 import { VacationProgressBar, VacationTimeline } from "@/components/vacaciones/vacation-progress";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
+import { formatDate, formatDateShort, toDateKey } from "@/lib/format-date";
+import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 
 export default async function VacacionesPage({
   searchParams,
@@ -43,7 +45,12 @@ export default async function VacacionesPage({
         orderBy: { createdAt: "desc" },
       }),
       prisma.vacationRequest.aggregate({
-        where: { userId: session.user.id, year, status: "PENDIENTE" },
+        where: {
+          userId: session.user.id,
+          year,
+          status: "PENDIENTE",
+          leaveType: { in: ["VACACIONES", "MEDIO_DIA"] },
+        },
         _sum: { days: true },
       }),
       deptId
@@ -52,12 +59,12 @@ export default async function VacacionesPage({
               status: "APROBADA",
               year,
               user: { departmentId: deptId, id: { not: session.user.id } },
-              startDate: { lte: new Date(year, 11, 31) },
-              endDate: { gte: new Date(year, 0, 1) },
+              startDate: { lte: new Date(Date.UTC(year, 11, 31)) },
+              endDate: { gte: new Date(Date.UTC(year, 0, 1)) },
             },
             include: { user: { select: { name: true } } },
             orderBy: { startDate: "asc" },
-            take: 8,
+            take: 20,
           })
         : Promise.resolve([]),
     ]);
@@ -77,7 +84,7 @@ export default async function VacacionesPage({
       <Stagger>
         <PageHeader
           title="Vacaciones y horas"
-          description="Consulta tu saldo, solicita vacaciones y revisa tu bolsa de horas."
+          description="Consulta tu saldo, solicita ausencias y revisa tu bolsa de horas."
         >
           <form method="get" className="flex items-end gap-2">
             <div className="w-28">
@@ -106,10 +113,16 @@ export default async function VacacionesPage({
         <div className="flex items-center gap-4 py-5 sm:pr-5">
           <Umbrella className="h-5 w-5 shrink-0 text-brand-blue" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm text-slate-500">Vacaciones restantes</p>
+            <p className="text-sm text-slate-500">Vacaciones disponibles</p>
             <p className="font-display text-2xl font-semibold tabular-nums text-brand-navy">
               {remaining !== null ? `${remaining} días` : "Sin datos"}
             </p>
+            {totalDays > 0 && (
+              <p className="mt-1 text-xs tabular-nums text-slate-500">
+                Total {totalDays} · Usados {usedDays}
+                {pendingDays > 0 ? ` · En trámite ${pendingDays}` : ""}
+              </p>
+            )}
             {totalDays > 0 && (
               <div className="mt-3">
                 <VacationProgressBar total={totalDays} used={usedDays} pending={pendingDays} />
@@ -124,7 +137,11 @@ export default async function VacacionesPage({
             <p className="font-display text-2xl font-semibold tabular-nums text-brand-navy">
               {totalHours.toFixed(1)} h
             </p>
-            <p className="text-xs text-slate-500">Ajustes acumulados</p>
+            <p className="text-xs text-slate-500">
+              {adjustments.length === 0
+                ? "Sin ajustes este año"
+                : `${adjustments.length} ajuste${adjustments.length === 1 ? "" : "s"} en ${year}`}
+            </p>
           </div>
         </div>
       </div>
@@ -133,8 +150,8 @@ export default async function VacacionesPage({
         <VacationTimeline
           year={year}
           requests={vacationRequests.map((r) => ({
-            startDate: r.startDate.toISOString(),
-            endDate: r.endDate.toISOString(),
+            startDate: toDateKey(r.startDate),
+            endDate: toDateKey(r.endDate),
             status: r.status,
             days: Number(r.days),
           }))}
@@ -155,8 +172,8 @@ export default async function VacacionesPage({
           year={year}
           requests={vacationRequests.map((r) => ({
             id: r.id,
-            startDate: r.startDate.toISOString(),
-            endDate: r.endDate.toISOString(),
+            startDate: toDateKey(r.startDate),
+            endDate: toDateKey(r.endDate),
             days: Number(r.days),
             status: r.status,
             leaveType: r.leaveType,
@@ -176,10 +193,16 @@ export default async function VacacionesPage({
           <ListSurface>
             {teamApproved.map((r) => (
               <div key={r.id} className="flex justify-between gap-2 py-3 text-sm">
-                <span className="font-medium text-brand-navy">{r.user.name}</span>
-                <span className="text-slate-500 tabular-nums">
-                  {r.startDate.toLocaleDateString("es-ES", { day: "numeric", month: "short" })} –{" "}
-                  {r.endDate.toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                <div className="min-w-0">
+                  <span className="font-medium text-brand-navy">{r.user.name}</span>
+                  {r.leaveType && r.leaveType !== "VACACIONES" && (
+                    <span className="ml-2 text-xs text-slate-500">
+                      {LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}
+                    </span>
+                  )}
+                </div>
+                <span className="shrink-0 text-slate-500 tabular-nums">
+                  {formatDateShort(r.startDate)} – {formatDateShort(r.endDate)}
                 </span>
               </div>
             ))}
@@ -191,7 +214,7 @@ export default async function VacacionesPage({
         <h2 className="mb-3 text-sm font-semibold text-brand-navy">Historial de ajustes de horas</h2>
         {adjustments.length === 0 ? (
           <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
-            Sin ajustes registrados.
+            Sin ajustes registrados en {year}.
           </p>
         ) : (
           <ListSurface>
@@ -212,7 +235,7 @@ export default async function VacacionesPage({
                   <span className="ml-2 text-sm text-slate-600">{a.reason}</span>
                 </div>
                 <span className="shrink-0 text-xs text-slate-500">
-                  {a.createdAt.toLocaleDateString("es-ES")} · {a.createdBy.name}
+                  {formatDate(a.createdAt)} · {a.createdBy.name}
                 </span>
               </div>
             ))}

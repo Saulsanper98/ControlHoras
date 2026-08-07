@@ -8,6 +8,7 @@ import { createNotification } from "@/lib/notifications";
 import { writeAuditLog } from "@/lib/audit";
 import { findDepartmentVacationOverlaps } from "@/lib/vacation-overlaps";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
+import { formatDateNumeric } from "@/lib/format-date";
 
 function revalidateAll(userId: string) {
   revalidatePath("/jefa/vacaciones");
@@ -87,7 +88,7 @@ export async function approveVacationRequestAction(
   await createNotification({
     userId: request.userId,
     title: `${LEAVE_TYPE_LABEL[request.leaveType] ?? "Solicitud"} aprobada`,
-    body: `Tu solicitud del ${request.startDate.toLocaleDateString("es-ES")} al ${request.endDate.toLocaleDateString("es-ES")} ha sido aprobada.`,
+    body: `Tu solicitud del ${formatDateNumeric(request.startDate)} al ${formatDateNumeric(request.endDate)} ha sido aprobada.`,
     href: "/vacaciones",
   });
   await writeAuditLog({

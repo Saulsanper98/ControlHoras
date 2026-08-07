@@ -164,7 +164,12 @@ export type TimeSheetPdfProps = {
 };
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Intl.DateTimeFormat("es-ES", {
+    timeZone: "Atlantic/Canary",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
 }
 
 export function TimeSheetPdf({

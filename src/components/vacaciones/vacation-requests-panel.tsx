@@ -6,7 +6,10 @@ import { CalendarPlus, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
 import { FieldSelect } from "@/components/ui/field-select";
+import { ListSurface } from "@/components/ui/list-surface";
 import { countVacationDays } from "@/lib/holidays";
+import { formatDate, yearFromDateKey } from "@/lib/format-date";
+import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   cancelVacationRequestAction,
@@ -99,19 +102,30 @@ export function VacationRequestsPanel({
     })();
   }
 
-  const yearRequests = requests.filter((r) => new Date(r.startDate).getFullYear() === year);
+  const yearRequests = requests.filter((r) => yearFromDateKey(r.startDate) === year);
 
   const estimatedDays = useMemo(() => {
     if (!startDate || !endDate || endDate < startDate) return null;
+    if (leaveType === "MEDIO_DIA") return 0.5;
+    if (leaveType === "ASUNTOS_PROPIOS") {
+      const [ys, ms, ds] = startDate.split("-").map(Number);
+      const [ye, me, de] = endDate.split("-").map(Number);
+      return countVacationDays(new Date(ys, ms - 1, ds), new Date(ye, me - 1, de));
+    }
     const [ys, ms, ds] = startDate.split("-").map(Number);
     const [ye, me, de] = endDate.split("-").map(Number);
     return countVacationDays(new Date(ys, ms - 1, ds), new Date(ye, me - 1, de));
-  }, [startDate, endDate]);
+  }, [startDate, endDate, leaveType]);
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-brand-navy">Mis solicitudes</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-brand-navy">Mis solicitudes</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Vacaciones, asuntos propios o medio día · {year}
+          </p>
+        </div>
         <button
           type="button"
           onClick={() => setShowModal(true)}
@@ -133,36 +147,31 @@ export function VacationRequestsPanel({
       )}
 
       {yearRequests.length === 0 ? (
-        <p className="mt-4 text-sm text-slate-500">Sin solicitudes para {year}.</p>
+        <p className="mt-4 border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
+          Sin solicitudes para {year}. Pulsa «Nueva solicitud» para empezar.
+        </p>
       ) : (
-        <ul className="mt-4 divide-y divide-brand-navy/8">
+        <ListSurface className="mt-4">
           {yearRequests.map((r) => (
-            <li
+            <div
               key={r.id}
-              className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+              className="flex flex-wrap items-center justify-between gap-3 py-3"
             >
               <div className="min-w-0">
                 <p className="font-medium text-brand-navy">
-                  {new Date(r.startDate).toLocaleDateString("es-ES", {
-                    day: "numeric",
-                    month: "short",
-                  })}{" "}
-                  –{" "}
-                  {new Date(r.endDate).toLocaleDateString("es-ES", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                  <span className="ml-2 font-normal text-slate-500">{r.days} días</span>
-                  {r.leaveType && r.leaveType !== "VACACIONES" && (
-                    <span className="ml-2 text-xs text-brand-blue">{r.leaveType.replaceAll("_", " ")}</span>
-                  )}
+                  {formatDate(r.startDate, { day: "numeric", month: "short" })}
+                  {" – "}
+                  {formatDate(r.endDate, { day: "numeric", month: "short", year: "numeric" })}
+                  <span className="ml-2 font-normal tabular-nums text-slate-500">
+                    {r.days} día{r.days === 1 ? "" : "s"}
+                  </span>
                 </p>
-                {r.employeeNotes && (
-                  <p className="mt-0.5 truncate text-xs text-slate-500">{r.employeeNotes}</p>
-                )}
+                <p className="mt-0.5 text-xs text-slate-500">
+                  {LEAVE_TYPE_LABEL[r.leaveType ?? "VACACIONES"] ?? r.leaveType}
+                  {r.employeeNotes ? ` · ${r.employeeNotes}` : ""}
+                </p>
                 {r.rejectionReason && (
-                  <p className="mt-0.5 text-xs text-red-600">{r.rejectionReason}</p>
+                  <p className="mt-0.5 text-xs text-red-600">Motivo: {r.rejectionReason}</p>
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -181,9 +190,9 @@ export function VacationRequestsPanel({
                   </button>
                 )}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </ListSurface>
       )}
 
       <Modal open={showModal} onClose={closeModal} title="Nueva solicitud">
@@ -203,6 +212,16 @@ export function VacationRequestsPanel({
                 { value: "MEDIO_DIA", label: "Medio día" },
               ]}
             />
+            {leaveType === "ASUNTOS_PROPIOS" && (
+              <p className="mt-1.5 text-xs text-slate-500">
+                Los asuntos propios no descuentan del saldo de vacaciones.
+              </p>
+            )}
+            {leaveType === "MEDIO_DIA" && (
+              <p className="mt-1.5 text-xs text-slate-500">
+                Se cuenta como medio día laborable (0,5).
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <DateField
@@ -230,7 +249,7 @@ export function VacationRequestsPanel({
           </div>
 
           {estimatedDays !== null && (
-            <p className="rounded-lg bg-brand-blue/8 px-3 py-2 text-sm text-brand-navy">
+            <p className="border-y border-brand-navy/10 py-2 text-sm text-brand-navy">
               <span className="font-semibold tabular-nums">{estimatedDays}</span>{" "}
               día{estimatedDays === 1 ? "" : "s"} laborable{estimatedDays === 1 ? "" : "s"}
               <span className="text-slate-500"> · sin fines de semana ni festivos</span>

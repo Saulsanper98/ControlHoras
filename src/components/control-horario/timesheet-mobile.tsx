@@ -1,6 +1,7 @@
 "use client";
 
 import { calculateDayHours } from "@/lib/timesheet-calc";
+import { formatWeekdayShort } from "@/lib/format-date";
 import { FieldSelect } from "@/components/ui/field-select";
 import { TimeField } from "@/components/ui/time-field";
 
@@ -39,9 +40,7 @@ export function TimeSheetMobileDays({
     <div className="divide-y divide-brand-navy/8 md:hidden">
       {entries.map((entry) => {
         const hours = calculateDayHours(entry.checkIn, entry.checkOut);
-        const weekday = new Date(year, month - 1, entry.day).toLocaleDateString("es-ES", {
-          weekday: "short",
-        });
+        const weekday = formatWeekdayShort(year, month, entry.day);
         const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
         const holidayName = monthHolidays.get(entry.day);
         const shiftKey = shiftKeyForEntry(entry);
