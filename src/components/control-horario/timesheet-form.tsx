@@ -436,12 +436,12 @@ export function TimeSheetForm({
           )}
         </div>
 
-        {/* Herramientas: bulk / copiar / filtros */}
-        <div className="border-b border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] py-4">
+        {/* Herramientas: bulk / copiar / filtros — fondo con degradado, sin aristas duras */}
+        <div className="bg-gradient-to-b from-transparent via-[color:var(--surface-muted)] to-transparent px-4 py-5 sm:px-5 sm:py-6">
           {editable && (
             <div className="flex flex-wrap items-end gap-3">
               <div className="w-full min-w-[10rem] sm:w-52">
-                <label htmlFor="bulk-shift" className="mb-1 block text-xs font-medium text-slate-500">
+                <label htmlFor="bulk-shift" className="mb-1.5 block text-xs font-medium text-slate-500">
                   Turno a aplicar
                 </label>
                 <FieldSelect
@@ -481,7 +481,9 @@ export function TimeSheetForm({
 
           <div
             className={`flex flex-wrap items-center gap-3 text-xs text-slate-500 ${
-              editable ? "mt-4 border-t border-[color:var(--surface-divider)] pt-4" : ""
+              editable
+                ? "mt-5 border-t border-[color:var(--surface-divider)]/60 pt-4"
+                : ""
             }`}
           >
             <span className="font-medium text-slate-600">Leyenda:</span>
