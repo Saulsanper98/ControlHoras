@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
+import { CalendarClock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ScheduleUploadRow } from "@/components/jefa/schedule-upload-row";
 import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
@@ -37,20 +39,20 @@ export default async function HorariosPage() {
         <div className="grid grid-cols-2 divide-x divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3">
           <div className="py-4 sm:px-4">
             <p className="text-sm text-slate-500">Departamentos</p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums text-brand-navy">
+            <p className="mt-1 font-display text-2xl font-semibold tabular-nums text-brand-navy">
               {departments.length}
             </p>
           </div>
           <div className="py-4 sm:px-4">
             <p className="text-sm text-slate-500">Con horario</p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums text-emerald-800">
+            <p className="mt-1 font-display text-2xl font-semibold tabular-nums text-emerald-800">
               {withSchedule}
             </p>
           </div>
           <div className="col-span-2 py-4 sm:col-span-1 sm:px-4">
             <p className="text-sm text-slate-500">Sin horario</p>
             <p
-              className={`mt-1 text-2xl font-semibold tabular-nums ${
+              className={`mt-1 font-display text-2xl font-semibold tabular-nums ${
                 withoutSchedule > 0 ? "text-amber-800" : "text-brand-navy"
               }`}
             >
@@ -61,9 +63,11 @@ export default async function HorariosPage() {
       )}
 
       {departments.length === 0 ? (
-        <p className="border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
-          No hay departamentos configurados.
-        </p>
+        <EmptyState
+          icon={CalendarClock}
+          title="Sin departamentos"
+          description="Configura departamentos para poder publicar cuadrantes de horario."
+        />
       ) : (
         <ListSurface>
           {departments.map((dept) => {

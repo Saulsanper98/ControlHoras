@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Check, XCircle } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { ListSurface } from "@/components/ui/list-surface";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { SectionEyebrow } from "@/components/ui/section-title";
+import { useToast } from "@/components/ui/toast";
 import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
@@ -25,7 +28,9 @@ type PendingRequest = {
 
 export function PendingVacationRequests({ requests }: { requests: PendingRequest[] }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { showToast } = useToast();
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -39,10 +44,13 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
 
   function handleApprove(id: string, force = false) {
     setMessage(null);
+    setPendingId(id);
     startTransition(async () => {
       const result = await approveVacationRequestAction(id, force);
+      setPendingId(null);
       if (result.ok) {
         setOverlapPrompt(null);
+        showToast("Solicitud aprobada.");
         router.refresh();
         return;
       }
@@ -51,72 +59,83 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         return;
       }
       setMessage(result.error ?? "Error al aprobar.");
+      showToast(result.error ?? "Error al aprobar.", "error");
     });
   }
 
   function handleReject() {
     if (!rejectId) return;
     setMessage(null);
+    setPendingId(rejectId);
     startTransition(async () => {
       const result = await rejectVacationRequestAction(rejectId, reason);
+      setPendingId(null);
       if (result.ok) {
         setRejectId(null);
         setReason("");
+        showToast("Solicitud rechazada.");
         router.refresh();
       } else {
         setMessage(result.error ?? "Error al rechazar.");
+        showToast(result.error ?? "Error al rechazar.", "error");
       }
     });
   }
 
   return (
     <section className="space-y-3">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-700">
+      <SectionEyebrow className="text-amber-700">
         Solicitudes pendientes ({requests.length})
-      </h2>
+      </SectionEyebrow>
       {message && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>}
       <ListSurface>
-        {requests.map((r) => (
-          <div
-            key={r.id}
-            className="flex flex-wrap items-center justify-between gap-3 py-3"
-          >
-            <div>
-              <p className="font-medium text-brand-navy">{r.userName}</p>
-              <p className="text-sm text-slate-500">
-                {r.departmentName ?? "—"} ·{" "}
-                {formatDateNumeric(r.startDate)} – {formatDateNumeric(r.endDate)} ({r.days}{" "}
-                días)
-                {r.leaveType && r.leaveType !== "VACACIONES"
-                  ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
-                  : ""}
-              </p>
-              {r.employeeNotes ? (
-                <p className="text-xs text-slate-500">{r.employeeNotes}</p>
-              ) : null}
+        {requests.map((r) => {
+          const busy = pendingId === r.id;
+          return (
+            <div
+              key={r.id}
+              className="flex flex-wrap items-center justify-between gap-3 py-3"
+            >
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium text-brand-navy">{r.userName}</p>
+                  <StatusBadge status="PENDIENTE" preset="leave" />
+                </div>
+                <p className="text-sm text-slate-500">
+                  {r.departmentName ?? "—"} ·{" "}
+                  {formatDateNumeric(r.startDate)} – {formatDateNumeric(r.endDate)} ({r.days}{" "}
+                  días)
+                  {r.leaveType && r.leaveType !== "VACACIONES"
+                    ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
+                    : ""}
+                </p>
+                {r.employeeNotes ? (
+                  <p className="text-xs text-slate-500">{r.employeeNotes}</p>
+                ) : null}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleApprove(r.id)}
+                  disabled={busy || pendingId !== null}
+                  className="btn-primary bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60"
+                >
+                  <Check className="h-4 w-4" />
+                  {busy ? "…" : "Aprobar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRejectId(r.id)}
+                  disabled={busy || pendingId !== null}
+                  className="btn-ghost text-red-700 hover:bg-red-500/10 disabled:opacity-60"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Rechazar
+                </button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => handleApprove(r.id)}
-                disabled={pending}
-                className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
-              >
-                <Check className="h-4 w-4" />
-                Aprobar
-              </button>
-              <button
-                type="button"
-                onClick={() => setRejectId(r.id)}
-                disabled={pending}
-                className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-500/10 disabled:opacity-60"
-              >
-                <XCircle className="h-4 w-4" />
-                Rechazar
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </ListSurface>
 
       <Modal
@@ -138,15 +157,15 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
               <button
                 type="button"
                 onClick={() => setOverlapPrompt(null)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                className="btn-ghost"
               >
                 Cancelar
               </button>
               <button
                 type="button"
-                disabled={pending}
+                disabled={pendingId !== null}
                 onClick={() => handleApprove(overlapPrompt.id, true)}
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
+                className="btn-primary bg-amber-600 hover:bg-amber-700 disabled:opacity-60"
               >
                 Aprobar igual
               </button>
@@ -160,26 +179,26 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         onClose={() => setRejectId(null)}
         title="Rechazar solicitud"
       >
+        <label htmlFor="vac-reject-reason" className="mb-1 block text-xs font-medium text-slate-500">
+          Motivo (opcional)
+        </label>
         <textarea
+          id="vac-reject-reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="Motivo (opcional)"
+          placeholder="Motivo del rechazo"
           rows={3}
           className="field-control w-full rounded-md px-3 py-2 text-sm"
         />
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => setRejectId(null)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
-          >
+          <button type="button" onClick={() => setRejectId(null)} className="btn-ghost">
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleReject}
-            disabled={pending}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+            disabled={pendingId !== null}
+            className="btn-danger disabled:opacity-60"
           >
             Rechazar
           </button>

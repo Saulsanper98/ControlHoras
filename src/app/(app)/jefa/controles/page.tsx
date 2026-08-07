@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ClipboardList } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/ui/page-header";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Stagger } from "@/components/ui/stagger";
+import { EmptyState } from "@/components/ui/empty-state";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { SectionEyebrow } from "@/components/ui/section-title";
 import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
@@ -14,20 +18,6 @@ const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ];
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Pendiente de firma",
-  FIRMADO_RESPONSABLE: "Firmado",
-  RECHAZADO: "Rechazado",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  BORRADOR: "bg-brand-navy/[0.06] text-slate-600",
-  FIRMADO_EMPLEADO: "bg-amber-500/12 text-amber-800",
-  FIRMADO_RESPONSABLE: "bg-emerald-500/12 text-emerald-800",
-  RECHAZADO: "bg-red-500/12 text-red-800",
-};
 
 export default async function ControlesPage({
   searchParams,
@@ -141,17 +131,11 @@ export default async function ControlesPage({
               ))}
             </Select>
           </div>
-          <button
-            type="submit"
-            className="rounded-md bg-brand-blue px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-          >
+          <button type="submit" className="btn-primary">
             Filtrar
           </button>
           {hasFilters && (
-            <Link
-              href="/jefa/controles"
-              className="text-sm font-medium text-slate-500 hover:text-brand-navy"
-            >
+            <Link href="/jefa/controles" className="btn-ghost">
               Limpiar filtros
             </Link>
           )}
@@ -159,13 +143,13 @@ export default async function ControlesPage({
       </SectionBlock>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Pendientes de firma ({pending.length})
-        </h2>
+        <SectionEyebrow>Pendientes de firma ({pending.length})</SectionEyebrow>
         {pending.length === 0 ? (
-          <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
-            No hay controles pendientes.
-          </p>
+          <EmptyState
+            icon={ClipboardList}
+            title="No hay controles pendientes"
+            description="Cuando un empleado envíe su control, aparecerá aquí para firmar."
+          />
         ) : (
           <ListSurface>
             {pending.map((t) => (
@@ -177,9 +161,7 @@ export default async function ControlesPage({
 
       {drafts.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Sin enviar (borrador) ({drafts.length})
-          </h2>
+          <SectionEyebrow>Sin enviar (borrador) ({drafts.length})</SectionEyebrow>
           <ListSurface>
             {drafts.map((t) => (
               <TimeSheetRow key={t.id} t={t} />
@@ -190,9 +172,7 @@ export default async function ControlesPage({
 
       {others.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Historial
-          </h2>
+          <SectionEyebrow>Historial</SectionEyebrow>
           {others.length === HISTORY_LIMIT && othersTotal > HISTORY_LIMIT && (
             <p className="mb-3 text-xs text-slate-500">
               Página {page} de {totalPages} · {othersTotal} registros en total
@@ -208,7 +188,7 @@ export default async function ControlesPage({
               {page > 1 && (
                 <Link
                   href={`/jefa/controles?${queryBase.toString()}&page=${page - 1}`}
-                  className="rounded-lg px-3 py-1.5 text-sm text-brand-blue hover:bg-brand-blue/10"
+                  className="btn-ghost"
                 >
                   ← Anterior
                 </Link>
@@ -216,7 +196,7 @@ export default async function ControlesPage({
               {page < totalPages && (
                 <Link
                   href={`/jefa/controles?${queryBase.toString()}&page=${page + 1}`}
-                  className="rounded-lg px-3 py-1.5 text-sm text-brand-blue hover:bg-brand-blue/10"
+                  className="btn-ghost"
                 >
                   Siguiente →
                 </Link>
@@ -251,9 +231,7 @@ function TimeSheetRow({
           {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
         </p>
       </div>
-      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
-        {STATUS_LABEL[t.status]}
-      </span>
+      <StatusBadge status={t.status} />
     </Link>
   );
 }

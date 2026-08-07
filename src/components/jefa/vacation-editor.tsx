@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
+import { useToast } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { formatDate } from "@/lib/format-date";
 import {
   addHourAdjustmentAction,
@@ -19,6 +21,7 @@ export function VacationEditor({
   initialUsedDays,
   initialNotes,
   adjustments,
+  pendingDays = 0,
 }: {
   userId: string;
   year: number;
@@ -26,7 +29,10 @@ export function VacationEditor({
   initialUsedDays: number;
   initialNotes: string;
   adjustments: Adjustment[];
+  pendingDays?: number;
 }) {
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [totalDays, setTotalDays] = useState(initialTotalDays);
   const [usedDays, setUsedDays] = useState(initialUsedDays);
   const [notes, setNotes] = useState(initialNotes);
@@ -39,11 +45,13 @@ export function VacationEditor({
     setMessage(null);
     startTransition(async () => {
       const result = await saveVacationBalanceAction(userId, year, totalDays, usedDays, notes);
-      setMessage(
-        result.ok
-          ? { type: "success", text: "Saldo de vacaciones guardado." }
-          : { type: "error", text: result.error ?? "Error al guardar." }
-      );
+      if (result.ok) {
+        showToast("Saldo de vacaciones guardado.");
+        setMessage({ type: "success", text: "Saldo de vacaciones guardado." });
+      } else {
+        showToast(result.error ?? "Error al guardar.", "error");
+        setMessage({ type: "error", text: result.error ?? "Error al guardar." });
+      }
     });
   }
 
@@ -59,22 +67,36 @@ export function VacationEditor({
       if (result.ok) {
         setHours("");
         setReason("");
+        showToast("Ajuste de horas añadido.");
       } else {
+        showToast(result.error ?? "Error al añadir el ajuste.", "error");
         setMessage({ type: "error", text: result.error ?? "Error al añadir el ajuste." });
       }
     });
   }
 
-  function handleDeleteAdjustment(id: string) {
-    if (!window.confirm("¿Eliminar este ajuste de horas? Esta acción no se puede deshacer.")) return;
+  async function handleDeleteAdjustment(id: string) {
+    const ok = await confirm({
+      title: "Eliminar ajuste",
+      message: "¿Eliminar este ajuste de horas? Esta acción no se puede deshacer.",
+      variant: "danger",
+      confirmLabel: "Eliminar",
+    });
+    if (!ok) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteHourAdjustmentAction(id, userId);
-      if (!result.ok) setMessage({ type: "error", text: result.error ?? "Error al eliminar el ajuste." });
+      if (result.ok) {
+        showToast("Ajuste eliminado.");
+      } else {
+        showToast(result.error ?? "Error al eliminar el ajuste.", "error");
+        setMessage({ type: "error", text: result.error ?? "Error al eliminar el ajuste." });
+      }
     });
   }
 
   const totalHours = adjustments.reduce((sum, a) => sum + a.hours, 0);
+  const remaining = totalDays - usedDays - pendingDays;
 
   return (
     <div className="space-y-6">
@@ -137,14 +159,19 @@ export function VacationEditor({
             type="button"
             onClick={handleSaveBalance}
             disabled={pending}
-            className="rounded-md bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
+            className="btn-primary disabled:opacity-60"
           >
             Guardar
           </button>
         </div>
         <p className="mt-2 text-sm text-slate-500">
           Restantes:{" "}
-          <span className="font-medium text-brand-navy">{(totalDays - usedDays).toFixed(1)} días</span>
+          <span className="font-medium text-brand-navy">{remaining.toFixed(1)} días</span>
+          {pendingDays > 0 && (
+            <span className="ml-2 text-amber-700">
+              (incluye {pendingDays} en trámite)
+            </span>
+          )}
         </p>
       </SectionBlock>
 
@@ -187,7 +214,7 @@ export function VacationEditor({
               type="button"
               onClick={handleAddAdjustment}
               disabled={pending}
-              className="rounded-md border border-brand-blue px-4 py-2 text-sm font-semibold text-brand-blue hover:bg-brand-blue/10 disabled:opacity-60"
+              className="btn-secondary disabled:opacity-60"
             >
               Añadir ajuste
             </button>
@@ -215,10 +242,10 @@ export function VacationEditor({
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleDeleteAdjustment(a.id)}
+                  onClick={() => void handleDeleteAdjustment(a.id)}
                   disabled={pending}
                   aria-label="Eliminar ajuste"
-                  className="text-slate-400 hover:text-red-600 disabled:opacity-60"
+                  className="hit-area inline-flex items-center justify-center rounded-lg text-slate-400 transition hover:bg-red-500/10 hover:text-red-600 disabled:opacity-60"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

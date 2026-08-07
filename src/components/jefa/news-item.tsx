@@ -2,6 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { Pin, Pencil, Trash2, X, Check } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import { FileDropzone } from "@/components/ui/file-dropzone";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
 
 export function NewsItem({
@@ -21,6 +24,8 @@ export function NewsItem({
   imagePath: string | null;
   status: string;
 }) {
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [editing, setEditing] = useState(false);
   const [titleValue, setTitleValue] = useState(title);
   const [bodyValue, setBodyValue] = useState(body);
@@ -40,41 +45,73 @@ export function NewsItem({
     if (imageFile) formData.set("image", imageFile);
     startTransition(async () => {
       const result = await updateNewsAction(id, formData);
-      if (result.ok) setEditing(false);
-      else setMessage(result.error ?? "Error al guardar.");
+      if (result.ok) {
+        setEditing(false);
+        setImageFile(null);
+        showToast("Noticia actualizada.");
+      } else {
+        setMessage(result.error ?? "Error al guardar.");
+        showToast(result.error ?? "Error al guardar.", "error");
+      }
     });
   }
 
-  function handleDelete() {
-    if (!window.confirm("¿Eliminar esta noticia?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Eliminar noticia",
+      message: "¿Eliminar esta noticia? Esta acción no se puede deshacer.",
+      variant: "danger",
+      confirmLabel: "Eliminar",
+    });
+    if (!ok) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteNewsAction(id);
-      if (!result.ok) setMessage(result.error ?? "Error al eliminar la noticia.");
+      if (result.ok) {
+        showToast("Noticia eliminada.");
+      } else {
+        setMessage(result.error ?? "Error al eliminar la noticia.");
+        showToast(result.error ?? "Error al eliminar la noticia.", "error");
+      }
     });
   }
 
   if (editing) {
     return (
       <div className="space-y-3 py-4">
-        <input
-          type="text"
-          value={titleValue}
-          onChange={(e) => setTitleValue(e.target.value)}
-          className="field-control w-full rounded-md px-3 py-2 text-sm"
-        />
-        <textarea
-          value={bodyValue}
-          onChange={(e) => setBodyValue(e.target.value)}
-          rows={4}
-          className="field-control w-full rounded-md px-3 py-2 text-sm"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-          className="text-xs text-slate-500"
-        />
+        <div>
+          <label htmlFor={`news-edit-title-${id}`} className="mb-1 block text-xs font-medium text-slate-500">
+            Título
+          </label>
+          <input
+            id={`news-edit-title-${id}`}
+            type="text"
+            value={titleValue}
+            onChange={(e) => setTitleValue(e.target.value)}
+            className="field-control w-full rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor={`news-edit-body-${id}`} className="mb-1 block text-xs font-medium text-slate-500">
+            Contenido
+          </label>
+          <textarea
+            id={`news-edit-body-${id}`}
+            value={bodyValue}
+            onChange={(e) => setBodyValue(e.target.value)}
+            rows={4}
+            className="field-control w-full rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <p className="mb-1 text-xs font-medium text-slate-500">Imagen (opcional)</p>
+          <FileDropzone
+            accept="image/*"
+            disabled={pending}
+            label={imageFile ? imageFile.name : "Cambiar imagen"}
+            onFile={setImageFile}
+          />
+        </div>
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-600">
             <input
@@ -93,11 +130,7 @@ export function NewsItem({
             Guardar como borrador
           </label>
           <div className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-slate-600"
-            >
+            <button type="button" onClick={() => setEditing(false)} className="btn-ghost">
               <X className="h-4 w-4" />
               Cancelar
             </button>
@@ -105,7 +138,7 @@ export function NewsItem({
               type="button"
               onClick={handleSave}
               disabled={pending}
-              className="flex items-center gap-1 rounded-md bg-brand-blue px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+              className="btn-primary disabled:opacity-60"
             >
               <Check className="h-4 w-4" />
               Guardar
@@ -142,11 +175,22 @@ export function NewsItem({
             {new Date(publishedAt).toLocaleDateString("es-ES")}
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <button type="button" onClick={() => setEditing(true)} aria-label="Editar noticia" className="text-slate-400 hover:text-brand-blue">
+        <div className="flex shrink-0 gap-1">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            aria-label="Editar noticia"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-400 transition hover:bg-brand-navy/6 hover:text-brand-blue"
+          >
             <Pencil className="h-4 w-4" />
           </button>
-          <button type="button" onClick={handleDelete} disabled={pending} aria-label="Eliminar noticia" className="text-slate-400 hover:text-red-600 disabled:opacity-60">
+          <button
+            type="button"
+            onClick={() => void handleDelete()}
+            disabled={pending}
+            aria-label="Eliminar noticia"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-400 transition hover:bg-red-500/10 hover:text-red-600 disabled:opacity-60"
+          >
             <Trash2 className="h-4 w-4" />
           </button>
         </div>

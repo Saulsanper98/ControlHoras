@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { FileText, Trash2 } from "lucide-react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { DateField } from "@/components/ui/date-field";
+import { useToast } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/horarios/actions";
 
 type Schedule = {
@@ -25,6 +27,8 @@ export function ScheduleUploadRow({
   schedule: Schedule | null;
   history?: Schedule[];
 }) {
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [validFrom, setValidFrom] = useState(() => new Date().toISOString().slice(0, 10));
@@ -37,20 +41,31 @@ export function ScheduleUploadRow({
     formData.set("validFrom", validFrom);
     startTransition(async () => {
       const result = await uploadScheduleAction(departmentId, formData);
-      setMessage(
-        result.ok
-          ? { type: "success", text: "Horario subido. Se conserva el historial." }
-          : { type: "error", text: result.error ?? "Error al subir el archivo." }
-      );
+      if (result.ok) {
+        showToast("Horario subido. Se conserva el historial.");
+        setMessage({ type: "success", text: "Horario subido. Se conserva el historial." });
+      } else {
+        showToast(result.error ?? "Error al subir el archivo.", "error");
+        setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
+      }
     });
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm("¿Eliminar esta versión del historial?")) return;
+  async function handleDelete(id: string) {
+    const ok = await confirm({
+      title: "Eliminar versión",
+      message: "¿Eliminar esta versión del historial? Esta acción no se puede deshacer.",
+      variant: "danger",
+      confirmLabel: "Eliminar",
+    });
+    if (!ok) return;
     setMessage(null);
     startTransition(async () => {
       const result = await deleteScheduleAction(id);
-      if (!result.ok) {
+      if (result.ok) {
+        showToast("Versión eliminada.");
+      } else {
+        showToast(result.error ?? "Error al eliminar el horario.", "error");
         setMessage({ type: "error", text: result.error ?? "Error al eliminar el horario." });
       }
     });
@@ -101,7 +116,7 @@ export function ScheduleUploadRow({
           <button
             type="button"
             onClick={() => setShowHistory((v) => !v)}
-            className="text-xs font-medium text-brand-blue hover:underline"
+            className="btn-ghost text-xs"
           >
             {showHistory ? "Ocultar historial" : `Historial (${history.length})`}
           </button>
@@ -148,9 +163,9 @@ export function ScheduleUploadRow({
               {idx > 0 && (
                 <button
                   type="button"
-                  onClick={() => handleDelete(h.id)}
+                  onClick={() => void handleDelete(h.id)}
                   disabled={pending}
-                  className="rounded-md p-1.5 text-slate-400 transition hover:bg-red-500/10 hover:text-red-600"
+                  className="hit-area inline-flex items-center justify-center rounded-md p-1.5 text-slate-400 transition hover:bg-red-500/10 hover:text-red-600"
                   aria-label="Eliminar versión"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

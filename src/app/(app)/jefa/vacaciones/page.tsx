@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Umbrella, CalendarDays } from "lucide-react";
+import { Umbrella, CalendarDays, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ListSurface } from "@/components/ui/list-surface";
 import { Select } from "@/components/ui/select";
+import { PageHeader } from "@/components/ui/page-header";
+import { Stagger } from "@/components/ui/stagger";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionEyebrow } from "@/components/ui/section-title";
 import { PendingVacationRequests } from "@/components/jefa/pending-vacation-requests";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { toDateKey } from "@/lib/format-date";
@@ -112,43 +116,36 @@ export default async function JefaVacacionesPage({
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-navy">Vacaciones y horas</h1>
-          <p className="text-brand-navy/55">
-            Gestiona saldos, solicitudes pendientes y bolsa de horas ({year}).
-          </p>
-        </div>
-        <div className="flex flex-wrap items-end gap-3">
-          <form method="get" className="flex items-end gap-2">
-            <div className="w-28">
-              <label htmlFor="jefa-vac-year" className="mb-1 block text-xs font-medium text-slate-500">
-                Año
-              </label>
-              <Select id="jefa-vac-year" name="year" defaultValue={String(year)}>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <button
-              type="submit"
-              className="rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Ver
-            </button>
-          </form>
-          <Link
-            href="/jefa/vacaciones/calendario"
-            className="surface-btn flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-brand-blue"
-          >
-            <CalendarDays className="h-4 w-4" />
-            Calendario del equipo
-          </Link>
-        </div>
-      </div>
+      <Stagger>
+        <PageHeader
+          title="Vacaciones y horas"
+          description={`Gestiona saldos, solicitudes pendientes y bolsa de horas (${year}).`}
+        >
+          <div className="flex flex-wrap items-end gap-3">
+            <form method="get" className="flex items-end gap-2">
+              <div className="w-28">
+                <label htmlFor="jefa-vac-year" className="mb-1 block text-xs font-medium text-slate-500">
+                  Año
+                </label>
+                <Select id="jefa-vac-year" name="year" defaultValue={String(year)}>
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <button type="submit" className="btn-primary">
+                Ver
+              </button>
+            </form>
+            <Link href="/jefa/vacaciones/calendario" className="btn-secondary">
+              <CalendarDays className="h-4 w-4" />
+              Calendario del equipo
+            </Link>
+          </div>
+        </PageHeader>
+      </Stagger>
 
       <PendingVacationRequests
         requests={pendingRequests.map((r) => ({
@@ -168,9 +165,9 @@ export default async function JefaVacacionesPage({
         if (list.length === 0) return null;
         return (
           <section key={dept.id}>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
+            <SectionEyebrow>
               {dept.name} ({list.length})
-            </h2>
+            </SectionEyebrow>
             <ListSurface>
               {list.map((e) => (
                 <EmployeeLink key={e.id} e={e} />
@@ -182,9 +179,7 @@ export default async function JefaVacacionesPage({
 
       {noDept.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Sin departamento ({noDept.length})
-          </h2>
+          <SectionEyebrow>Sin departamento ({noDept.length})</SectionEyebrow>
           <ListSurface>
             {noDept.map((e) => (
               <EmployeeLink key={e.id} e={e} />
@@ -194,9 +189,11 @@ export default async function JefaVacacionesPage({
       )}
 
       {employees.length === 0 && (
-        <p className="border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
-          No hay empleados dados de alta.
-        </p>
+        <EmptyState
+          icon={Users}
+          title="No hay empleados"
+          description="Cuando haya empleados activos, podrás gestionar aquí sus vacaciones y bolsa de horas."
+        />
       )}
     </div>
   );

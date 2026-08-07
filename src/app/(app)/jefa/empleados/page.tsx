@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
-import { Users, Mail } from "lucide-react";
+import { Mail, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { EmployeeCreateForm, EmployeeRowActions } from "@/components/jefa/employee-row-actions";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionEyebrow } from "@/components/ui/section-title";
 import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
@@ -43,24 +46,21 @@ export default async function EmpleadosPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-navy">Empleados</h1>
-          <p className="text-brand-navy/55">
-            {activeCount} activos de {users.length} en total, agrupados por departamento.
-          </p>
-        </div>
+      <PageHeader
+        title="Empleados"
+        description={`${activeCount} activos de ${users.length} en total, agrupados por departamento.`}
+      >
         <EmployeeCreateForm departments={departments} />
-      </div>
+      </PageHeader>
 
       {departments.map((dept) => {
         const list = usersByDept.get(dept.id) ?? [];
         if (list.length === 0) return null;
         return (
           <section key={dept.id}>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
+            <SectionEyebrow>
               {dept.name} ({list.length})
-            </h2>
+            </SectionEyebrow>
             <ListSurface>
               {list.map((u) => (
                 <EmployeeRow key={u.id} user={u} departments={departments} />
@@ -72,9 +72,7 @@ export default async function EmpleadosPage() {
 
       {noDept.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Sin departamento ({noDept.length})
-          </h2>
+          <SectionEyebrow>Sin departamento ({noDept.length})</SectionEyebrow>
           <ListSurface>
             {noDept.map((u) => (
               <EmployeeRow key={u.id} user={u} departments={departments} />
@@ -84,9 +82,11 @@ export default async function EmpleadosPage() {
       )}
 
       {users.length === 0 && (
-        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
-          No hay empleados dados de alta.
-        </p>
+        <EmptyState
+          icon={Users}
+          title="No hay empleados"
+          description="Da de alta el primer empleado para empezar a gestionar controles y vacaciones."
+        />
       )}
     </div>
   );
@@ -101,16 +101,14 @@ function EmployeeRow({
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 py-3">
-      <div className="flex items-center gap-3">
-        <Users className="h-4 w-4 text-brand-blue" />
-        <div>
-          <p className="font-medium text-brand-navy">{user.name}</p>
-          <p className="flex items-center gap-1 text-sm text-slate-500">
-            <Mail className="h-3.5 w-3.5" /> {user.email}
-          </p>
-        </div>
+      <div className="min-w-0">
+        <p className="font-medium text-brand-navy">{user.name}</p>
+        <p className="flex items-center gap-1 text-sm text-slate-500">
+          <Mail className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{user.email}</span>
+        </p>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <span
           className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
             user.active ? "bg-emerald-500/12 text-emerald-800" : "bg-brand-navy/[0.06] text-slate-500"

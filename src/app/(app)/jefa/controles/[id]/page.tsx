@@ -3,19 +3,16 @@ import { Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { TimeSheetGrid } from "@/components/control-horario/timesheet-grid";
 import { ReviewActions } from "@/components/jefa/review-actions";
+import { PageHeader } from "@/components/ui/page-header";
+import { BackLink } from "@/components/ui/back-link";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ];
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Pendiente de firma",
-  FIRMADO_RESPONSABLE: "Firmado",
-  RECHAZADO: "Rechazado",
-};
 
 export default async function ControlDetailPage({
   params,
@@ -44,39 +41,43 @@ export default async function ControlDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-navy">{timeSheet.user.name}</h1>
-          <p className="text-slate-500">
-            {timeSheet.user.department?.name ?? "—"} · {MONTH_NAMES[timeSheet.month - 1]} de{" "}
-            {timeSheet.year} · {STATUS_LABEL[timeSheet.status]}
-          </p>
-        </div>
-        <a
-          href={`/api/timesheets/${timeSheet.id}/pdf`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="surface-btn flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600"
+      <div>
+        <BackLink href="/jefa/controles">Volver a controles</BackLink>
+        <PageHeader
+          title={timeSheet.user.name}
+          description={`${timeSheet.user.department?.name ?? "—"} · ${MONTH_NAMES[timeSheet.month - 1]} de ${timeSheet.year}`}
         >
-          <Download className="h-4 w-4" />
-          Descargar PDF
-        </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <StatusBadge status={timeSheet.status} />
+            <a
+              href={`/api/timesheets/${timeSheet.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary"
+            >
+              <Download className="h-4 w-4" />
+              Descargar PDF
+            </a>
+          </div>
+        </PageHeader>
       </div>
 
-      <TimeSheetGrid
-        month={timeSheet.month}
-        year={timeSheet.year}
-        entries={timeSheet.entries.map((e) => ({
-          day: e.day,
-          checkIn: e.checkIn,
-          checkOut: e.checkOut,
-          totalHours: Number(e.totalHours),
-          normalHours: Number(e.normalHours),
-          overtimeHours: Number(e.overtimeHours),
-          nightHours: Number(e.nightHours),
-          notes: e.notes,
-        }))}
-      />
+      <ScrollShadow>
+        <TimeSheetGrid
+          month={timeSheet.month}
+          year={timeSheet.year}
+          entries={timeSheet.entries.map((e) => ({
+            day: e.day,
+            checkIn: e.checkIn,
+            checkOut: e.checkOut,
+            totalHours: Number(e.totalHours),
+            normalHours: Number(e.normalHours),
+            overtimeHours: Number(e.overtimeHours),
+            nightHours: Number(e.nightHours),
+            notes: e.notes,
+          }))}
+        />
+      </ScrollShadow>
 
       {timeSheet.notes && (
         <p className="border-y border-brand-navy/10 py-3 text-sm text-slate-600">

@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
+import { Newspaper } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { NewsCreateForm } from "@/components/jefa/news-create-form";
 import { NewsItem } from "@/components/jefa/news-item";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ListSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
@@ -18,17 +21,19 @@ export default async function JefaNoticiasPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Noticias</h1>
-        <p className="text-brand-navy/55">Publica, programa y gestiona las noticias de la empresa.</p>
-      </div>
+      <PageHeader
+        title="Noticias"
+        description="Publica, programa y gestiona las noticias de la empresa."
+      />
 
       <NewsCreateForm />
 
       {news.length === 0 ? (
-        <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
-          Todavía no hay noticias.
-        </p>
+        <EmptyState
+          icon={Newspaper}
+          title="Todavía no hay noticias"
+          description="Publica la primera noticia para que aparezca en el inicio de los empleados."
+        />
       ) : (
         <ListSurface>
           {news.map((n) => (

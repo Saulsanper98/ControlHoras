@@ -1,10 +1,12 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { SectionBlock } from "@/components/ui/list-surface";
+import { PageHeader } from "@/components/ui/page-header";
+import { BackLink } from "@/components/ui/back-link";
+import { Select } from "@/components/ui/select";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { daysInMonth } from "@/lib/timesheet-calc";
+import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -64,58 +66,98 @@ export default async function VacationCalendarPage({
   const prev = month === 1 ? { month: 12, year: year - 1 } : { month: month - 1, year };
   const next = month === 12 ? { month: 1, year: year + 1 } : { month: month + 1, year };
   const queryDept = departmentId ? `&department=${departmentId}` : "";
+  const yearOptions = [year - 1, year, year + 1];
 
   return (
     <div className="space-y-6">
       <div>
-        <Link
-          href="/jefa/vacaciones"
-          className="mb-2 inline-flex items-center gap-1 text-sm text-brand-blue hover:underline"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Volver a vacaciones
-        </Link>
-        <h1 className="text-2xl font-semibold text-brand-navy">Calendario de vacaciones</h1>
-        <p className="text-brand-navy/55">Cobertura del equipo por día del mes.</p>
+        <BackLink href="/jefa/vacaciones">Volver a vacaciones</BackLink>
+        <PageHeader
+          title="Calendario de vacaciones"
+          description="Cobertura del equipo por día del mes."
+        />
       </div>
 
       <SectionBlock className="flex flex-wrap items-center justify-between gap-3">
-        <Link
+        <a
           href={`/jefa/vacaciones/calendario?month=${prev.month}&year=${prev.year}${queryDept}`}
-          className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-brand-navy/5"
+          className="btn-ghost"
         >
           ← {MONTH_NAMES[prev.month - 1]}
-        </Link>
-        <span className="font-medium text-brand-navy">
+        </a>
+        <span className="font-display text-lg font-semibold text-brand-navy">
           {MONTH_NAMES[month - 1]} de {year}
         </span>
-        <Link
+        <a
           href={`/jefa/vacaciones/calendario?month=${next.month}&year=${next.year}${queryDept}`}
-          className="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-brand-navy/5"
+          className="btn-ghost"
         >
           {MONTH_NAMES[next.month - 1]} →
-        </Link>
+        </a>
       </SectionBlock>
 
-      <form method="get" className="flex flex-wrap items-end gap-2">
-        <input type="hidden" name="month" value={month} />
-        <input type="hidden" name="year" value={year} />
-        <select
-          name="department"
-          defaultValue={departmentId ?? ""}
-          className="field-control px-3 py-2 text-sm"
-        >
-          <option value="">Todos los departamentos</option>
-          {departments.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit" className="rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white">
+      <form method="get" className="flex flex-wrap items-end gap-3">
+        <div className="w-36">
+          <label htmlFor="cal-month" className="mb-1 block text-xs font-medium text-slate-500">
+            Mes
+          </label>
+          <Select id="cal-month" name="month" defaultValue={month}>
+            {MONTH_NAMES.map((name, i) => (
+              <option key={name} value={i + 1}>
+                {name}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="w-28">
+          <label htmlFor="cal-year" className="mb-1 block text-xs font-medium text-slate-500">
+            Año
+          </label>
+          <Select id="cal-year" name="year" defaultValue={year}>
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="w-52">
+          <label htmlFor="cal-dept" className="mb-1 block text-xs font-medium text-slate-500">
+            Departamento
+          </label>
+          <Select id="cal-dept" name="department" defaultValue={departmentId ?? ""}>
+            <option value="">Todos los departamentos</option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <button type="submit" className="btn-primary">
           Filtrar
         </button>
       </form>
+
+      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-medium text-amber-900">
+            {LEAVE_TYPE_LABEL.VACACIONES}
+          </span>
+        </span>
+        <span className="inline-flex items-center gap-1.5 opacity-50">
+          <span className="rounded-md bg-brand-navy/8 px-2 py-0.5 font-medium">
+            {LEAVE_TYPE_LABEL.ASUNTOS_PROPIOS}
+          </span>
+          <span className="rounded-md bg-brand-navy/8 px-2 py-0.5 font-medium">
+            {LEAVE_TYPE_LABEL.MEDIO_DIA}
+          </span>
+          no incluidos
+        </span>
+      </div>
+      <p className="text-xs text-slate-500">
+        Este calendario muestra solo ausencias de tipo «{LEAVE_TYPE_LABEL.VACACIONES}» aprobadas.
+      </p>
 
       <div className="overflow-x-auto border-y border-brand-navy/10 py-3">
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
@@ -145,7 +187,7 @@ export default async function VacationCalendarPage({
                   {people.slice(0, 3).map((p, idx) => (
                     <p
                       key={`${day}-${p.name}-${idx}`}
-                      className="truncate bg-amber-500/15 px-1 text-[10px] font-medium text-amber-900"
+                      className="truncate rounded-md bg-amber-500/15 px-1 text-[10px] font-medium text-amber-900"
                       title={`${p.name} · ${p.dept}`}
                     >
                       {p.name}
