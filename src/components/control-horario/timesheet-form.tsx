@@ -20,7 +20,9 @@ import { TimeField } from "@/components/ui/time-field";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { useDensity } from "@/lib/density";
+import { TIMESHEET_STATUS_DESCRIPTION } from "@/lib/labels";
 import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
@@ -55,20 +57,6 @@ function shiftKeyForEntry(entry: Entry): ShiftKey {
   }
   return "";
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Enviado, pendiente de la responsable",
-  FIRMADO_RESPONSABLE: "Firmado y cerrado",
-  RECHAZADO: "Rechazado, puedes corregirlo",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  BORRADOR: "bg-brand-navy/8 text-slate-600",
-  FIRMADO_EMPLEADO: "bg-amber-500/15 text-amber-800",
-  FIRMADO_RESPONSABLE: "bg-emerald-500/15 text-emerald-800",
-  RECHAZADO: "bg-red-500/15 text-red-800",
-};
 
 export function TimeSheetForm({
   timeSheetId,
@@ -266,7 +254,16 @@ export function TimeSheetForm({
       if (!res.ok) throw new Error("Error al generar PDF");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener,noreferrer");
+      const opened = window.open(url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `parte-${year}-${String(month).padStart(2, "0")}.pdf`;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch {
       showToast("No se pudo generar el PDF.", "error");
@@ -303,6 +300,7 @@ export function TimeSheetForm({
       const result = await signAsEmployeeAction(month, year, entries, notes, signatureDataUrl);
       if (result.ok) {
         setShowSignPad(false);
+        showToast("Parte firmado correctamente");
         router.refresh();
       } else {
         setMessage({ type: "error", text: result.error ?? "Error al firmar." });
@@ -310,8 +308,21 @@ export function TimeSheetForm({
     });
   }
 
+  async function navigateMonth(href: string) {
+    if (isDirty && editable) {
+      const ok = await confirm({
+        title: "Cambios sin guardar",
+        message: "Tienes cambios sin guardar. ¿Cambiar de mes de todos modos?",
+      });
+      if (!ok) return;
+    }
+    router.push(href);
+  }
+
   const prev = month === 1 ? { month: 12, year: year - 1 } : { month: month - 1, year };
   const next = month === 12 ? { month: 1, year: year + 1 } : { month: month + 1, year };
+  const prevHref = `/control-horario?month=${prev.month}&year=${prev.year}`;
+  const nextHref = `/control-horario?month=${next.month}&year=${next.year}`;
 
   const shiftOptions = [
     { value: "LIBRE", label: "Libre" },
@@ -325,15 +336,24 @@ export function TimeSheetForm({
     label: SHIFTS[key].label,
   }));
 
+  const statusDescription = TIMESHEET_STATUS_DESCRIPTION[status] ?? status;
+
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden border-y border-brand-navy/10">
-        {/* Cabecera + resumen + herramientas en un solo bloque */}
-        <div className="border-b border-brand-navy/10 py-4">
+      <div className="overflow-hidden border-y border-[color:var(--surface-divider)]">
+        {/* Cabecera + resumen */}
+        <div className="border-b border-[color:var(--surface-divider)] py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Link
-                href={`/control-horario?month=${prev.month}&year=${prev.year}`}
+                href={prevHref}
+                aria-label="Mes anterior"
+                onClick={(e) => {
+                  if (isDirty && editable) {
+                    e.preventDefault();
+                    void navigateMonth(prevHref);
+                  }
+                }}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -342,7 +362,14 @@ export function TimeSheetForm({
                 {monthNames[month - 1]} de {year}
               </span>
               <Link
-                href={`/control-horario?month=${next.month}&year=${next.year}`}
+                href={nextHref}
+                aria-label="Mes siguiente"
+                onClick={(e) => {
+                  if (isDirty && editable) {
+                    e.preventDefault();
+                    void navigateMonth(nextHref);
+                  }
+                }}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -365,9 +392,12 @@ export function TimeSheetForm({
                   {pdfLoading ? "Generando…" : "PDF"}
                 </button>
               )}
-              <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[status]}`}>
-                {STATUS_LABEL[status]}
-              </span>
+              <div className="flex flex-col items-end gap-0.5">
+                <StatusBadge status={status} />
+                <span className="max-w-[14rem] text-right text-[10px] leading-tight text-slate-500">
+                  {statusDescription}
+                </span>
+              </div>
               {isDirty && editable && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-800">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
@@ -407,9 +437,12 @@ export function TimeSheetForm({
                 ))}
             </p>
           )}
+        </div>
 
+        {/* Herramientas: bulk / copiar / filtros */}
+        <div className="border-b border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] py-4">
           {editable && (
-            <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-brand-navy/8 pt-4">
+            <div className="flex flex-wrap items-end gap-3">
               <div className="w-full min-w-[10rem] sm:w-52">
                 <label htmlFor="bulk-shift" className="mb-1 block text-xs font-medium text-slate-500">
                   Turno a aplicar
@@ -449,7 +482,11 @@ export function TimeSheetForm({
             </div>
           )}
 
-          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+          <div
+            className={`flex flex-wrap items-center gap-3 text-xs text-slate-500 ${
+              editable ? "mt-4 border-t border-[color:var(--surface-divider)] pt-4" : ""
+            }`}
+          >
             <span className="font-medium text-slate-600">Leyenda:</span>
             <span className="inline-flex items-center gap-1">
               <span className="h-2 w-4 rounded bg-slate-400/20" /> Fin de semana
@@ -468,6 +505,7 @@ export function TimeSheetForm({
                   key={f}
                   type="button"
                   onClick={() => setFilter(f)}
+                  aria-pressed={filter === f}
                   className={`rounded-md px-2 py-0.5 font-medium transition ${
                     filter === f
                       ? "bg-brand-blue/15 text-brand-blue"
@@ -495,17 +533,27 @@ export function TimeSheetForm({
 
         <ScrollShadow className="hidden md:block">
           <table className="w-full min-w-[720px] text-sm">
-            <thead className="sticky top-0 z-10">
-              <tr className="border-b border-brand-navy/10 text-left text-[11px] uppercase tracking-wide text-slate-500">
-                <th className="px-3 py-2.5">Día</th>
-                <th className="px-3 py-2.5">Turno</th>
-                <th className="px-3 py-2.5">Entrada</th>
-                <th className="px-3 py-2.5">Salida</th>
-                <th className="px-3 py-2.5">Total</th>
-                <th className="px-3 py-2.5">Norm.</th>
-                <th className="px-3 py-2.5">Extra</th>
-                <th className="px-3 py-2.5">Noct.</th>
-                <th className="px-3 py-2.5">Obs.</th>
+            <thead className="sticky top-0 z-10 bg-[color:var(--app-gradient-top)]">
+              <tr className="border-b border-[color:var(--surface-divider)] text-left text-[11px] uppercase tracking-wide text-slate-500">
+                <th className={tableCell}>Día</th>
+                <th className={tableCell}>Turno</th>
+                <th className={tableCell}>Entrada</th>
+                <th className={tableCell}>Salida</th>
+                <th className={tableCell} title="Horas totales">
+                  Total
+                </th>
+                <th className={tableCell} title="Horas normales">
+                  Normales
+                </th>
+                <th className={tableCell} title="Horas extra">
+                  Extra
+                </th>
+                <th className={tableCell} title="Horas nocturnas">
+                  Nocturnas
+                </th>
+                <th className={tableCell} title="Observaciones">
+                  Obs.
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -523,7 +571,7 @@ export function TimeSheetForm({
                 return (
                   <tr
                     key={entry.day}
-                    className={`border-b border-brand-navy/5 last:border-0 ${
+                    className={`border-b border-[color:var(--surface-divider)] last:border-0 ${
                       holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
                     } ${todayDay === entry.day ? "ring-1 ring-inset ring-brand-blue/25" : ""}`}
                   >
@@ -536,7 +584,7 @@ export function TimeSheetForm({
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-1.5">
+                    <td className={tableCell}>
                       <FieldSelect
                         disabled={!editable}
                         value={shiftKey}
@@ -547,7 +595,7 @@ export function TimeSheetForm({
                         className="w-28"
                       />
                     </td>
-                    <td className="px-3 py-1.5">
+                    <td className={tableCell}>
                       <TimeField
                         disabled={!editable}
                         value={entry.checkIn}
@@ -556,7 +604,7 @@ export function TimeSheetForm({
                         className="w-28"
                       />
                     </td>
-                    <td className="px-3 py-1.5">
+                    <td className={tableCell}>
                       <TimeField
                         disabled={!editable}
                         value={entry.checkOut}
@@ -565,11 +613,19 @@ export function TimeSheetForm({
                         className="w-28"
                       />
                     </td>
-                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.totalHours.toFixed(2)}</td>
-                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.normalHours.toFixed(2)}</td>
-                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.overtimeHours.toFixed(2)}</td>
-                    <td className="px-3 py-1.5 tabular-nums text-slate-600">{hours.nightHours.toFixed(2)}</td>
-                    <td className="px-3 py-1.5">
+                    <td className={`${tableCell} tabular-nums text-slate-600`}>
+                      {hours.totalHours.toFixed(2)}
+                    </td>
+                    <td className={`${tableCell} tabular-nums text-slate-600`}>
+                      {hours.normalHours.toFixed(2)}
+                    </td>
+                    <td className={`${tableCell} tabular-nums text-slate-600`}>
+                      {hours.overtimeHours.toFixed(2)}
+                    </td>
+                    <td className={`${tableCell} tabular-nums text-slate-600`}>
+                      {hours.nightHours.toFixed(2)}
+                    </td>
+                    <td className={tableCell}>
                       <input
                         type="text"
                         disabled={!editable}
@@ -584,29 +640,30 @@ export function TimeSheetForm({
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t border-brand-navy/10 bg-brand-navy/[0.04] font-semibold text-brand-navy">
-                <td className="px-3 py-2.5" colSpan={4}>
+              <tr className="border-t border-[color:var(--surface-divider)] bg-brand-navy/[0.04] font-semibold text-brand-navy">
+                <td className={tableCell} colSpan={4}>
                   Totales
                 </td>
-                <td className="px-3 py-2.5 tabular-nums">{totals.totalHours.toFixed(2)}</td>
-                <td className="px-3 py-2.5 tabular-nums">{totals.normalHours.toFixed(2)}</td>
-                <td className="px-3 py-2.5 tabular-nums">{totals.overtimeHours.toFixed(2)}</td>
-                <td className="px-3 py-2.5 tabular-nums">{totals.nightHours.toFixed(2)}</td>
-                <td className="px-3 py-2.5" />
+                <td className={`${tableCell} tabular-nums`}>{totals.totalHours.toFixed(2)}</td>
+                <td className={`${tableCell} tabular-nums`}>{totals.normalHours.toFixed(2)}</td>
+                <td className={`${tableCell} tabular-nums`}>{totals.overtimeHours.toFixed(2)}</td>
+                <td className={`${tableCell} tabular-nums`}>{totals.nightHours.toFixed(2)}</td>
+                <td className={tableCell} />
               </tr>
-          </tfoot>
-        </table>
+            </tfoot>
+          </table>
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-brand-navy/10 bg-[#dce6f0]/95 px-0 py-2 backdrop-blur-sm md:hidden">
+          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-0 py-2 backdrop-blur-sm md:hidden">
             <p className="text-center text-xs tabular-nums text-brand-navy">
-              <strong>{totals.totalHours.toFixed(1)} h</strong> totales · {summary.workedDays} días trabajados
+              <strong>{totals.totalHours.toFixed(1)} h</strong> totales · {summary.workedDays} días
+              trabajados
             </p>
           </div>
         )}
 
-        <div className="border-t border-brand-navy/10 py-4">
+        <div className="border-t border-[color:var(--surface-divider)] py-4">
           <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
             Notas del mes
           </label>
@@ -620,14 +677,14 @@ export function TimeSheetForm({
           />
         </div>
 
-        <div className="border-t border-brand-navy/10 py-4">
+        <div className="border-t border-[color:var(--surface-divider)] py-4">
           <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
             <Paperclip className="h-4 w-4" />
             Adjuntos (PDF/Excel)
           </p>
 
           {attachments.length > 0 && (
-            <ul className="mb-3 divide-y divide-brand-navy/8">
+            <ul className="mb-3 divide-y divide-[color:var(--surface-divider)]">
               {attachments.map((a) => (
                 <li key={a.id} className="flex items-center justify-between gap-2 py-2 first:pt-0">
                   <a
@@ -681,40 +738,40 @@ export function TimeSheetForm({
         </div>
 
         {(employeeSignaturePath || responsableSignaturePath) && (
-          <div className="border-t border-brand-navy/10 py-4">
+          <div className="border-t border-[color:var(--surface-divider)] py-4">
             <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
             <div className="flex flex-wrap gap-6">
-            {employeeSignaturePath && (
-              <div>
-                <p className="mb-1 text-xs text-slate-500">
-                  Empleado
-                  {employeeSignedAt && (
-                    <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                      · {formatDateTime(employeeSignedAt)}
-                    </span>
-                  )}
-                </p>
+              {employeeSignaturePath && (
+                <div>
+                  <p className="mb-1 text-xs text-slate-500">
+                    Empleado
+                    {employeeSignedAt && (
+                      <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                        · {formatDateTime(employeeSignedAt)}
+                      </span>
+                    )}
+                  </p>
                   <img
                     src={`/api/uploads/${employeeSignaturePath}`}
                     alt="Firma del empleado"
-                    className="h-16 rounded-lg border border-brand-navy/10 bg-white/50 p-2"
+                    className="h-16 rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] p-2"
                   />
                 </div>
               )}
-            {responsableSignaturePath && (
-              <div>
-                <p className="mb-1 text-xs text-slate-500">
-                  Responsable
-                  {responsableSignedAt && (
-                    <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                      · {formatDateTime(responsableSignedAt)}
-                    </span>
-                  )}
-                </p>
+              {responsableSignaturePath && (
+                <div>
+                  <p className="mb-1 text-xs text-slate-500">
+                    Responsable
+                    {responsableSignedAt && (
+                      <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                        · {formatDateTime(responsableSignedAt)}
+                      </span>
+                    )}
+                  </p>
                   <img
                     src={`/api/uploads/${responsableSignaturePath}`}
                     alt="Firma de la responsable"
-                    className="h-16 rounded-lg border border-brand-navy/10 bg-white/50 p-2"
+                    className="h-16 rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] p-2"
                   />
                 </div>
               )}
@@ -744,12 +801,7 @@ export function TimeSheetForm({
 
       {editable && (
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={pending}
-            className="inline-flex items-center gap-2 rounded-lg border border-brand-blue/30 bg-brand-blue/8 px-4 py-2 text-sm font-semibold text-brand-blue transition hover:bg-brand-blue/14 disabled:opacity-50"
-          >
+          <button type="button" onClick={handleSave} disabled={pending} className="btn-primary">
             <Save className="h-4 w-4" />
             Guardar borrador
           </button>
@@ -757,7 +809,7 @@ export function TimeSheetForm({
             type="button"
             onClick={() => setShowSignPad(true)}
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-dark disabled:opacity-50"
+            className="btn-primary"
           >
             <PenLine className="h-4 w-4" />
             Firmar y enviar
