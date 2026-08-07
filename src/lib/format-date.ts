@@ -1,6 +1,36 @@
 /** Zona horaria de la organización (Gran Canaria). Fija SSR = cliente. */
 export const APP_TIMEZONE = "Atlantic/Canary";
 
+export const MONTH_NAMES_ES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+] as const;
+
+export const MONTH_SHORT_ES = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dic",
+] as const;
+
 function asDate(value: Date | string): Date {
   return value instanceof Date ? value : new Date(value);
 }

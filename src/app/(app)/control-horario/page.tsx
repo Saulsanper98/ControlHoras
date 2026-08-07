@@ -4,12 +4,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Stagger } from "@/components/ui/stagger";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { TimeSheetForm } from "@/components/control-horario/timesheet-form";
+import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { TIMESHEET_STATUS_DESCRIPTION } from "@/lib/labels";
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
 
 export default async function ControlHorarioPage({
   searchParams,
@@ -40,7 +36,7 @@ export default async function ControlHorarioPage({
       <Stagger>
         <PageHeader
           title="Control horario"
-          description={`${MONTH_NAMES[month - 1]} de ${year} · ${TIMESHEET_STATUS_DESCRIPTION[status] ?? status}`}
+          description={`${MONTH_NAMES_ES[month - 1]} de ${year} · ${TIMESHEET_STATUS_DESCRIPTION[status] ?? status}`}
         />
       </Stagger>
 
@@ -48,7 +44,7 @@ export default async function ControlHorarioPage({
         timeSheetId={timeSheet?.id ?? null}
         month={month}
         year={year}
-        monthNames={MONTH_NAMES}
+        monthNames={[...MONTH_NAMES_ES]}
         status={status}
         notes={timeSheet?.notes ?? ""}
         rejectionReason={timeSheet?.rejectionReason}

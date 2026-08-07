@@ -11,12 +11,20 @@ import { NotificationPanel } from "@/components/layout/notification-panel";
 import { PageTransition } from "@/components/ui/page-transition";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { useDensity } from "@/lib/density";
+import { mobileTitleForPath } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 
 function atmosphereForPath(pathname: string) {
   if (pathname.includes("vacaciones")) return "warm";
-  if (pathname.includes("control") || pathname.includes("informe")) return "cool";
-  if (pathname.includes("horario")) return "cool";
+  if (
+    pathname.includes("control") ||
+    pathname.includes("informe") ||
+    pathname.includes("horario") ||
+    pathname.includes("emplead") ||
+    pathname.includes("auditoria")
+  ) {
+    return "cool";
+  }
   if (pathname.includes("noticia")) return "default";
   return "default";
 }
@@ -51,6 +59,8 @@ export function AppShell({
   const atmosphere = atmosphereForPath(pathname);
   const drawerId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const mobileTitle = mobileTitleForPath(pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -58,12 +68,40 @@ export function AppShell({
 
   useEffect(() => {
     if (!open) return;
+
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !drawerRef.current) return;
+      const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
+
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+
+    const t = window.setTimeout(() => {
+      const closeBtn = drawerRef.current?.querySelector<HTMLElement>(
+        'button[aria-label="Cerrar menú"]'
+      );
+      closeBtn?.focus();
+    }, 20);
+
     return () => {
+      window.clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
       menuButtonRef.current?.focus();
@@ -81,11 +119,14 @@ export function AppShell({
       )}
 
       <aside
+        ref={drawerRef}
         id={drawerId}
+        role={open ? "dialog" : undefined}
+        aria-modal={open ? true : undefined}
+        aria-label={open ? "Menú de navegación" : "Barra lateral"}
         className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 -translate-x-full flex-col bg-brand-navy transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
           open ? "translate-x-0" : ""
         }`}
-        aria-label="Barra lateral"
       >
         <div className="flex items-center justify-between gap-2 border-b border-white/10 px-4 py-6 md:justify-center">
           <img src="/brand/logo.svg" alt="CCMGC" className="h-10 w-auto" width={120} height={40} />
@@ -157,15 +198,21 @@ export function AppShell({
           >
             <Menu className="h-6 w-6" />
           </button>
-          <p className="font-display text-sm font-semibold text-brand-navy md:hidden">Portal</p>
+          <p className="font-display text-sm font-semibold text-brand-navy md:hidden">
+            {mobileTitle}
+          </p>
           <CommandPalette role={role} />
           <div className="flex-1" />
           <button
             type="button"
             onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
             className="hidden rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy md:block"
-            title={density === "compact" ? "Modo cómodo" : "Modo compacto"}
-            aria-label={density === "compact" ? "Activar modo cómodo" : "Activar modo compacto"}
+            title="Densidad de tablas del control horario"
+            aria-label={
+              density === "compact"
+                ? "Activar modo cómodo de tablas del control horario"
+                : "Activar modo compacto de tablas del control horario"
+            }
           >
             {density === "compact" ? (
               <Maximize2 className="h-4 w-4" />

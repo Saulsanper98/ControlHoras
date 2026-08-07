@@ -38,28 +38,16 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   return (
     <ConfirmContext.Provider value={value}>
       {children}
-      <Modal
-        open={Boolean(state)}
-        onClose={() => handleClose(false)}
-        title={state?.title ?? ""}
-      >
+      <Modal open={Boolean(state)} onClose={() => handleClose(false)} title={state?.title ?? ""}>
         <p className="text-sm leading-relaxed text-slate-600">{state?.message}</p>
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => handleClose(false)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 active:scale-[0.98]"
-          >
+          <button type="button" onClick={() => handleClose(false)} className="btn-ghost" data-autofocus>
             {state?.cancelLabel ?? "Cancelar"}
           </button>
           <button
             type="button"
             onClick={() => handleClose(true)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] ${
-              state?.variant === "danger"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-brand-blue hover:bg-brand-blue-dark"
-            }`}
+            className={state?.variant === "danger" ? "btn-danger" : "btn-primary"}
           >
             {state?.confirmLabel ?? "Confirmar"}
           </button>

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Bell, ClipboardList, MessageSquare, Umbrella } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/app/(app)/notifications/actions";
 import { formatRelativeTime } from "@/lib/format-relative-time";
+import { InlineEmpty } from "@/components/ui/inline-empty";
 
 type InboxItem = {
   id: string;
@@ -33,6 +34,7 @@ export function NotificationPanel({
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pending, startTransition] = useTransition();
+  const panelId = useId();
 
   const unreadInbox = inbox.filter((n) => !n.readAt).length;
   const managerPending = (pendingControls ?? 0) + pendingVacations;
@@ -69,6 +71,8 @@ export function NotificationPanel({
             ? `${total} notificaciones pendientes`
             : "Sin notificaciones"
         }
+        aria-expanded={open}
+        aria-controls={panelId}
       >
         <Bell className="h-5 w-5" />
         {total > 0 && (
@@ -89,6 +93,9 @@ export function NotificationPanel({
               onClick={() => setOpen(false)}
             />
             <div
+              id={panelId}
+              role="region"
+              aria-label="Notificaciones"
               className="surface-menu fixed right-4 top-14 z-[200] w-80 rounded-xl p-2 sm:right-6"
             >
               <div className="flex items-center justify-between px-2 py-1.5">
@@ -108,7 +115,7 @@ export function NotificationPanel({
               </div>
 
               {total === 0 ? (
-                <p className="px-2 py-4 text-center text-sm text-slate-500">Todo al día</p>
+                <InlineEmpty>Todo al día</InlineEmpty>
               ) : (
                 <ul className="max-h-80 space-y-1 overflow-y-auto">
                   {pendingControls !== null && pendingControls > 0 && (
@@ -176,7 +183,7 @@ export function NotificationPanel({
                           n.readAt ? "text-slate-500" : "text-brand-navy"
                         }`}
                       >
-                        <p className="font-medium">{n.title}</p>
+                        <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
                         <p className="text-xs text-slate-500">{n.body}</p>
                         <p className="mt-0.5 text-[11px] text-slate-400">
                           {formatRelativeTime(new Date(n.createdAt))}

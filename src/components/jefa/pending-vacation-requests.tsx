@@ -8,11 +8,11 @@ import { ListSurface } from "@/components/ui/list-surface";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionEyebrow } from "@/components/ui/section-title";
 import { useToast } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
 } from "@/app/(app)/jefa/vacaciones/request-actions";
-import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { formatDateNumeric } from "@/lib/format-date";
 
 type PendingRequest = {
@@ -29,11 +29,11 @@ type PendingRequest = {
 export function PendingVacationRequests({ requests }: { requests: PendingRequest[] }) {
   const router = useRouter();
   const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
   const [overlapPrompt, setOverlapPrompt] = useState<{
     id: string;
     warning: string;
@@ -43,7 +43,6 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
   if (requests.length === 0) return null;
 
   function handleApprove(id: string, force = false) {
-    setMessage(null);
     setPendingId(id);
     startTransition(async () => {
       const result = await approveVacationRequestAction(id, force);
@@ -58,14 +57,22 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         setOverlapPrompt({ id, warning: result.warning, overlaps: result.overlaps });
         return;
       }
-      setMessage(result.error ?? "Error al aprobar.");
       showToast(result.error ?? "Error al aprobar.", "error");
     });
   }
 
+  async function openReject(id: string) {
+    const ok = await confirm({
+      title: "Rechazar solicitud",
+      message: "¿Rechazar esta solicitud de ausencia? El empleado será notificado.",
+      variant: "danger",
+      confirmLabel: "Continuar",
+    });
+    if (ok) setRejectId(id);
+  }
+
   function handleReject() {
     if (!rejectId) return;
-    setMessage(null);
     setPendingId(rejectId);
     startTransition(async () => {
       const result = await rejectVacationRequestAction(rejectId, reason);
@@ -76,7 +83,6 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         showToast("Solicitud rechazada.");
         router.refresh();
       } else {
-        setMessage(result.error ?? "Error al rechazar.");
         showToast(result.error ?? "Error al rechazar.", "error");
       }
     });
@@ -87,7 +93,6 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
       <SectionEyebrow className="text-amber-700">
         Solicitudes pendientes ({requests.length})
       </SectionEyebrow>
-      {message && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>}
       <ListSurface>
         {requests.map((r) => {
           const busy = pendingId === r.id;
@@ -99,15 +104,12 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-brand-navy">{r.userName}</p>
-                  <StatusBadge status="PENDIENTE" preset="leave" />
+                  <StatusBadge status={r.leaveType ?? "VACACIONES"} preset="leaveType" />
                 </div>
                 <p className="text-sm text-slate-500">
                   {r.departmentName ?? "—"} ·{" "}
                   {formatDateNumeric(r.startDate)} – {formatDateNumeric(r.endDate)} ({r.days}{" "}
                   días)
-                  {r.leaveType && r.leaveType !== "VACACIONES"
-                    ? ` · ${LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}`
-                    : ""}
                 </p>
                 {r.employeeNotes ? (
                   <p className="text-xs text-slate-500">{r.employeeNotes}</p>
@@ -125,7 +127,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRejectId(r.id)}
+                  onClick={() => void openReject(r.id)}
                   disabled={busy || pendingId !== null}
                   className="btn-ghost text-red-700 hover:bg-red-500/10 disabled:opacity-60"
                 >

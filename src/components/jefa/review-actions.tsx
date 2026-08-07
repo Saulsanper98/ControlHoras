@@ -17,10 +17,8 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
   const [showSignPad, setShowSignPad] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [reason, setReason] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
 
   function handleSign(dataUrl: string) {
-    setMessage(null);
     startTransition(async () => {
       const result = await signAsResponsableAction(timeSheetId, dataUrl);
       if (result.ok) {
@@ -28,7 +26,6 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
         showToast("Control firmado correctamente.");
         router.refresh();
       } else {
-        setMessage(result.error ?? "Error al firmar.");
         showToast(result.error ?? "Error al firmar.", "error");
       }
     });
@@ -45,7 +42,6 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
   }
 
   function handleReject() {
-    setMessage(null);
     startTransition(async () => {
       const result = await rejectTimeSheetAction(timeSheetId, reason);
       if (result.ok) {
@@ -54,7 +50,6 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
         showToast("Control rechazado.");
         router.refresh();
       } else {
-        setMessage(result.error ?? "Error al rechazar.");
         showToast(result.error ?? "Error al rechazar.", "error");
       }
     });
@@ -62,11 +57,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
 
   return (
     <div className="space-y-3">
-      {message && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{message}</p>
-      )}
-
-      <div className="flex items-center gap-3">
+      <div className="hidden items-center gap-3 md:flex">
         <button
           type="button"
           onClick={() => setShowSignPad(true)}
@@ -86,6 +77,31 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
           Rechazar
         </button>
       </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-4 py-3 backdrop-blur-sm md:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowSignPad(true)}
+            disabled={pending}
+            className="btn-primary flex-1 disabled:opacity-60"
+          >
+            <PenLine className="h-4 w-4" />
+            Firmar
+          </button>
+          <button
+            type="button"
+            onClick={() => void openReject()}
+            disabled={pending}
+            className="btn-danger flex-1 disabled:opacity-60"
+          >
+            <XCircle className="h-4 w-4" />
+            Rechazar
+          </button>
+        </div>
+      </div>
+      {/* Spacer so content isn't hidden behind the fixed bar */}
+      <div className="h-16 md:hidden" aria-hidden />
 
       {showSignPad && (
         <SignatureModal

@@ -2,10 +2,22 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-type Toast = { id: number; message: string; type: "success" | "error"; exiting?: boolean };
+type ToastAction = { label: string; onClick: () => void };
+
+type Toast = {
+  id: number;
+  message: string;
+  type: "success" | "error";
+  exiting?: boolean;
+  action?: ToastAction;
+};
+
+type ToastOptions = {
+  action?: ToastAction;
+};
 
 type ToastContextValue = {
-  showToast: (message: string, type?: "success" | "error") => void;
+  showToast: (message: string, type?: "success" | "error", options?: ToastOptions) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -13,18 +25,21 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    window.setTimeout(() => {
-      setToasts((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
-      );
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" = "success", options?: ToastOptions) => {
+      const id = Date.now() + Math.random();
+      setToasts((prev) => [...prev, { id, message, type, action: options?.action }]);
       window.setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 200);
-    }, 3800);
-  }, []);
+        setToasts((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+        );
+        window.setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, 200);
+      }, options?.action ? 8000 : 3800);
+    },
+    []
+  );
 
   const value = useMemo(() => ({ showToast }), [showToast]);
 
@@ -46,7 +61,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 : "bg-red-600 text-white"
             }`}
           >
-            {t.message}
+            <p>{t.message}</p>
+            {t.action && (
+              <button
+                type="button"
+                onClick={t.action.onClick}
+                className="mt-2 rounded-md bg-white/20 px-2.5 py-1 text-xs font-semibold transition hover:bg-white/30"
+              >
+                {t.action.label}
+              </button>
+            )}
           </div>
         ))}
       </div>

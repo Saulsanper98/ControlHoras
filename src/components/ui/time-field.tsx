@@ -24,6 +24,7 @@ export function TimeField({
   className,
   id,
   variant = "default",
+  "aria-label": ariaLabel,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -31,6 +32,7 @@ export function TimeField({
   className?: string;
   id?: string;
   variant?: "default" | "plain";
+  "aria-label"?: string;
 }) {
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -63,6 +65,7 @@ export function TimeField({
           disabled={disabled}
           placeholder="HH:MM"
           inputMode="numeric"
+          aria-label={ariaLabel}
           onFocus={() => !disabled && setOpen(true)}
           onClick={() => !disabled && setOpen(true)}
           onChange={(e) => onChange(e.target.value)}

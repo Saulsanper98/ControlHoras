@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Modal } from "@/components/ui/modal";
 import { FieldSelect } from "@/components/ui/field-select";
+import { TEMP_EMPLOYEE_PASSWORD } from "@/lib/labels";
 import {
   createEmployeeAction,
   resetEmployeePasswordAction,
@@ -23,6 +24,21 @@ type Employee = {
   departmentId: string | null;
 };
 
+function tempPasswordToast(
+  showToast: ReturnType<typeof useToast>["showToast"],
+  prefix: string
+) {
+  const message = `${prefix} Contraseña temporal: ${TEMP_EMPLOYEE_PASSWORD}`;
+  showToast(message, "success", {
+    action: {
+      label: "Copiar contraseña",
+      onClick: () => {
+        void navigator.clipboard?.writeText(TEMP_EMPLOYEE_PASSWORD);
+      },
+    },
+  });
+}
+
 export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
   const router = useRouter();
   const { showToast } = useToast();
@@ -36,7 +52,10 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
     startTransition(async () => {
       const result = await createEmployeeAction({ name, email, departmentId });
       if (result.ok) {
-        showToast("Empleado creado. Deberá cambiar la contraseña temporal al entrar.");
+        tempPasswordToast(
+          showToast,
+          "Empleado creado. Deberá cambiarla al entrar."
+        );
         setOpen(false);
         setName("");
         setEmail("");
@@ -92,7 +111,9 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
             />
           </div>
           <p className="text-xs text-slate-500">
-            Se generará una contraseña temporal. El empleado deberá cambiarla al iniciar sesión.
+            Se generará la contraseña temporal{" "}
+            <span className="font-medium text-brand-navy">{TEMP_EMPLOYEE_PASSWORD}</span>. El
+            empleado deberá cambiarla al iniciar sesión.
           </p>
           <button
             type="button"
@@ -149,14 +170,14 @@ export function EmployeeRowActions({
   async function handleResetPassword() {
     const ok = await confirm({
       title: "Restablecer contraseña",
-      message: `Se generará una contraseña temporal para ${user.name}. Deberá cambiarla al entrar.`,
+      message: `Se generará la contraseña temporal ${TEMP_EMPLOYEE_PASSWORD} para ${user.name}. Deberá cambiarla al entrar.`,
       confirmLabel: "Restablecer",
     });
     if (!ok) return;
     startTransition(async () => {
       const result = await resetEmployeePasswordAction(user.id);
       if (result.ok) {
-        showToast("Contraseña restablecida. El empleado deberá cambiarla al entrar.");
+        tempPasswordToast(showToast, "Contraseña restablecida.");
         router.refresh();
       } else {
         showToast(result.error ?? "Error.", "error");
@@ -183,12 +204,12 @@ export function EmployeeRowActions({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1">
+    <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
       <button
         type="button"
         onClick={() => setEditOpen(true)}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60"
+        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60 sm:px-3"
       >
         <Pencil className="h-4 w-4" />
         Editar
@@ -197,7 +218,7 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => void handleToggle()}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60"
+        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60 sm:px-3"
       >
         {user.active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
         {user.active ? "Desactivar" : "Activar"}
@@ -206,10 +227,10 @@ export function EmployeeRowActions({
         type="button"
         onClick={() => void handleResetPassword()}
         disabled={pending}
-        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-60"
+        className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-brand-blue transition hover:bg-brand-blue/10 disabled:opacity-60 sm:px-3"
       >
-        <KeyRound className="h-4 w-4" />
-        Reset pass
+        <KeyRound className="h-4 w-4 shrink-0" />
+        <span className="whitespace-nowrap">Restablecer contraseña</span>
       </button>
 
       <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Editar empleado">

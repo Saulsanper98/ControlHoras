@@ -3,14 +3,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  BarChart3,
+  CalendarDays,
   ClipboardList,
   Search,
+  Shield,
   Umbrella,
   Users,
 } from "lucide-react";
 import { employeeNav, jefaNav } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 import { Modal } from "@/components/ui/modal";
+import { InlineEmpty } from "@/components/ui/inline-empty";
+import { cn } from "@/lib/utils";
 
 type CommandItem = {
   id: string;
@@ -32,6 +37,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
   const isMac = useIsMac();
   const shortcutLabel = isMac ? "⌘K" : "Ctrl+K";
 
@@ -44,26 +50,49 @@ export function CommandPalette({ role }: { role: AppRole }) {
       icon: n.icon,
     }));
     if (role === "JEFA") {
-      base.push({
-        id: "next-controls",
-        label: "Controles pendientes de firmar",
-        href: "/jefa/controles",
-        icon: ClipboardList,
-        keywords: "firmar pendiente",
-      });
-      base.push({
-        id: "vac-pending",
-        label: "Vacaciones pendientes",
-        href: "/jefa/vacaciones",
-        icon: Umbrella,
-        keywords: "aprobar vacaciones",
-      });
-      base.push({
-        id: "employees",
-        label: "Lista de empleados",
-        href: "/jefa/empleados",
-        icon: Users,
-      });
+      base.push(
+        {
+          id: "next-controls",
+          label: "Controles pendientes de firmar",
+          href: "/jefa/controles",
+          icon: ClipboardList,
+          keywords: "firmar pendiente",
+        },
+        {
+          id: "vac-pending",
+          label: "Vacaciones pendientes",
+          href: "/jefa/vacaciones",
+          icon: Umbrella,
+          keywords: "aprobar vacaciones",
+        },
+        {
+          id: "employees",
+          label: "Lista de empleados",
+          href: "/jefa/empleados",
+          icon: Users,
+        },
+        {
+          id: "calendario",
+          label: "Calendario de vacaciones",
+          href: "/jefa/vacaciones/calendario",
+          icon: CalendarDays,
+          keywords: "calendario vacaciones",
+        },
+        {
+          id: "informes-csv",
+          label: "Exportar informe de horas",
+          href: "/jefa/informes",
+          icon: BarChart3,
+          keywords: "csv export horas informe",
+        },
+        {
+          id: "auditoria-logs",
+          label: "Registro de auditoría",
+          href: "/jefa/auditoria",
+          icon: Shield,
+          keywords: "logs historial auditoría",
+        }
+      );
     } else {
       base.push({
         id: "my-control",
@@ -72,11 +101,10 @@ export function CommandPalette({ role }: { role: AppRole }) {
         icon: ClipboardList,
       });
     }
-    // Evitar duplicar "Panel principal" si ya viene en nav
     const seen = new Set<string>();
     return base.filter((item) => {
-      if (seen.has(item.href)) return false;
-      seen.add(item.href);
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
       return true;
     });
   }, [role]);
@@ -91,6 +119,10 @@ export function CommandPalette({ role }: { role: AppRole }) {
         i.keywords?.toLowerCase().includes(q)
     );
   }, [items, query]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query, open]);
 
   const go = useCallback(
     (href: string) => {
@@ -111,6 +143,22 @@ export function CommandPalette({ role }: { role: AppRole }) {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
+
+  function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (filtered.length === 0 ? 0 : (i + 1) % filtered.length));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) =>
+        filtered.length === 0 ? 0 : (i - 1 + filtered.length) % filtered.length
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const item = filtered[activeIndex];
+      if (item) go(item.href);
+    }
+  }
 
   return (
     <>
@@ -140,18 +188,31 @@ export function CommandPalette({ role }: { role: AppRole }) {
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={onInputKeyDown}
           placeholder="Escribe para buscar páginas…"
           className="field-control mb-3 w-full px-3 py-2 text-sm"
+          aria-activedescendant={
+            filtered[activeIndex] ? `cmd-${filtered[activeIndex].id}` : undefined
+          }
+          role="combobox"
+          aria-expanded={true}
+          aria-controls="command-palette-list"
+          aria-autocomplete="list"
         />
-        <ul className="max-h-64 overflow-y-auto px-0.5">
-          {filtered.map((item) => {
+        <ul id="command-palette-list" role="listbox" className="max-h-64 overflow-y-auto px-0.5">
+          {filtered.map((item, index) => {
             const Icon = item.icon;
+            const active = index === activeIndex;
             return (
-              <li key={item.id}>
+              <li key={item.id} role="option" aria-selected={active} id={`cmd-${item.id}`}>
                 <button
                   type="button"
                   onClick={() => go(item.href)}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition hover:bg-brand-navy/6"
+                  onMouseEnter={() => setActiveIndex(index)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-brand-navy transition",
+                    active ? "bg-brand-navy/8" : "hover:bg-brand-navy/6"
+                  )}
                 >
                   <Icon className="h-4 w-4 text-brand-blue" />
                   {item.label}
@@ -160,7 +221,9 @@ export function CommandPalette({ role }: { role: AppRole }) {
             );
           })}
           {filtered.length === 0 && (
-            <li className="px-3 py-4 text-center text-sm text-slate-500">Sin resultados</li>
+            <li>
+              <InlineEmpty>Sin resultados</InlineEmpty>
+            </li>
           )}
         </ul>
       </Modal>

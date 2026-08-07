@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { useToast } from "@/components/ui/toast";
 import { countVacationDays } from "@/lib/holidays";
 import { formatDate, yearFromDateKey } from "@/lib/format-date";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
@@ -48,7 +49,6 @@ export function VacationRequestsPanel({
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
   const [leaveType, setLeaveType] = useState<"VACACIONES" | "ASUNTOS_PROPIOS" | "MEDIO_DIA">("VACACIONES");
-  const [error, setError] = useState<string | null>(null);
 
   function closeModal() {
     setShowModal(false);
@@ -56,11 +56,9 @@ export function VacationRequestsPanel({
     setEndDate("");
     setNotes("");
     setLeaveType("VACACIONES");
-    setError(null);
   }
 
   function handleCreate() {
-    setError(null);
     startTransition(async () => {
       const result = await createVacationRequestAction(startDate, endDate, notes, leaveType);
       if (result.ok) {
@@ -68,7 +66,7 @@ export function VacationRequestsPanel({
         showToast("Solicitud enviada correctamente.");
         router.refresh();
       } else {
-        setError(result.error ?? "Error al enviar.");
+        showToast(result.error ?? "Error al enviar.", "error");
       }
     });
   }
@@ -82,14 +80,13 @@ export function VacationRequestsPanel({
         confirmLabel: "Cancelar solicitud",
       });
       if (!ok) return;
-      setError(null);
       startTransition(async () => {
         const result = await cancelVacationRequestAction(id);
         if (result.ok) {
           showToast("Solicitud cancelada.");
           router.refresh();
         } else {
-          setError(result.error ?? "Error al cancelar.");
+          showToast(result.error ?? "Error al cancelar.", "error");
         }
       });
     })();
@@ -129,12 +126,6 @@ export function VacationRequestsPanel({
         </button>
       </div>
 
-      {error && (
-        <p className="mt-4 rounded-lg bg-red-500/12 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
-      )}
-
       {yearRequests.length === 0 ? (
         <EmptyState
           className="mt-4"
@@ -166,6 +157,8 @@ export function VacationRequestsPanel({
                 <p className="mt-0.5 text-xs text-slate-500">
                   {LEAVE_TYPE_LABEL[r.leaveType ?? "VACACIONES"] ?? r.leaveType}
                   {r.employeeNotes ? ` · ${r.employeeNotes}` : ""}
+                  {" · "}
+                  {formatRelativeTime(r.createdAt)}
                 </p>
                 {r.rejectionReason && (
                   <p className="mt-0.5 text-xs text-red-600">Motivo: {r.rejectionReason}</p>
@@ -195,6 +188,7 @@ export function VacationRequestsPanel({
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
             <FieldSelect
+              autoFocus
               value={leaveType}
               onChange={(v) => {
                 const next = v as typeof leaveType;

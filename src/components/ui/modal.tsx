@@ -11,12 +11,15 @@ export function Modal({
   title,
   children,
   className,
+  closeLabel = "Cerrar",
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
   className?: string;
+  /** aria-label del botón X (p. ej. onboarding: omitir introducción). */
+  closeLabel?: string;
 }) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -52,10 +55,22 @@ export function Modal({
     document.body.style.overflow = "hidden";
 
     const t = window.setTimeout(() => {
-      const el = panelRef.current?.querySelector<HTMLElement>(
-        "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+      const preferred = panelRef.current?.querySelector<HTMLElement>("[data-autofocus]");
+      if (preferred) {
+        preferred.focus();
+        return;
+      }
+      const candidates = panelRef.current?.querySelectorAll<HTMLElement>(
+        "input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1']), button:not([disabled]), a[href]"
       );
-      el?.focus();
+      if (!candidates?.length) return;
+      // Prefer first field over the close button
+      for (const el of candidates) {
+        if (el.getAttribute("data-modal-close") != null) continue;
+        el.focus();
+        return;
+      }
+      candidates[0]?.focus();
     }, 20);
 
     return () => {
@@ -94,7 +109,8 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            data-modal-close=""
+            aria-label={closeLabel}
             className="btn-press min-h-11 min-w-11 rounded-lg p-2 text-slate-400 transition hover:bg-brand-navy/8 hover:text-brand-navy"
           >
             <X className="h-5 w-5" />

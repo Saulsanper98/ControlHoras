@@ -39,27 +39,22 @@ export function VacationEditor({
   const [hours, setHours] = useState("");
   const [reason, setReason] = useState("");
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function handleSaveBalance() {
-    setMessage(null);
     startTransition(async () => {
       const result = await saveVacationBalanceAction(userId, year, totalDays, usedDays, notes);
       if (result.ok) {
         showToast("Saldo de vacaciones guardado.");
-        setMessage({ type: "success", text: "Saldo de vacaciones guardado." });
       } else {
         showToast(result.error ?? "Error al guardar.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al guardar." });
       }
     });
   }
 
   function handleAddAdjustment() {
-    setMessage(null);
     const parsed = Number(hours);
     if (!parsed) {
-      setMessage({ type: "error", text: "Indica un número de horas distinto de cero." });
+      showToast("Indica un número de horas distinto de cero.", "error");
       return;
     }
     startTransition(async () => {
@@ -70,7 +65,6 @@ export function VacationEditor({
         showToast("Ajuste de horas añadido.");
       } else {
         showToast(result.error ?? "Error al añadir el ajuste.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al añadir el ajuste." });
       }
     });
   }
@@ -83,14 +77,12 @@ export function VacationEditor({
       confirmLabel: "Eliminar",
     });
     if (!ok) return;
-    setMessage(null);
     startTransition(async () => {
       const result = await deleteHourAdjustmentAction(id, userId);
       if (result.ok) {
         showToast("Ajuste eliminado.");
       } else {
         showToast(result.error ?? "Error al eliminar el ajuste.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al eliminar el ajuste." });
       }
     });
   }
@@ -100,18 +92,6 @@ export function VacationEditor({
 
   return (
     <div className="space-y-6">
-      {message && (
-        <p
-          className={`rounded-md px-3 py-2 text-sm ${
-            message.type === "success"
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-red-50 text-red-600"
-          }`}
-        >
-          {message.text}
-        </p>
-      )}
-
       <SectionBlock>
         <p className="mb-3 text-sm font-medium text-brand-navy">Saldo de vacaciones ({year})</p>
         <div className="flex flex-wrap items-end gap-4">

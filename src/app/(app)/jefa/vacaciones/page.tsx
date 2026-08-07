@@ -3,14 +3,15 @@ import { redirect } from "next/navigation";
 import { Umbrella, CalendarDays, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ListSurface } from "@/components/ui/list-surface";
-import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stagger } from "@/components/ui/stagger";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionEyebrow } from "@/components/ui/section-title";
+import { YearSwitcher } from "@/components/ui/year-switcher";
 import { PendingVacationRequests } from "@/components/jefa/pending-vacation-requests";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { toDateKey } from "@/lib/format-date";
+import { cn } from "@/lib/utils";
 
 export default async function JefaVacacionesPage({
   searchParams,
@@ -51,15 +52,26 @@ export default async function JefaVacacionesPage({
     ]);
 
   const years = [
-    ...new Set([currentYear, currentYear - 1, ...balanceYears.map((b) => b.year)]),
+    ...new Set([
+      currentYear,
+      currentYear - 1,
+      ...balanceYears.map((b) => b.year),
+      ...pendingRequests.map((r) => r.year),
+    ]),
   ].sort((a, b) => b - a);
 
   const balanceByUser = new Map(balances.map((b) => [b.userId, b]));
   const hoursByUser = new Map(adjustmentSums.map((a) => [a.userId, Number(a._sum.hours ?? 0)]));
 
+  const pendingThisYear = pendingRequests.filter((r) => r.year === year);
+  const pendingOtherYears = pendingRequests.filter((r) => r.year !== year);
+  const otherYearsCount = new Map<number, number>();
+  for (const r of pendingOtherYears) {
+    otherYearsCount.set(r.year, (otherYearsCount.get(r.year) ?? 0) + 1);
+  }
+
   const pendingByUser = new Map<string, number>();
-  for (const r of pendingRequests) {
-    if (r.year !== year) continue;
+  for (const r of pendingThisYear) {
     if (r.leaveType !== "VACACIONES" && r.leaveType !== "MEDIO_DIA") continue;
     pendingByUser.set(r.userId, (pendingByUser.get(r.userId) ?? 0) + Number(r.days));
   }
@@ -80,30 +92,53 @@ export default async function JefaVacacionesPage({
   function EmployeeLink({ e }: { e: Emp }) {
     const balance = balanceByUser.get(e.id);
     const pending = pendingByUser.get(e.id) ?? 0;
-    const remaining = balance
-      ? Number(balance.totalDays) - Number(balance.usedDays) - pending
-      : null;
+    const total = balance ? Number(balance.totalDays) : 0;
+    const used = balance ? Number(balance.usedDays) : 0;
+    const remaining = balance ? total - used - pending : null;
     const hours = hoursByUser.get(e.id) ?? 0;
+    const availablePct =
+      remaining !== null && total > 0
+        ? Math.max(0, Math.min(100, Math.round((remaining / total) * 100)))
+        : null;
     return (
       <Link
         href={`/jefa/vacaciones/${e.id}?year=${year}`}
         className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.035]"
       >
-        <div className="flex items-center gap-3">
-          <Umbrella className="h-4 w-4 text-brand-blue" />
-          <div>
+        <div className="flex min-w-0 items-center gap-3">
+          <Umbrella className="h-4 w-4 shrink-0 text-brand-blue" />
+          <div className="min-w-0">
             <p className="font-medium text-brand-navy">{e.name}</p>
             {pending > 0 && (
               <p className="text-xs text-amber-700">{pending} días en trámite</p>
             )}
+            {total > 0 && (
+              <div className="mt-1.5 w-28 max-w-full">
+                <div className="flex h-1 overflow-hidden rounded-full bg-brand-navy/8">
+                  <div
+                    className="bg-brand-blue"
+                    style={{ width: `${Math.min(100, (used / total) * 100)}%` }}
+                  />
+                  <div
+                    className="bg-amber-400"
+                    style={{
+                      width: `${Math.min(100 - (used / total) * 100, (pending / total) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex gap-6 text-right text-sm">
+        <div className="flex shrink-0 gap-6 text-right text-sm">
           <div>
             <p className="text-xs text-slate-500">Disponibles</p>
             <p className="font-medium tabular-nums text-brand-navy">
               {remaining !== null ? `${remaining} días` : "Sin datos"}
             </p>
+            {availablePct !== null && (
+              <p className="text-[10px] tabular-nums text-slate-400">{availablePct}%</p>
+            )}
           </div>
           <div>
             <p className="text-xs text-slate-500">Bolsa</p>
@@ -121,24 +156,14 @@ export default async function JefaVacacionesPage({
           title="Vacaciones y horas"
           description={`Gestiona saldos, solicitudes pendientes y bolsa de horas (${year}).`}
         >
-          <div className="flex flex-wrap items-end gap-3">
-            <form method="get" className="flex items-end gap-2">
-              <div className="w-28">
-                <label htmlFor="jefa-vac-year" className="mb-1 block text-xs font-medium text-slate-500">
-                  Año
-                </label>
-                <Select id="jefa-vac-year" name="year" defaultValue={String(year)}>
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <button type="submit" className="btn-primary">
-                Ver
-              </button>
-            </form>
+          <div className="flex flex-wrap items-center gap-3">
+            <YearSwitcher
+              years={years}
+              year={year}
+              hrefForYear={(y) =>
+                y === currentYear ? "/jefa/vacaciones" : `/jefa/vacaciones?year=${y}`
+              }
+            />
             <Link href="/jefa/vacaciones/calendario" className="btn-secondary">
               <CalendarDays className="h-4 w-4" />
               Calendario del equipo
@@ -147,8 +172,27 @@ export default async function JefaVacacionesPage({
         </PageHeader>
       </Stagger>
 
+      {otherYearsCount.size > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-slate-500">Pendientes en otras anualidades:</span>
+          {[...otherYearsCount.entries()]
+            .sort((a, b) => b[0] - a[0])
+            .map(([y, count]) => (
+              <Link
+                key={y}
+                href={`/jefa/vacaciones?year=${y}`}
+                className={cn(
+                  "rounded-lg bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-900 transition hover:bg-amber-500/25"
+                )}
+              >
+                {y}: {count}
+              </Link>
+            ))}
+        </div>
+      )}
+
       <PendingVacationRequests
-        requests={pendingRequests.map((r) => ({
+        requests={pendingThisYear.map((r) => ({
           id: r.id,
           userName: r.user.name,
           departmentName: r.user.department?.name ?? null,

@@ -3,6 +3,9 @@ import { Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { SectionBlock } from "@/components/ui/list-surface";
 import { BackLink } from "@/components/ui/back-link";
+import { PageHeader } from "@/components/ui/page-header";
+import { Stagger } from "@/components/ui/stagger";
+import { formatDate } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 
 export default async function NoticiaDetallePage({
@@ -24,26 +27,33 @@ export default async function NoticiaDetallePage({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <BackLink href="/noticias">Volver a noticias</BackLink>
-      <SectionBlock className="space-y-4">
-        <div className="flex items-center gap-2">
-          {news.pinned && (
-            <Pin className="h-4 w-4 shrink-0 text-brand-blue" aria-label="Fijada" />
-          )}
-          <h1 className="font-display text-2xl font-semibold text-brand-navy">{news.title}</h1>
+      <Stagger>
+        <div>
+          <BackLink href="/noticias">Volver a noticias</BackLink>
+          <PageHeader
+            title={news.title}
+            description={`${formatRelativeTime(news.publishedAt)} · ${formatDate(news.publishedAt)} · ${news.publishedBy.name}`}
+          />
         </div>
-        <p className="text-xs text-slate-500">
-          {formatRelativeTime(news.publishedAt)} · {news.publishedBy.name}
-        </p>
+      </Stagger>
+      <SectionBlock className="space-y-4">
+        {news.pinned && (
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-blue">
+            <Pin className="h-3.5 w-3.5" aria-hidden />
+            Fijada
+          </p>
+        )}
         {news.imagePath && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`/api/uploads/${news.imagePath}`}
-            alt=""
+            alt={news.title}
             className="max-h-[28rem] w-full rounded-lg object-cover"
           />
         )}
-        <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">{news.body}</p>
+        <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-slate-700">
+          {news.body}
+        </p>
       </SectionBlock>
     </div>
   );

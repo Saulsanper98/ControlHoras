@@ -17,11 +17,11 @@ const STEPS = [
     title: "Firma y envío",
     body: "Al firmar, el control queda bloqueado hasta que la responsable lo apruebe o lo rechace con motivo.",
     href: "/control-horario",
-    cta: "Entendido",
+    cta: "Ver el control horario",
   },
   {
     title: "Vacaciones y horas",
-    body: "Consulta tu saldo, solicita vacaciones desde el modal y revisa tu bolsa de horas acumulada.",
+    body: "Consulta tu saldo, solicita vacaciones desde la pantalla de vacaciones y revisa tu bolsa de horas acumulada.",
     href: "/vacaciones",
     cta: "Ver vacaciones",
   },
@@ -49,16 +49,18 @@ export function OnboardingModal() {
   }
 
   const current = STEPS[step];
+  const isLast = step === STEPS.length - 1;
 
   return (
     <Modal
       open={open}
       onClose={finish}
       title={`Bienvenido · Paso ${step + 1} de ${STEPS.length}`}
+      closeLabel="Cerrar e omitir introducción"
     >
       <p className="font-display text-base font-semibold text-brand-navy">{current.title}</p>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">{current.body}</p>
-      <div className="mt-2 flex gap-1">
+      <div className="mt-2 flex gap-1" aria-hidden="true">
         {STEPS.map((_, i) => (
           <div
             key={i}
@@ -67,10 +69,14 @@ export function OnboardingModal() {
         ))}
       </div>
       <div className="mt-6 flex items-center justify-between gap-2">
-        <button type="button" onClick={finish} className="btn-ghost px-2 text-xs text-slate-400">
-          Omitir
+        <button
+          type="button"
+          onClick={finish}
+          className="btn-ghost px-2 text-xs text-slate-400"
+        >
+          Omitir introducción
         </button>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {step > 0 && (
             <button
               type="button"
@@ -80,7 +86,16 @@ export function OnboardingModal() {
               Atrás
             </button>
           )}
-          {step < STEPS.length - 1 ? (
+          {!isLast && current.href && (
+            <Link href={current.href} onClick={finish} className="btn-ghost">
+              {current.cta}
+            </Link>
+          )}
+          {isLast ? (
+            <Link href={current.href} onClick={finish} className="btn-primary">
+              {current.cta}
+            </Link>
+          ) : (
             <button
               type="button"
               onClick={() => setStep((s) => s + 1)}
@@ -88,10 +103,6 @@ export function OnboardingModal() {
             >
               Siguiente
             </button>
-          ) : (
-            <Link href={current.href} onClick={finish} className="btn-primary">
-              {current.cta}
-            </Link>
           )}
         </div>
       </div>

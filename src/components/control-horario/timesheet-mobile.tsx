@@ -78,18 +78,38 @@ export function TimeSheetMobileDays({
               className="mb-2"
             />
             <div className="grid grid-cols-2 gap-2">
-              <TimeField
-                disabled={!editable}
-                value={entry.checkIn}
-                onChange={(v) => onUpdate(entry.day, { checkIn: v })}
-                variant="plain"
-              />
-              <TimeField
-                disabled={!editable}
-                value={entry.checkOut}
-                onChange={(v) => onUpdate(entry.day, { checkOut: v })}
-                variant="plain"
-              />
+              <div>
+                <label
+                  htmlFor={`mobile-in-${entry.day}`}
+                  className="mb-0.5 block text-[11px] font-medium text-slate-500"
+                >
+                  Entrada
+                </label>
+                <TimeField
+                  id={`mobile-in-${entry.day}`}
+                  aria-label="Entrada"
+                  disabled={!editable}
+                  value={entry.checkIn}
+                  onChange={(v) => onUpdate(entry.day, { checkIn: v })}
+                  variant="plain"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor={`mobile-out-${entry.day}`}
+                  className="mb-0.5 block text-[11px] font-medium text-slate-500"
+                >
+                  Salida
+                </label>
+                <TimeField
+                  id={`mobile-out-${entry.day}`}
+                  aria-label="Salida"
+                  disabled={!editable}
+                  value={entry.checkOut}
+                  onChange={(v) => onUpdate(entry.day, { checkOut: v })}
+                  variant="plain"
+                />
+              </div>
             </div>
             <label className="mt-2 block">
               <span className="sr-only">Observaciones del día {entry.day}</span>

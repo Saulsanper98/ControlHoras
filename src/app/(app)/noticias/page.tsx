@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ListSurface } from "@/components/ui/list-surface";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Stagger } from "@/components/ui/stagger";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import Link from "next/link";
 
@@ -22,10 +23,12 @@ export default async function NoticiasPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Noticias"
-        description="Todas las noticias y comunicados de la empresa."
-      />
+      <Stagger>
+        <PageHeader
+          title="Noticias"
+          description="Todas las noticias y comunicados de la empresa."
+        />
+      </Stagger>
 
       {news.length === 0 ? (
         <EmptyState
@@ -52,8 +55,8 @@ export default async function NoticiasPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={`/api/uploads/${n.imagePath}`}
-                  alt=""
-                  className="mt-3 h-48 w-full rounded-lg object-cover"
+                  alt={n.title}
+                  className="mt-3 h-36 w-full rounded-lg object-cover"
                 />
               )}
               <p className="mt-2 text-xs text-slate-500">

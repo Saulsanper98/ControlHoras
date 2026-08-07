@@ -112,7 +112,7 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
               className="pointer-events-none absolute inset-x-10 top-0 h-[2px] bg-gradient-to-r from-brand-blue/0 via-brand-blue/50 to-brand-blue/0 blur-[1px]"
             />
 
-            <h1 className="mb-1 text-xl font-semibold tracking-tight text-white">
+            <h1 className="mb-1 font-display text-xl font-semibold tracking-tight text-white">
               Portal del Empleado
             </h1>
             <p className="mb-6 text-sm text-slate-300">

@@ -8,11 +8,6 @@ const MONTH_NAMES = [
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ];
 
-const STATUS_LABEL: Record<string, string> = {
-  ...TIMESHEET_STATUS_LABEL,
-  SIN_CONTROL: "Sin control",
-};
-
 export async function GET(req: NextRequest) {
   const session = await requireManagerSession();
   if (!session) return new NextResponse("No autorizado", { status: 401 });
@@ -25,7 +20,7 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get("status") || undefined;
 
   const { rows } = await buildInformeHoras({ month, year, departmentId, status });
-  const csv = informeToCsv(rows, STATUS_LABEL);
+  const csv = informeToCsv(rows, TIMESHEET_STATUS_LABEL);
   const filename = `informe-horas-${MONTH_NAMES[month - 1]}-${year}.csv`;
 
   return new NextResponse(csv, {

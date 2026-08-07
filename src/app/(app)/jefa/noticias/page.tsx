@@ -6,6 +6,7 @@ import { NewsItem } from "@/components/jefa/news-item";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListSurface } from "@/components/ui/list-surface";
+import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 const NEWS_LIMIT = 100;
@@ -21,12 +22,20 @@ export default async function JefaNoticiasPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Noticias"
-        description="Publica, programa y gestiona las noticias de la empresa."
-      />
+      <Stagger>
+        <PageHeader
+          title="Noticias"
+          description="Publica, programa y gestiona las noticias de la empresa."
+        >
+          <NewsCreateForm />
+        </PageHeader>
+      </Stagger>
 
-      <NewsCreateForm />
+      {news.length >= NEWS_LIMIT && (
+        <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-900">
+          Se muestran las {NEWS_LIMIT} noticias más recientes. Hay más en el historial.
+        </p>
+      )}
 
       {news.length === 0 ? (
         <EmptyState
@@ -44,6 +53,7 @@ export default async function JefaNoticiasPage() {
               body={n.body}
               pinned={n.pinned}
               publishedAt={n.publishedAt.toISOString()}
+              scheduledAt={n.scheduledAt?.toISOString() ?? null}
               imagePath={n.imagePath}
               status={n.status}
             />

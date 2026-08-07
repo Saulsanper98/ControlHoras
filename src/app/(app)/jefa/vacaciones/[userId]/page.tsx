@@ -3,7 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { VacationEditor } from "@/components/jefa/vacation-editor";
 import { BackLink } from "@/components/ui/back-link";
 import { PageHeader } from "@/components/ui/page-header";
+import { ListSurface } from "@/components/ui/list-surface";
+import { SectionTitle } from "@/components/ui/section-title";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { VacationProgressBar } from "@/components/vacaciones/vacation-progress";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { formatDate, formatDateShort } from "@/lib/format-date";
+import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 
 export default async function VacationDetailPage({
   params,
@@ -20,7 +26,7 @@ export default async function VacationDetailPage({
   const currentYear = new Date().getFullYear();
   const year = Number(sp.year) || currentYear;
 
-  const [employee, balance, adjustments, pendingRequests] = await Promise.all([
+  const [employee, balance, adjustments, yearRequests] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, include: { department: true } }),
     prisma.vacationBalance.findUnique({ where: { userId_year: { userId, year } } }),
     prisma.hourAdjustment.findMany({
@@ -29,19 +35,23 @@ export default async function VacationDetailPage({
       orderBy: { createdAt: "desc" },
     }),
     prisma.vacationRequest.findMany({
-      where: {
-        userId,
-        year,
-        status: "PENDIENTE",
-        leaveType: { in: ["VACACIONES", "MEDIO_DIA"] },
-      },
-      select: { days: true },
+      where: { userId, year },
+      orderBy: { startDate: "desc" },
     }),
   ]);
 
   if (!employee || employee.role !== "EMPLEADO") notFound();
 
-  const pendingDays = pendingRequests.reduce((sum, r) => sum + Number(r.days), 0);
+  const pendingDays = yearRequests
+    .filter(
+      (r) =>
+        r.status === "PENDIENTE" &&
+        (r.leaveType === "VACACIONES" || r.leaveType === "MEDIO_DIA")
+    )
+    .reduce((sum, r) => sum + Number(r.days), 0);
+
+  const totalDays = balance ? Number(balance.totalDays) : 0;
+  const usedDays = balance ? Number(balance.usedDays) : 0;
 
   return (
     <div className="space-y-6">
@@ -53,11 +63,15 @@ export default async function VacationDetailPage({
         />
       </div>
 
+      {totalDays > 0 && (
+        <VacationProgressBar total={totalDays} used={usedDays} pending={pendingDays} />
+      )}
+
       <VacationEditor
         userId={employee.id}
         year={year}
-        initialTotalDays={balance ? Number(balance.totalDays) : 0}
-        initialUsedDays={balance ? Number(balance.usedDays) : 0}
+        initialTotalDays={totalDays}
+        initialUsedDays={usedDays}
         initialNotes={balance?.notes ?? ""}
         pendingDays={pendingDays}
         adjustments={adjustments.map((a) => ({
@@ -68,6 +82,37 @@ export default async function VacationDetailPage({
           createdByName: a.createdBy.name,
         }))}
       />
+
+      <section>
+        <SectionTitle className="mb-3">Solicitudes {year}</SectionTitle>
+        {yearRequests.length === 0 ? (
+          <p className="text-sm text-slate-500">Sin solicitudes este año.</p>
+        ) : (
+          <ListSurface>
+            {yearRequests.map((r) => (
+              <div
+                key={r.id}
+                className="flex flex-wrap items-center justify-between gap-3 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium text-brand-navy">
+                    {formatDateShort(r.startDate)} – {formatDate(r.endDate)}
+                    <span className="ml-2 font-normal tabular-nums text-slate-500">
+                      {Number(r.days)} día{Number(r.days) === 1 ? "" : "s"}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}
+                    {r.employeeNotes ? ` · ${r.employeeNotes}` : ""}
+                    {r.rejectionReason ? ` · Motivo: ${r.rejectionReason}` : ""}
+                  </p>
+                </div>
+                <StatusBadge status={r.status} preset="leave" />
+              </div>
+            ))}
+          </ListSurface>
+        )}
+      </section>
     </div>
   );
 }

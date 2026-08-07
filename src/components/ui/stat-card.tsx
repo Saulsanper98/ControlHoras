@@ -1,24 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/**
- * @deprecated Prefer ListSurface / SectionBlock / TableSurface.
- * Card se mantiene solo por compatibilidad; no anidar Cards.
- */
-export function Card({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn("border-y border-brand-navy/10 py-4", className)}>
-      {children}
-    </div>
-  );
-}
-
 export function StatCard({
   label,
   value,

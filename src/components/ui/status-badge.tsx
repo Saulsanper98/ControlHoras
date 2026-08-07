@@ -1,7 +1,14 @@
 import { cn } from "@/lib/utils";
 import {
+  ACTIVE_STATUS_COLOR,
+  ACTIVE_STATUS_LABEL,
   LEAVE_STATUS_COLOR,
   LEAVE_STATUS_LABEL,
+  LEAVE_TYPE_LABEL,
+  NEWS_STATUS_COLOR,
+  NEWS_STATUS_LABEL,
+  SCHEDULE_STATUS_COLOR,
+  SCHEDULE_STATUS_LABEL,
   TIMESHEET_STATUS_COLOR,
   TIMESHEET_STATUS_LABEL,
 } from "@/lib/labels";
@@ -9,7 +16,17 @@ import {
 const PRESETS = {
   timesheet: { label: TIMESHEET_STATUS_LABEL, color: TIMESHEET_STATUS_COLOR },
   leave: { label: LEAVE_STATUS_LABEL, color: LEAVE_STATUS_COLOR },
+  leaveType: { label: LEAVE_TYPE_LABEL, color: {} as Record<string, string> },
+  active: { label: ACTIVE_STATUS_LABEL, color: ACTIVE_STATUS_COLOR },
+  news: { label: NEWS_STATUS_LABEL, color: NEWS_STATUS_COLOR },
+  schedule: { label: SCHEDULE_STATUS_LABEL, color: SCHEDULE_STATUS_COLOR },
 } as const;
+
+const LEAVE_TYPE_COLOR: Record<string, string> = {
+  VACACIONES: "bg-brand-blue/12 text-brand-blue",
+  ASUNTOS_PROPIOS: "bg-brand-navy/[0.06] text-slate-600",
+  MEDIO_DIA: "bg-amber-500/12 text-amber-800",
+};
 
 export function StatusBadge({
   status,
@@ -21,11 +38,16 @@ export function StatusBadge({
   className?: string;
 }) {
   const map = PRESETS[preset];
+  const color =
+    preset === "leaveType"
+      ? LEAVE_TYPE_COLOR[status] ?? "bg-brand-navy/[0.06] text-slate-600"
+      : map.color[status] ?? "bg-brand-navy/8 text-slate-600";
+
   return (
     <span
       className={cn(
         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
-        map.color[status] ?? "bg-brand-navy/8 text-slate-600",
+        color,
         className
       )}
     >

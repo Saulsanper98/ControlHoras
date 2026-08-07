@@ -37,12 +37,12 @@ export function SignatureModal({
     <Modal open onClose={onCancel} title={title} className="max-w-lg">
       <p className="mb-2 text-sm text-slate-500">Firma en el recuadro con el ratón o el dedo.</p>
 
-      <div className="rounded-md border border-dashed border-brand-navy/18 bg-brand-navy/[0.03]">
+      <div className="rounded-lg border border-dashed border-brand-navy/18 bg-brand-navy/[0.03]">
         <SignatureCanvas
           ref={padRef}
           penColor="#0a2240"
           canvasProps={{
-            className: "w-full min-h-40 h-[min(40vw,12rem)] sm:h-48 rounded-md touch-none",
+            className: "w-full min-h-40 h-[min(40vw,12rem)] sm:h-48 rounded-lg touch-none",
           }}
           onBegin={() => setEmptyWarning(false)}
         />
@@ -55,28 +55,21 @@ export function SignatureModal({
       )}
 
       <div className="mt-4 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={handleClear}
-          className="text-sm font-medium text-slate-500 hover:text-slate-700"
-        >
+        <button type="button" onClick={handleClear} className="btn-ghost">
           Limpiar
         </button>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6"
-          >
+          <button type="button" onClick={onCancel} className="btn-ghost">
             Cancelar
           </button>
           <button
             type="button"
             disabled={pending}
             onClick={handleConfirm}
-            className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
+            className="btn-primary"
+            aria-busy={pending}
           >
-            {pending ? "Firmando..." : "Firmar"}
+            {pending ? "Firmando…" : "Firmar"}
           </button>
         </div>
       </div>

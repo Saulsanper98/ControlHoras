@@ -33,6 +33,7 @@ export function FileDropzone({
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled || undefined}
       onClick={() => !disabled && inputRef.current?.click()}
       onKeyDown={(e) => {
         if (!disabled && (e.key === "Enter" || e.key === " ")) {

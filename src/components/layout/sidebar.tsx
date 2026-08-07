@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { employeeNav, jefaNav, type NavItem } from "@/lib/nav";
+import { employeeNav, jefaNavGroups, type NavItem } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
@@ -62,8 +62,6 @@ export function Sidebar({
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  const items = role === "JEFA" ? jefaNav : employeeNav;
-
   function badgeFor(href: string): number | undefined {
     if (role !== "JEFA") return undefined;
     if (href === "/jefa/controles") return pendingSignatures ?? undefined;
@@ -71,15 +69,39 @@ export function Sidebar({
     return undefined;
   }
 
+  if (role === "JEFA") {
+    return (
+      <nav className="flex flex-col gap-4 px-2 py-3" aria-label="Navegación principal">
+        {jefaNavGroups.map((group) => (
+          <div key={group.id} className="flex flex-col gap-1.5">
+            {group.label && (
+              <p className="px-3.5 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={isActive(item.href)}
+                onNavigate={onNavigate}
+                badge={badgeFor(item.href)}
+              />
+            ))}
+          </div>
+        ))}
+      </nav>
+    );
+  }
+
   return (
     <nav className="flex flex-col gap-1.5 px-2 py-3" aria-label="Navegación principal">
-      {items.map((item) => (
+      {employeeNav.map((item) => (
         <NavLink
           key={item.href}
           item={item}
           active={isActive(item.href)}
           onNavigate={onNavigate}
-          badge={badgeFor(item.href)}
         />
       ))}
     </nav>

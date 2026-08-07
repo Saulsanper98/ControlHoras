@@ -12,11 +12,9 @@ export function NewsCreateForm() {
   const { showToast } = useToast();
   const [pending, startTransition] = useTransition();
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
     const formData = new FormData(e.currentTarget);
     if (imageFile) formData.set("image", imageFile);
     startTransition(async () => {
@@ -25,10 +23,8 @@ export function NewsCreateForm() {
         formRef.current?.reset();
         setImageFile(null);
         showToast("Noticia guardada.");
-        setMessage({ type: "success", text: "Noticia guardada." });
       } else {
         showToast(result.error ?? "Error al publicar.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al publicar." });
       }
     });
   }
@@ -101,11 +97,6 @@ export function NewsCreateForm() {
             </button>
           </div>
         </div>
-        {message && (
-          <p className={`text-sm ${message.type === "success" ? "text-emerald-700" : "text-red-600"}`}>
-            {message.text}
-          </p>
-        )}
       </form>
     </SectionBlock>
   );

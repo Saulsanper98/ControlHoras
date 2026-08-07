@@ -2,18 +2,15 @@ import Link from "next/link";
 import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { StatCard } from "@/components/ui/card";
+import { StatCard } from "@/components/ui/stat-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { SectionTitle } from "@/components/ui/section-title";
 import { formatRelativeTime } from "@/lib/format-relative-time";
+import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
 
 function greeting(date: Date): string {
   const h = date.getHours();
@@ -102,6 +99,21 @@ export default async function DashboardPage() {
   const timesheetStatusLabel =
     TIMESHEET_STATUS_LABEL[timesheetStatus] ?? timesheetStatus;
 
+  const controlCta =
+    showPersonal && (!timeSheet || timeSheet.status === "BORRADOR")
+      ? !timeSheet
+        ? {
+            href: "/control-horario",
+            label: `Empieza tu control de ${MONTH_NAMES_ES[month - 1]}`,
+          }
+        : now.getDate() >= 25
+          ? {
+              href: "/control-horario",
+              label: `Recuerda enviar tu control de ${MONTH_NAMES_ES[month - 1]}`,
+            }
+          : null
+      : null;
+
   return (
     <div className="space-y-8">
       <Stagger>
@@ -112,26 +124,18 @@ export default async function DashboardPage() {
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <p className="text-brand-navy/55">
               {role === "JEFA"
-                ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
-                : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
+                ? `Resumen de ${MONTH_NAMES_ES[month - 1]} de ${year}`
+                : `${session.user.departmentName} · ${MONTH_NAMES_ES[month - 1]} de ${year}`}
             </p>
             {showPersonal && timeSheet && (
               <StatusBadge status={timeSheet.status} preset="timesheet" />
             )}
-            {showPersonal && (!timeSheet || timeSheet.status === "BORRADOR") && now.getDate() >= 25 && (
+            {controlCta && (
               <Link
-                href="/control-horario"
+                href={controlCta.href}
                 className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 hover:underline"
               >
-                Recuerda enviar tu control de {MONTH_NAMES[month - 1]}
-              </Link>
-            )}
-            {showPersonal && !timeSheet && (
-              <Link
-                href="/control-horario"
-                className="rounded-full bg-brand-blue/12 px-2 py-0.5 text-xs font-medium text-brand-blue hover:underline"
-              >
-                Empieza tu control de {MONTH_NAMES[month - 1]}
+                {controlCta.label}
               </Link>
             )}
           </div>
@@ -141,7 +145,7 @@ export default async function DashboardPage() {
       {showPersonal && timeSheet?.status === "RECHAZADO" && (
         <Link
           href="/control-horario"
-          className="block rounded-2xl bg-red-500/10 px-4 py-3 ring-1 ring-red-300/40 transition hover:bg-red-500/14"
+          className="block border-y border-red-300/50 bg-red-500/10 px-4 py-3 transition hover:bg-red-500/14"
         >
           <p className="text-sm font-medium text-red-800">Tu control horario fue rechazado</p>
           <p className="mt-1 text-sm text-brand-navy">
@@ -164,7 +168,7 @@ export default async function DashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
                     <p className="font-semibold text-brand-navy">
-                      {nextPending.user.name} · {MONTH_NAMES[nextPending.month - 1]} de{" "}
+                      {nextPending.user.name} · {MONTH_NAMES_ES[nextPending.month - 1]} de{" "}
                       {nextPending.year}
                     </p>
                     <p className="text-xs text-slate-500">
@@ -193,12 +197,18 @@ export default async function DashboardPage() {
               ))}
             </div>
           )}
-          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
+          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
             <StatCard
               label="Controles pendientes de firmar"
               value={String(pendientes)}
               icon={ClipboardList}
               href="/jefa/controles"
+            />
+            <StatCard
+              label="Vacaciones pendientes"
+              value={String(pendingVacations)}
+              icon={Umbrella}
+              href="/jefa/vacaciones"
             />
             <StatCard
               label="Empleados activos"
@@ -267,9 +277,9 @@ function NewsSection({
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Newspaper className="h-4 w-4 text-brand-blue" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
+          <SectionTitle className="uppercase tracking-wide text-brand-navy/45">
             Últimas noticias
-          </h2>
+          </SectionTitle>
         </div>
         <Link href={viewAllHref} className="text-sm font-medium text-brand-blue hover:underline">
           Ver todas

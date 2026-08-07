@@ -31,12 +31,10 @@ export function ScheduleUploadRow({
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [validFrom, setValidFrom] = useState(() => new Date().toISOString().slice(0, 10));
   const [showHistory, setShowHistory] = useState(false);
 
   function handleFile(file: File) {
-    setMessage(null);
     const formData = new FormData();
     formData.set("file", file);
     formData.set("validFrom", validFrom);
@@ -44,10 +42,8 @@ export function ScheduleUploadRow({
       const result = await uploadScheduleAction(departmentId, formData);
       if (result.ok) {
         showToast("Horario subido. Se conserva el historial.");
-        setMessage({ type: "success", text: "Horario subido. Se conserva el historial." });
       } else {
         showToast(result.error ?? "Error al subir el archivo.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
       }
     });
   }
@@ -60,14 +56,12 @@ export function ScheduleUploadRow({
       confirmLabel: "Eliminar",
     });
     if (!ok) return;
-    setMessage(null);
     startTransition(async () => {
       const result = await deleteScheduleAction(id);
       if (result.ok) {
         showToast("Versión eliminada.");
       } else {
         showToast(result.error ?? "Error al eliminar el horario.", "error");
-        setMessage({ type: "error", text: result.error ?? "Error al eliminar el horario." });
       }
     });
   }
@@ -175,16 +169,6 @@ export function ScheduleUploadRow({
             </li>
           ))}
         </ul>
-      )}
-
-      {message && (
-        <p
-          className={`text-sm ${
-            message.type === "success" ? "text-emerald-700" : "text-red-600"
-          }`}
-        >
-          {message.text}
-        </p>
       )}
     </div>
   );

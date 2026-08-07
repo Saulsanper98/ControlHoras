@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ScheduleUploadRow } from "@/components/jefa/schedule-upload-row";
 import { ListSurface } from "@/components/ui/list-surface";
+import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 export default async function HorariosPage() {
@@ -30,10 +31,12 @@ export default async function HorariosPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="Horarios"
-        description="Publica el cuadrante por departamento. Se conserva el historial de versiones."
-      />
+      <Stagger>
+        <PageHeader
+          title="Horarios"
+          description="Publica el cuadrante por departamento. Se conserva el historial de versiones."
+        />
+      </Stagger>
 
       {departments.length > 0 && (
         <div className="grid grid-cols-2 divide-x divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3">

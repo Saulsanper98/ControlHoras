@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, Clock, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -7,12 +6,17 @@ import { Stagger } from "@/components/ui/stagger";
 import { ListSurface } from "@/components/ui/list-surface";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionEyebrow, SectionTitle } from "@/components/ui/section-title";
+import { YearSwitcher } from "@/components/ui/year-switcher";
 import { VacationRequestsPanel } from "@/components/vacaciones/vacation-requests-panel";
 import { VacationProgressBar, VacationTimeline } from "@/components/vacaciones/vacation-progress";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
-import { formatDate, formatDateShort, toDateKey } from "@/lib/format-date";
+import {
+  formatDateShort,
+  formatDateTime,
+  toDateKey,
+  yearFromDateKey,
+} from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
-import { cn } from "@/lib/utils";
 
 export default async function VacacionesPage({
   searchParams,
@@ -82,6 +86,18 @@ export default async function VacacionesPage({
   const remaining = balance ? totalDays - usedDays - pendingDays : null;
   const totalHours = adjustments.reduce((sum, a) => sum + Number(a.hours), 0);
 
+  const timelineRequests = vacationRequests
+    .filter(
+      (r) =>
+        yearFromDateKey(r.startDate) === year || yearFromDateKey(r.endDate) === year
+    )
+    .map((r) => ({
+      startDate: toDateKey(r.startDate),
+      endDate: toDateKey(r.endDate),
+      status: r.status,
+      days: Number(r.days),
+    }));
+
   return (
     <div className="space-y-8">
       <Stagger>
@@ -89,52 +105,45 @@ export default async function VacacionesPage({
           title="Vacaciones y horas"
           description="Consulta tu saldo, solicita ausencias y revisa tu bolsa de horas."
         >
-          <nav className="flex flex-wrap gap-1" aria-label="Seleccionar año">
-            {years.map((y) => (
-              <Link
-                key={y}
-                href={y === currentYear ? "/vacaciones" : `/vacaciones?year=${y}`}
-                className={cn(
-                  "rounded-lg px-3 py-1.5 text-sm font-medium transition",
-                  y === year
-                    ? "bg-brand-blue text-white"
-                    : "text-slate-600 hover:bg-brand-navy/6"
-                )}
-                aria-current={y === year ? "page" : undefined}
-              >
-                {y}
-              </Link>
-            ))}
-          </nav>
+          <YearSwitcher
+            years={years}
+            year={year}
+            hrefForYear={(y) => (y === currentYear ? "/vacaciones" : `/vacaciones?year=${y}`)}
+          />
         </PageHeader>
       </Stagger>
 
       <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-        <div className="flex items-center gap-4 py-5 sm:pr-5">
+        <div className="flex items-center gap-3 py-3.5 sm:pr-5">
           <Umbrella className="h-5 w-5 shrink-0 text-brand-blue" />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-slate-500">Vacaciones disponibles</p>
-            <p className="font-display text-2xl font-semibold tabular-nums text-brand-navy">
+            <p className="font-display text-xl font-semibold tabular-nums text-brand-navy">
               {remaining !== null ? `${remaining} días` : "Sin datos"}
             </p>
             {totalDays > 0 && (
-              <p className="mt-1 text-xs tabular-nums text-slate-500">
+              <p className="mt-0.5 text-xs tabular-nums text-slate-500">
                 Total {totalDays} · Usados {usedDays}
                 {pendingDays > 0 ? ` · En trámite ${pendingDays}` : ""}
               </p>
             )}
             {totalDays > 0 && (
-              <div className="mt-3">
-                <VacationProgressBar total={totalDays} used={usedDays} pending={pendingDays} />
+              <div className="mt-2">
+                <VacationProgressBar
+                  total={totalDays}
+                  used={usedDays}
+                  pending={pendingDays}
+                  compact
+                />
               </div>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4 py-5 sm:pl-5">
+        <div className="flex items-center gap-3 py-3.5 sm:pl-5">
           <Clock className="h-5 w-5 shrink-0 text-brand-blue" />
           <div>
             <p className="text-sm text-slate-500">Bolsa de horas</p>
-            <p className="font-display text-2xl font-semibold tabular-nums text-brand-navy">
+            <p className="font-display text-xl font-semibold tabular-nums text-brand-navy">
               {totalHours.toFixed(1)} h
             </p>
             <p className="text-xs text-slate-500">
@@ -146,17 +155,11 @@ export default async function VacacionesPage({
         </div>
       </div>
 
-      <section className="border-y border-[color:var(--surface-divider)] py-4">
-        <VacationTimeline
-          year={year}
-          requests={vacationRequests.map((r) => ({
-            startDate: toDateKey(r.startDate),
-            endDate: toDateKey(r.endDate),
-            status: r.status,
-            days: Number(r.days),
-          }))}
-        />
-      </section>
+      {timelineRequests.length > 0 && (
+        <section className="border-y border-[color:var(--surface-divider)] py-4">
+          <VacationTimeline year={year} requests={timelineRequests} />
+        </section>
+      )}
 
       {balance?.notes && (
         <section className="border-y border-[color:var(--surface-divider)] py-4">
@@ -235,7 +238,7 @@ export default async function VacacionesPage({
                   <span className="ml-2 text-sm text-slate-600">{a.reason}</span>
                 </div>
                 <span className="shrink-0 text-xs text-slate-500">
-                  {formatDate(a.createdAt)} · {a.createdBy.name}
+                  {formatDateTime(a.createdAt)} · {a.createdBy.name}
                 </span>
               </div>
             ))}

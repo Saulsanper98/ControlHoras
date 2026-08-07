@@ -22,7 +22,6 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useDensity } from "@/lib/density";
-import { TIMESHEET_STATUS_DESCRIPTION } from "@/lib/labels";
 import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
@@ -110,7 +109,7 @@ export function TimeSheetForm({
   });
   const [notes, setNotes] = useState(initialNotes);
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [pendingAction, setPendingAction] = useState<"save" | "sign" | null>(null);
   const [showSignPad, setShowSignPad] = useState(false);
   const [bulkShift, setBulkShift] = useState<keyof typeof SHIFTS>("M");
   const [weekdaysOnly, setWeekdaysOnly] = useState(true);
@@ -163,7 +162,6 @@ export function TimeSheetForm({
         message: "¿Copiar las horas del mes anterior? Se sobrescribirán los días que coincidan.",
       });
       if (!ok) return;
-      setMessage(null);
       startTransition(async () => {
         const result = await copyFromPreviousMonthAction(month, year);
         if (result.ok && result.entries) {
@@ -177,7 +175,7 @@ export function TimeSheetForm({
           showToast("Horas copiadas del mes anterior.");
           router.refresh();
         } else {
-          setMessage({ type: "error", text: result.error ?? "Error al copiar." });
+          showToast(result.error ?? "Error al copiar.", "error");
         }
       });
     })();
@@ -215,21 +213,24 @@ export function TimeSheetForm({
   }
 
   function handleSave() {
-    setMessage(null);
+    setPendingAction("save");
     startTransition(async () => {
-      const result = await saveDraftAction(month, year, entries, notes);
-      if (result.ok) {
-        initialSnapshot.current = JSON.stringify({ entries, notes });
-        showToast("Borrador guardado.");
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al guardar." });
+      try {
+        const result = await saveDraftAction(month, year, entries, notes);
+        if (result.ok) {
+          initialSnapshot.current = JSON.stringify({ entries, notes });
+          showToast("Borrador guardado.");
+          router.refresh();
+        } else {
+          showToast(result.error ?? "Error al guardar.", "error");
+        }
+      } finally {
+        setPendingAction(null);
       }
     });
   }
 
   function handleUpload(formData: FormData) {
-    setMessage(null);
     setUploadPending(true);
     startTransition(async () => {
       try {
@@ -238,7 +239,7 @@ export function TimeSheetForm({
           showToast("Archivo adjuntado.");
           router.refresh();
         } else {
-          setMessage({ type: "error", text: result.error ?? "Error al subir el archivo." });
+          showToast(result.error ?? "Error al subir el archivo.", "error");
         }
       } finally {
         setUploadPending(false);
@@ -281,29 +282,32 @@ export function TimeSheetForm({
         confirmLabel: "Eliminar",
       });
       if (!ok) return;
-      setMessage(null);
       startTransition(async () => {
         const result = await deleteAttachmentAction(id);
         if (result.ok) {
           showToast("Adjunto eliminado.");
           router.refresh();
         } else {
-          setMessage({ type: "error", text: result.error ?? "Error al eliminar el adjunto." });
+          showToast(result.error ?? "Error al eliminar el adjunto.", "error");
         }
       });
     })();
   }
 
   function handleSign(signatureDataUrl: string) {
-    setMessage(null);
+    setPendingAction("sign");
     startTransition(async () => {
-      const result = await signAsEmployeeAction(month, year, entries, notes, signatureDataUrl);
-      if (result.ok) {
-        setShowSignPad(false);
-        showToast("Parte firmado correctamente");
-        router.refresh();
-      } else {
-        setMessage({ type: "error", text: result.error ?? "Error al firmar." });
+      try {
+        const result = await signAsEmployeeAction(month, year, entries, notes, signatureDataUrl);
+        if (result.ok) {
+          setShowSignPad(false);
+          showToast("Parte firmado correctamente");
+          router.refresh();
+        } else {
+          showToast(result.error ?? "Error al firmar.", "error");
+        }
+      } finally {
+        setPendingAction(null);
       }
     });
   }
@@ -335,8 +339,6 @@ export function TimeSheetForm({
     value: key,
     label: SHIFTS[key].label,
   }));
-
-  const statusDescription = TIMESHEET_STATUS_DESCRIPTION[status] ?? status;
 
   return (
     <div className="space-y-4">
@@ -382,7 +384,7 @@ export function TimeSheetForm({
                   type="button"
                   onClick={() => void handlePdfDownload()}
                   disabled={pdfLoading}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-60"
+                  className="btn-ghost disabled:opacity-60"
                 >
                   {pdfLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -392,12 +394,7 @@ export function TimeSheetForm({
                   {pdfLoading ? "Generando…" : "PDF"}
                 </button>
               )}
-              <div className="flex flex-col items-end gap-0.5">
-                <StatusBadge status={status} />
-                <span className="max-w-[14rem] text-right text-[10px] leading-tight text-slate-500">
-                  {statusDescription}
-                </span>
-              </div>
+              <StatusBadge status={status} />
               {isDirty && editable && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-800">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
@@ -465,7 +462,7 @@ export function TimeSheetForm({
               <button
                 type="button"
                 onClick={applyBulkShift}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-blue/10 px-3 py-2 text-sm font-medium text-brand-blue transition hover:bg-brand-blue/18"
+                className="btn-secondary"
               >
                 <Wand2 className="h-4 w-4" />
                 Aplicar
@@ -474,7 +471,7 @@ export function TimeSheetForm({
                 type="button"
                 onClick={handleCopyPreviousMonth}
                 disabled={pending}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6 disabled:opacity-50"
+                className="btn-ghost disabled:opacity-50"
               >
                 <Copy className="h-4 w-4" />
                 Copiar mes anterior
@@ -499,7 +496,11 @@ export function TimeSheetForm({
                 <span className="h-2 w-2 rounded-full ring-2 ring-brand-blue/40" /> Hoy
               </span>
             )}
-            <span className="ml-auto flex gap-1">
+            <span
+              role="group"
+              aria-label="Filtrar días"
+              className="ml-auto flex gap-1"
+            >
               {(["all", "filled", "empty"] as const).map((f) => (
                 <button
                   key={f}
@@ -655,11 +656,35 @@ export function TimeSheetForm({
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-0 py-2 backdrop-blur-sm md:hidden">
-            <p className="text-center text-xs tabular-nums text-brand-navy">
-              <strong>{totals.totalHours.toFixed(1)} h</strong> totales · {summary.workedDays} días
-              trabajados
-            </p>
+          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-3 py-2 backdrop-blur-sm md:hidden">
+            <div className="flex items-center justify-between gap-2">
+              <p className="min-w-0 text-xs tabular-nums text-brand-navy">
+                <strong>{totals.totalHours.toFixed(1)} h</strong>
+                <span className="text-slate-500"> · {summary.workedDays} días</span>
+              </p>
+              <div className="flex shrink-0 gap-2">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={pending}
+                  className="btn-secondary"
+                >
+                  <Save className="h-4 w-4" />
+                  {pendingAction === "save" ? "Guardando…" : "Guardar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSignPad(true)}
+                  disabled={pending}
+                  className="btn-primary"
+                  title="Firmar y enviar el parte"
+                  aria-label="Firmar y enviar"
+                >
+                  <PenLine className="h-4 w-4" />
+                  {pendingAction === "sign" ? "Firmando…" : "Firmar"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -683,7 +708,9 @@ export function TimeSheetForm({
             Adjuntos (PDF/Excel)
           </p>
 
-          {attachments.length > 0 && (
+          {attachments.length === 0 ? (
+            <p className="mb-3 text-sm text-slate-500">Sin adjuntos</p>
+          ) : (
             <ul className="mb-3 divide-y divide-[color:var(--surface-divider)]">
               {attachments.map((a) => (
                 <li key={a.id} className="flex items-center justify-between gap-2 py-2 first:pt-0">
@@ -700,7 +727,7 @@ export function TimeSheetForm({
                       type="button"
                       onClick={() => handleDeleteAttachment(a.id)}
                       aria-label="Eliminar adjunto"
-                      className="shrink-0 rounded p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-600"
+                      className="hit-area shrink-0 inline-flex items-center justify-center rounded p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -723,7 +750,7 @@ export function TimeSheetForm({
                 <button
                   type="submit"
                   disabled={pending || uploadPending}
-                  className="rounded-lg bg-brand-blue/10 px-3 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/18 disabled:opacity-50"
+                  className="btn-secondary disabled:opacity-50"
                 >
                   {uploadPending ? "Subiendo…" : "Subir"}
                 </button>
@@ -780,18 +807,6 @@ export function TimeSheetForm({
         )}
       </div>
 
-      {message && (
-        <p
-          className={`rounded-lg px-3 py-2 text-sm ${
-            message.type === "success"
-              ? "bg-emerald-500/12 text-emerald-800"
-              : "bg-red-500/12 text-red-700"
-          }`}
-        >
-          {message.text}
-        </p>
-      )}
-
       {status === "RECHAZADO" && rejectionReason && (
         <div className="rounded-lg border border-red-200/80 bg-red-500/10 px-4 py-3 text-sm text-red-800">
           <p className="font-medium">Motivo del rechazo</p>
@@ -800,20 +815,25 @@ export function TimeSheetForm({
       )}
 
       {editable && (
-        <div className="flex flex-wrap items-center gap-3">
-          <button type="button" onClick={handleSave} disabled={pending} className="btn-primary">
+        <div className="hidden flex-wrap items-center gap-3 md:flex">
+          <button type="button" onClick={handleSave} disabled={pending} className="btn-secondary">
             <Save className="h-4 w-4" />
-            Guardar borrador
+            {pendingAction === "save" ? "Guardando…" : "Guardar borrador"}
           </button>
-          <button
-            type="button"
-            onClick={() => setShowSignPad(true)}
-            disabled={pending}
-            className="btn-primary"
-          >
-            <PenLine className="h-4 w-4" />
-            Firmar y enviar
-          </button>
+          <div className="flex flex-col gap-0.5">
+            <button
+              type="button"
+              onClick={() => setShowSignPad(true)}
+              disabled={pending}
+              className="btn-primary"
+              title="Firmar y enviar el parte"
+              aria-label="Firmar y enviar"
+            >
+              <PenLine className="h-4 w-4" />
+              {pendingAction === "sign" ? "Firmando…" : "Firmar y enviar"}
+            </button>
+            <p className="text-[11px] text-slate-500">La firma guarda y envía el parte</p>
+          </div>
         </div>
       )}
 

@@ -1,21 +1,18 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { monthFromDateKey, yearFromDateKey } from "@/lib/format-date";
-
-const MONTH_SHORT = [
-  "Ene", "Feb", "Mar", "Abr", "May", "Jun",
-  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
-];
+import { MONTH_SHORT_ES, monthFromDateKey, yearFromDateKey } from "@/lib/format-date";
 
 export function VacationProgressBar({
   total,
   used,
   pending,
+  compact,
 }: {
   total: number;
   used: number;
   pending: number;
+  compact?: boolean;
 }) {
   if (total <= 0) return null;
   const usedPct = Math.min(100, (used / total) * 100);
@@ -23,8 +20,13 @@ export function VacationProgressBar({
   const remaining = Math.max(0, total - used - pending);
 
   return (
-    <div className="space-y-2">
-      <div className="flex h-2.5 overflow-hidden rounded-full bg-brand-navy/8">
+    <div className={cn("space-y-2", compact && "space-y-1")}>
+      <div
+        className={cn(
+          "flex overflow-hidden rounded-full bg-brand-navy/8",
+          compact ? "h-1.5" : "h-2.5"
+        )}
+      >
         <div
           className="bg-brand-blue transition-all duration-500"
           style={{ width: `${usedPct}%` }}
@@ -36,20 +38,22 @@ export function VacationProgressBar({
           title={`${pending} días pendientes`}
         />
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-brand-blue" />
-          Usados: <strong className="tabular-nums text-brand-navy">{used}</strong>
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-amber-400" />
-          Pendientes: <strong className="tabular-nums text-brand-navy">{pending}</strong>
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-brand-navy/15" />
-          Disponibles: <strong className="tabular-nums text-brand-navy">{remaining}</strong>
-        </span>
-      </div>
+      {!compact && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-brand-blue" />
+            Usados: <strong className="tabular-nums text-brand-navy">{used}</strong>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-amber-400" />
+            Pendientes: <strong className="tabular-nums text-brand-navy">{pending}</strong>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-brand-navy/15" />
+            Disponibles: <strong className="tabular-nums text-brand-navy">{remaining}</strong>
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -102,12 +106,12 @@ export function VacationTimeline({
                   !hasApproved && hasPending && "bg-amber-500/20 text-amber-800",
                   count === 0 && "bg-brand-navy/5 text-slate-400"
                 )}
-                title={`${MONTH_SHORT[i]} · ${count} solicitud${count === 1 ? "" : "es"}`}
+                title={`${MONTH_SHORT_ES[i]} · ${count} solicitud${count === 1 ? "" : "es"}`}
               >
                 {count || "·"}
               </div>
               <span className="text-[10px] font-medium text-slate-500">
-                {MONTH_SHORT[i]}
+                {MONTH_SHORT_ES[i]}
               </span>
             </div>
           );

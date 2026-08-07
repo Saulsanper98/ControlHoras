@@ -6,7 +6,10 @@ import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { formatDate } from "@/lib/format-date";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
+import { StatusBadge } from "@/components/ui/status-badge";
+import Link from "next/link";
 
 export function NewsItem({
   id,
@@ -14,6 +17,7 @@ export function NewsItem({
   body,
   pinned,
   publishedAt,
+  scheduledAt,
   imagePath,
   status,
 }: {
@@ -22,6 +26,7 @@ export function NewsItem({
   body: string;
   pinned: boolean;
   publishedAt: string;
+  scheduledAt?: string | null;
   imagePath: string | null;
   status: string;
 }) {
@@ -34,10 +39,8 @@ export function NewsItem({
   const [draftValue, setDraftValue] = useState(status === "BORRADOR");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
 
   function handleSave() {
-    setMessage(null);
     const formData = new FormData();
     formData.set("title", titleValue);
     formData.set("body", bodyValue);
@@ -51,7 +54,6 @@ export function NewsItem({
         setImageFile(null);
         showToast("Noticia actualizada.");
       } else {
-        setMessage(result.error ?? "Error al guardar.");
         showToast(result.error ?? "Error al guardar.", "error");
       }
     });
@@ -65,13 +67,11 @@ export function NewsItem({
       confirmLabel: "Eliminar",
     });
     if (!ok) return;
-    setMessage(null);
     startTransition(async () => {
       const result = await deleteNewsAction(id);
       if (result.ok) {
         showToast("Noticia eliminada.");
       } else {
-        setMessage(result.error ?? "Error al eliminar la noticia.");
         showToast(result.error ?? "Error al eliminar la noticia.", "error");
       }
     });
@@ -146,7 +146,6 @@ export function NewsItem({
             </button>
           </div>
         </div>
-        {message && <p className="text-sm text-red-600">{message}</p>}
       </div>
     );
   }
@@ -174,6 +173,11 @@ export function NewsItem({
           )}
           <p className="mt-2 text-xs text-slate-500">
             {formatDate(publishedAt)}
+            {scheduledAt && status === "BORRADOR" && (
+              <span className="ml-2 text-amber-700">
+                · Programada {formatDate(scheduledAt)}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex shrink-0 gap-1">
@@ -196,7 +200,6 @@ export function NewsItem({
           </button>
         </div>
       </div>
-      {message && <p className="mt-2 text-sm text-red-600">{message}</p>}
     </div>
   );
 }

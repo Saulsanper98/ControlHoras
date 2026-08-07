@@ -17,6 +17,7 @@ export function FieldSelect({
   id,
   size = "md",
   variant = "default",
+  autoFocus,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -27,6 +28,8 @@ export function FieldSelect({
   id?: string;
   size?: "sm" | "md";
   variant?: "default" | "plain";
+  /** Marca el trigger para foco inicial del Modal (`[data-autofocus]`). */
+  autoFocus?: boolean;
 }) {
   const autoId = useId();
   const triggerId = id ?? autoId;
@@ -168,6 +171,7 @@ export function FieldSelect({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
+        data-autofocus={autoFocus || undefined}
         onClick={() => !disabled && setOpen((v) => !v)}
         onKeyDown={(e) => {
           if (disabled) return;

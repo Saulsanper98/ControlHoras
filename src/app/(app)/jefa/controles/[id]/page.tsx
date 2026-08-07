@@ -8,6 +8,8 @@ import { BackLink } from "@/components/ui/back-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { formatDateTime } from "@/lib/format-date";
+import { sumDayHours } from "@/lib/timesheet-calc";
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -39,6 +41,29 @@ export default async function ControlDetailPage({
   const employeeSignature = timeSheet.signatures.find((s) => s.signerRole === "EMPLEADO");
   const responsableSignature = timeSheet.signatures.find((s) => s.signerRole === "RESPONSABLE");
 
+  const gridEntries = timeSheet.entries.map((e) => ({
+    day: e.day,
+    checkIn: e.checkIn,
+    checkOut: e.checkOut,
+    totalHours: Number(e.totalHours),
+    normalHours: Number(e.normalHours),
+    overtimeHours: Number(e.overtimeHours),
+    nightHours: Number(e.nightHours),
+    notes: e.notes,
+  }));
+
+  const monthTotals =
+    gridEntries.length > 0
+      ? sumDayHours(
+          gridEntries.map((e) => ({
+            totalHours: e.totalHours,
+            normalHours: e.normalHours,
+            overtimeHours: e.overtimeHours,
+            nightHours: e.nightHours,
+          }))
+        )
+      : null;
+
   return (
     <div className="space-y-6">
       <div>
@@ -62,20 +87,40 @@ export default async function ControlDetailPage({
         </PageHeader>
       </div>
 
+      {monthTotals && (
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Total</p>
+            <p className="text-lg font-semibold tabular-nums text-brand-navy">
+              {monthTotals.totalHours.toFixed(1)} h
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Normales</p>
+            <p className="text-lg font-semibold tabular-nums text-brand-navy">
+              {monthTotals.normalHours.toFixed(1)} h
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Extra</p>
+            <p className="text-lg font-semibold tabular-nums text-brand-navy">
+              {monthTotals.overtimeHours.toFixed(1)} h
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">Nocturnas</p>
+            <p className="text-lg font-semibold tabular-nums text-brand-navy">
+              {monthTotals.nightHours.toFixed(1)} h
+            </p>
+          </div>
+        </div>
+      )}
+
       <ScrollShadow>
         <TimeSheetGrid
           month={timeSheet.month}
           year={timeSheet.year}
-          entries={timeSheet.entries.map((e) => ({
-            day: e.day,
-            checkIn: e.checkIn,
-            checkOut: e.checkOut,
-            totalHours: Number(e.totalHours),
-            normalHours: Number(e.normalHours),
-            overtimeHours: Number(e.overtimeHours),
-            nightHours: Number(e.nightHours),
-            notes: e.notes,
-          }))}
+          entries={gridEntries}
         />
       </ScrollShadow>
 
@@ -87,7 +132,7 @@ export default async function ControlDetailPage({
       )}
 
       {timeSheet.rejectionReason && (
-        <p className="border-y border-red-200/80 bg-red-50/50 py-3 text-sm text-red-800">
+        <p className="border-y border-red-200/80 bg-red-500/10 py-3 text-sm text-red-800">
           <span className="font-medium">Motivo del rechazo: </span>
           {timeSheet.rejectionReason}
         </p>
@@ -116,7 +161,14 @@ export default async function ControlDetailPage({
         <div className="flex flex-wrap gap-6">
           {employeeSignature && (
             <div>
-              <p className="mb-1 text-xs text-slate-500">Firma del empleado</p>
+              <p className="mb-1 text-xs text-slate-500">
+                Firma del empleado
+                {employeeSignature.signedAt && (
+                  <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                    · {formatDateTime(employeeSignature.signedAt)}
+                  </span>
+                )}
+              </p>
               <img
                 src={`/api/uploads/${employeeSignature.imagePath}`}
                 alt="Firma del empleado"
@@ -126,7 +178,14 @@ export default async function ControlDetailPage({
           )}
           {responsableSignature && (
             <div>
-              <p className="mb-1 text-xs text-slate-500">Firma de la responsable</p>
+              <p className="mb-1 text-xs text-slate-500">
+                Firma de la responsable
+                {responsableSignature.signedAt && (
+                  <span className="ml-1 text-slate-400" suppressHydrationWarning>
+                    · {formatDateTime(responsableSignature.signedAt)}
+                  </span>
+                )}
+              </p>
               <img
                 src={`/api/uploads/${responsableSignature.imagePath}`}
                 alt="Firma de la responsable"

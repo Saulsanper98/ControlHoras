@@ -99,7 +99,7 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   color: #fff;
-  transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease, box-shadow 0.15s ease;
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--color-brand-blue-dark);
@@ -110,6 +110,10 @@ body {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.28);
 }
 
 .btn-secondary {
@@ -124,13 +128,17 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-brand-navy);
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 .btn-secondary:hover:not(:disabled) {
   background: rgba(10, 34, 64, 0.08);
 }
 .btn-secondary:active:not(:disabled) {
   transform: scale(0.98);
+}
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.22);
 }
 
 .btn-ghost {
@@ -143,7 +151,7 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   color: #475569;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 .btn-ghost:hover:not(:disabled) {
   background: rgba(10, 34, 64, 0.06);
@@ -151,6 +159,10 @@ body {
 }
 .btn-ghost:active:not(:disabled) {
   transform: scale(0.98);
+}
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.22);
 }
 
 .btn-danger {
@@ -164,13 +176,17 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   color: #fff;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 .btn-danger:hover:not(:disabled) {
   background: #b91c1c;
 }
 .btn-danger:active:not(:disabled) {
   transform: scale(0.98);
+}
+.btn-danger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.28);
 }
 
 .hit-area {

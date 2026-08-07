@@ -126,7 +126,7 @@ export function ChangePasswordForm() {
         type="submit"
         disabled={pending}
         aria-busy={pending}
-        className="w-full rounded-md bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-navy transition hover:bg-brand-yellow/90 disabled:opacity-60"
+        className="btn-primary w-full disabled:opacity-60"
       >
         {pending ? "Guardando..." : "Cambiar contraseña"}
       </button>
