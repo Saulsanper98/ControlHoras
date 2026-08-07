@@ -12,6 +12,7 @@ import {
   deleteHourAdjustmentAction,
   saveVacationBalanceAction,
 } from "@/app/(app)/jefa/vacaciones/actions";
+import { Alert } from "@/components/ui/alert";
 import { InlineEmpty } from "@/components/ui/inline-empty";
 
 type Adjustment = { id: string; hours: number; reason: string; createdAt: string; createdByName: string };
@@ -61,6 +62,10 @@ export function VacationEditor({
       showToast("Indica un número de horas distinto de cero.", "error");
       return;
     }
+    if (!reason.trim()) {
+      showToast("Indica el motivo del ajuste.", "error");
+      return;
+    }
     startTransition(async () => {
       const result = await addHourAdjustmentAction(userId, parsed, reason, year);
       if (result.ok) {
@@ -95,6 +100,8 @@ export function VacationEditor({
 
   const totalHours = adjustments.reduce((sum, a) => sum + a.hours, 0);
   const remaining = totalDays - usedDays - pendingDays;
+  const displayRemaining = Math.max(0, remaining);
+  const negativeRemaining = remaining < 0;
 
   return (
     <div className="space-y-6">
@@ -153,13 +160,19 @@ export function VacationEditor({
         </div>
         <p className="mt-2 text-sm text-slate-500">
           Restantes:{" "}
-          <span className="font-medium text-brand-navy">{remaining.toFixed(1)} días</span>
+          <span className="font-medium text-brand-navy">{displayRemaining.toFixed(1)} días</span>
           {pendingDays > 0 && (
             <span className="ml-2 text-amber-700">
               (incluye {pendingDays} en trámite)
             </span>
           )}
         </p>
+        {negativeRemaining && (
+          <Alert variant="warning" className="mt-3 rounded-lg border" title="Saldo insuficiente">
+            Los días usados y en trámite superan el total asignado (
+            {remaining.toFixed(1)} días por debajo de cero).
+          </Alert>
+        )}
       </SectionBlock>
 
       <section>

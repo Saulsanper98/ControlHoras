@@ -63,6 +63,20 @@ export function NewsItem({
     status === "PUBLICADA" &&
     (!scheduledAt || new Date(scheduledAt).getTime() <= Date.now());
 
+  function resetEditForm() {
+    setTitleValue(title);
+    setBodyValue(body);
+    setPinnedValue(pinned);
+    setDraftValue(status === "BORRADOR");
+    setScheduledValue(toLocalDatetimeInput(scheduledAt));
+    setImageFile(null);
+  }
+
+  function cancelEdit() {
+    resetEditForm();
+    setEditing(false);
+  }
+
   function handleSave() {
     const formData = new FormData();
     formData.set("title", titleValue);
@@ -148,8 +162,9 @@ export function NewsItem({
             type="datetime-local"
             value={scheduledValue}
             onChange={(e) => setScheduledValue(e.target.value)}
-            className="field-control w-full px-2 py-2 text-sm"
+            className="field-control w-full px-3 py-2 text-sm"
           />
+          <p className="mt-1 text-xs text-slate-500">Hora local Canarias</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-600">
@@ -169,7 +184,7 @@ export function NewsItem({
             Guardar como borrador
           </label>
           <div className="ml-auto flex gap-2">
-            <button type="button" onClick={() => setEditing(false)} className="btn-ghost">
+            <button type="button" onClick={cancelEdit} className="btn-ghost">
               <X className="h-4 w-4" />
               Cancelar
             </button>

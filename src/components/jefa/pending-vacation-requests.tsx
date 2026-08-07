@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, XCircle } from "lucide-react";
@@ -17,6 +18,7 @@ import { formatDateShort } from "@/lib/format-date";
 
 type PendingRequest = {
   id: string;
+  userId: string;
   userName: string;
   departmentName: string | null;
   startDate: string;
@@ -26,10 +28,17 @@ type PendingRequest = {
   leaveType?: string;
 };
 
-export function PendingVacationRequests({ requests }: { requests: PendingRequest[] }) {
+export function PendingVacationRequests({
+  requests,
+  year,
+}: {
+  requests: PendingRequest[];
+  year: number;
+}) {
   const router = useRouter();
   const { showToast } = useToast();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<"approve" | "reject" | null>(null);
   const [, startTransition] = useTransition();
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
@@ -43,9 +52,11 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
 
   function handleApprove(id: string, force = false) {
     setPendingId(id);
+    setPendingAction("approve");
     startTransition(async () => {
       const result = await approveVacationRequestAction(id, force);
       setPendingId(null);
+      setPendingAction(null);
       if (result.ok) {
         setOverlapPrompt(null);
         showToast("Solicitud aprobada.");
@@ -63,9 +74,11 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
   function handleReject() {
     if (!rejectId) return;
     setPendingId(rejectId);
+    setPendingAction("reject");
     startTransition(async () => {
       const result = await rejectVacationRequestAction(rejectId, reason);
       setPendingId(null);
+      setPendingAction(null);
       if (result.ok) {
         setRejectId(null);
         setReason("");
@@ -85,6 +98,8 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
       <ListSurface>
         {requests.map((r) => {
           const busy = pendingId === r.id;
+          const approving = busy && pendingAction === "approve";
+          const rejecting = busy && pendingAction === "reject";
           return (
             <div
               key={r.id}
@@ -92,7 +107,12 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
             >
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium text-brand-navy">{r.userName}</p>
+                  <Link
+                    href={`/jefa/vacaciones/${r.userId}?year=${year}`}
+                    className="font-medium text-brand-navy hover:text-brand-blue hover:underline"
+                  >
+                    {r.userName}
+                  </Link>
                   <StatusBadge status={r.leaveType ?? "VACACIONES"} preset="leaveType" />
                 </div>
                 <p className="text-sm text-slate-500">
@@ -112,7 +132,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   className="btn-success"
                 >
                   <Check className="h-4 w-4" />
-                  {busy ? "…" : "Aprobar"}
+                  {approving ? "Aprobando…" : "Aprobar"}
                 </button>
                 <button
                   type="button"
@@ -121,7 +141,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   className="btn-danger"
                 >
                   <XCircle className="h-4 w-4" />
-                  Rechazar
+                  {rejecting ? "Rechazando…" : "Rechazar"}
                 </button>
               </div>
             </div>

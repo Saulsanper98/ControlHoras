@@ -22,7 +22,9 @@ export default async function JefaVacacionesPage({
   if (!session) redirect("/");
 
   const params = await searchParams;
-  const currentYear = new Date().getFullYear();
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
   const year = Number(params.year) || currentYear;
 
   const [departments, employees, balances, adjustmentSums, pendingRequests, balanceYears] =
@@ -168,7 +170,10 @@ export default async function JefaVacacionesPage({
                 href: y === currentYear ? "/jefa/vacaciones" : `/jefa/vacaciones?year=${y}`,
               }))}
             />
-            <Link href="/jefa/vacaciones/calendario" className="btn-secondary">
+            <Link
+              href={`/jefa/vacaciones/calendario?year=${year}&month=${currentMonth}`}
+              className="btn-secondary"
+            >
               <CalendarDays className="h-4 w-4" />
               Calendario del equipo
             </Link>
@@ -196,8 +201,10 @@ export default async function JefaVacacionesPage({
       )}
 
       <PendingVacationRequests
+        year={year}
         requests={pendingThisYear.map((r) => ({
           id: r.id,
+          userId: r.userId,
           userName: r.user.name,
           departmentName: r.user.department?.name ?? null,
           startDate: toDateKey(r.startDate),

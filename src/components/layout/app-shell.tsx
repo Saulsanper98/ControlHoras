@@ -11,6 +11,7 @@ import { NotificationPanel } from "@/components/layout/notification-panel";
 import { PageTransition } from "@/components/ui/page-transition";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { useDensity } from "@/lib/density";
+import { mobileTitleForPath } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 
 function atmosphereForPath(pathname: string) {
@@ -64,6 +65,7 @@ export function AppShell({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const showDensityToggle = pathname.includes("/control-horario");
+  const mobileTitle = mobileTitleForPath(pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -197,7 +199,7 @@ export function AppShell({
           />
         </div>
 
-        <header className="glass-panel-header relative z-30 flex items-center gap-3 px-4 py-3">
+        <header className="glass-panel-header sticky top-0 z-30 flex items-center gap-3 px-4 py-3">
           <button
             ref={menuButtonRef}
             type="button"
@@ -209,13 +211,14 @@ export function AppShell({
           >
             <Menu className="h-6 w-6" />
           </button>
+          <span className="truncate text-sm font-medium text-brand-navy md:hidden">{mobileTitle}</span>
           <CommandPalette role={role} />
           <div className="flex-1" />
           {showDensityToggle && (
             <button
               type="button"
               onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
-              className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
+              className="hit-area inline-flex items-center gap-1.5 rounded-lg px-2 text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
               title="Densidad de tablas del control horario (solo esa pantalla)"
               aria-label={
                 density === "compact"
@@ -228,6 +231,9 @@ export function AppShell({
               ) : (
                 <Minimize2 className="h-4 w-4" />
               )}
+              <span className="sr-only md:not-sr-only md:inline text-xs font-medium">
+                {density === "compact" ? "Compacto" : "Cómodo"}
+              </span>
             </button>
           )}
           <NotificationPanel

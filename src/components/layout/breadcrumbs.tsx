@@ -46,10 +46,10 @@ export function Breadcrumbs({ tail }: { tail?: string }) {
       <Link href="/" aria-label="Inicio" className="inline-flex items-center hover:text-brand-blue">
         <Home className="h-3.5 w-3.5" />
       </Link>
-      {crumbs.slice(1).map((c, i) => (
+      {crumbs.slice(1).map((c, i, arr) => (
         <span key={c.href} className="inline-flex items-center gap-1">
           <ChevronRight className="h-3 w-3 text-slate-400" />
-          {i === crumbs.length - 2 || tail ? (
+          {i === arr.length - 1 ? (
             <span className="font-medium text-brand-navy">{c.label}</span>
           ) : (
             <Link href={c.href} className="hover:text-brand-blue">

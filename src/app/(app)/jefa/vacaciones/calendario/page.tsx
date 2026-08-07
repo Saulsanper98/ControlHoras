@@ -13,6 +13,7 @@ import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { MONTH_NAMES_ES, dateKeyToUtcNoon, toDateKey } from "@/lib/format-date";
 import { daysInMonth } from "@/lib/timesheet-calc";
+import { CalendarDayCell } from "@/components/jefa/calendar-day-cell";
 import { LEAVE_TYPE_COLOR, LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +58,7 @@ export default async function VacationCalendarPage({
     }),
   ]);
 
-  type DayPerson = { name: string; dept: string; leaveType: string };
+  type DayPerson = { name: string; dept: string; leaveType: string; chipClassName: string };
 
   function chipDisplayName(fullName: string): string {
     const parts = fullName.trim().split(/\s+/);
@@ -77,6 +78,7 @@ export default async function VacationCalendarPage({
         name: chipDisplayName(r.user.name),
         dept: r.user.department?.name ?? "—",
         leaveType: r.leaveType,
+        chipClassName: chipClass(r.leaveType),
       });
       peopleByDay.set(d, list);
     }
@@ -112,7 +114,7 @@ export default async function VacationCalendarPage({
     <div className="space-y-6">
       <Stagger>
         <div>
-          <BackLink href="/jefa/vacaciones">Volver a vacaciones</BackLink>
+          <BackLink href={`/jefa/vacaciones?year=${year}`}>Volver a vacaciones</BackLink>
           <PageHeader
             title="Calendario de vacaciones"
             description="Cobertura del equipo por día del mes."
@@ -280,47 +282,14 @@ export default async function VacationCalendarPage({
                 const weekend = [0, 6].includes(dateKeyToUtcNoon(dayKey).getUTCDay());
                 const isToday = dayKey === todayKey;
                 return (
-                  <div
+                  <CalendarDayCell
                     key={day}
-                    className={cn(
-                      "min-h-20 border-t p-1.5 text-left",
-                      weekend
-                        ? "border-brand-navy/8 bg-brand-navy/[0.04]"
-                        : "border-brand-navy/10",
-                      isToday && "bg-brand-blue/8 ring-1 ring-inset ring-brand-blue/35"
-                    )}
-                  >
-                    <p
-                      className={cn(
-                        "text-xs font-semibold",
-                        isToday ? "text-brand-blue" : "text-brand-navy"
-                      )}
-                    >
-                      {day}
-                      {isToday && (
-                        <span className="ml-1 text-[9px] font-medium uppercase tracking-wide">
-                          hoy
-                        </span>
-                      )}
-                    </p>
-                    <div className="mt-1 space-y-0.5">
-                      {people.slice(0, 3).map((p, idx) => (
-                        <p
-                          key={`${day}-${p.name}-${idx}`}
-                          className={cn(
-                            "truncate rounded-lg px-1 text-[10px] font-medium",
-                            chipClass(p.leaveType)
-                          )}
-                          title={`${p.name} · ${p.dept} · ${LEAVE_TYPE_LABEL[p.leaveType] ?? p.leaveType}`}
-                        >
-                          {p.name}
-                        </p>
-                      ))}
-                      {people.length > 3 && (
-                        <p className="text-[10px] text-slate-500">+{people.length - 3} más</p>
-                      )}
-                    </div>
-                  </div>
+                    day={day}
+                    isToday={isToday}
+                    weekend={weekend}
+                    people={people}
+                    monthLabel={`${MONTH_NAMES_ES[month - 1]} de ${year}`}
+                  />
                 );
               })}
             </div>

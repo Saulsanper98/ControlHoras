@@ -81,7 +81,7 @@ export function OnboardingModal() {
             </button>
           )}
           {current.href && (
-            <Link href={current.href} onClick={() => setOpen(false)} className="btn-ghost">
+            <Link href={current.href} onClick={finish} className="btn-ghost">
               {current.cta}
             </Link>
           )}

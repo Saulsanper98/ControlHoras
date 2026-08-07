@@ -14,6 +14,7 @@ import { requireManagerSession } from "@/lib/auth-helpers";
 import { formatDateShort } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { CalendarDays } from "lucide-react";
+import { RequestReviewButtons } from "@/components/jefa/request-review-buttons";
 
 export default async function VacationDetailPage({
   params,
@@ -137,7 +138,13 @@ export default async function VacationDetailPage({
                     <p className="mt-0.5 text-xs text-red-700">{r.rejectionReason}</p>
                   )}
                 </div>
-                <StatusBadge status={r.status} preset="leave" />
+                <div className="flex flex-wrap items-center gap-3">
+                  {r.status === "PENDIENTE" ? (
+                    <RequestReviewButtons requestId={r.id} />
+                  ) : (
+                    <StatusBadge status={r.status} preset="leave" />
+                  )}
+                </div>
               </div>
             ))}
           </ListSurface>

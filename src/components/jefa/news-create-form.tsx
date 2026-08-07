@@ -86,8 +86,9 @@ export function NewsCreateForm() {
               id="news-scheduled"
               type="datetime-local"
               name="scheduledAt"
-              className="field-control w-full px-2 py-2 text-sm"
+              className="field-control w-full px-3 py-2 text-sm"
             />
+            <p className="mt-1 text-xs text-slate-500">Hora local Canarias</p>
           </div>
           <div>
             <p className="mb-1 text-xs font-medium text-slate-500">Imagen (opcional)</p>

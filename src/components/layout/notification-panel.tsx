@@ -102,6 +102,8 @@ export function NotificationPanel({
   useEffect(() => {
     if (!open) return;
 
+    document.body.style.overflow = "hidden";
+
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setOpen(false);
@@ -135,6 +137,7 @@ export function NotificationPanel({
     return () => {
       window.clearTimeout(t);
       document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
       triggerRef.current?.focus();
     };
   }, [open]);

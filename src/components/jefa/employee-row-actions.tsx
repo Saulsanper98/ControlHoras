@@ -83,8 +83,7 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        disabled={departments.length === 0}
-        className="btn-primary disabled:opacity-50"
+        className="btn-primary"
       >
         <UserPlus className="h-4 w-4" />
         Alta de empleado
@@ -159,6 +158,17 @@ export function EmployeeRowActions({
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [departmentId, setDepartmentId] = useState(user.departmentId ?? NO_DEPARTMENT);
+
+  function resetEditForm() {
+    setName(user.name);
+    setEmail(user.email);
+    setDepartmentId(user.departmentId ?? NO_DEPARTMENT);
+  }
+
+  function closeEdit() {
+    resetEditForm();
+    setEditOpen(false);
+  }
 
   async function handleToggle() {
     const next = !user.active;
@@ -248,7 +258,7 @@ export function EmployeeRowActions({
         <span className="whitespace-nowrap">Restablecer contraseña</span>
       </button>
 
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Editar empleado">
+      <Modal open={editOpen} onClose={closeEdit} title="Editar empleado">
         <div className="space-y-3">
           <div>
             <label htmlFor={`emp-edit-name-${user.id}`} className="mb-1 block text-xs font-medium text-slate-500">
@@ -284,14 +294,19 @@ export function EmployeeRowActions({
               options={departmentOptions(departments)}
             />
           </div>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={handleSave}
-            className="btn-primary w-full"
-          >
-            Guardar cambios
-          </button>
+          <div className="flex gap-2">
+            <button type="button" onClick={closeEdit} className="btn-ghost flex-1">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={handleSave}
+              className="btn-primary flex-1"
+            >
+              Guardar cambios
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
