@@ -206,7 +206,7 @@ export function AppShell({
           <button
             type="button"
             onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
-            className="hit-area hidden items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy md:inline-flex"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
             title="Densidad de tablas del control horario"
             aria-label={
               density === "compact"

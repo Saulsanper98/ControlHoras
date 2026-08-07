@@ -107,7 +107,7 @@ export function NotificationPanel({
                     type="button"
                     disabled={pending}
                     onClick={markAll}
-                    className="text-[11px] font-medium text-brand-blue hover:underline disabled:opacity-50"
+                    className="inline-flex min-h-11 items-center px-2 text-[11px] font-medium text-brand-blue hover:underline disabled:opacity-50"
                   >
                     Marcar leídas
                   </button>
@@ -168,27 +168,41 @@ export function NotificationPanel({
                   )}
                   {inbox.map((n) => (
                     <li key={n.id}>
-                      <Link
-                        href={n.href ?? "/"}
-                        onClick={() => {
-                          setOpen(false);
-                          if (!n.readAt) {
-                            startTransition(async () => {
-                              await markNotificationReadAction(n.id);
-                              router.refresh();
-                            });
-                          }
-                        }}
-                        className={`block rounded-lg px-2 py-2 text-sm hover:bg-brand-navy/6 ${
-                          n.readAt ? "text-slate-500" : "text-brand-navy"
-                        }`}
-                      >
-                        <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
-                        <p className="text-xs text-slate-500">{n.body}</p>
-                        <p className="mt-0.5 text-[11px] text-slate-400">
-                          {formatRelativeTime(new Date(n.createdAt))}
-                        </p>
-                      </Link>
+                      {n.href ? (
+                        <Link
+                          href={n.href}
+                          onClick={() => {
+                            setOpen(false);
+                            if (!n.readAt) {
+                              startTransition(async () => {
+                                await markNotificationReadAction(n.id);
+                                router.refresh();
+                              });
+                            }
+                          }}
+                          className={`block rounded-lg px-2 py-2 text-sm hover:bg-brand-navy/6 ${
+                            n.readAt ? "text-slate-500" : "text-brand-navy"
+                          }`}
+                        >
+                          <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
+                          <p className="text-xs text-slate-500">{n.body}</p>
+                          <p className="mt-0.5 text-[11px] text-slate-400">
+                            {formatRelativeTime(new Date(n.createdAt))}
+                          </p>
+                        </Link>
+                      ) : (
+                        <div
+                          className={`block rounded-lg px-2 py-2 text-sm ${
+                            n.readAt ? "text-slate-500" : "text-brand-navy"
+                          }`}
+                        >
+                          <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
+                          <p className="text-xs text-slate-500">{n.body}</p>
+                          <p className="mt-0.5 text-[11px] text-slate-400">
+                            {formatRelativeTime(new Date(n.createdAt))}
+                          </p>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>

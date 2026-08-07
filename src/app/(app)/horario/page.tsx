@@ -64,7 +64,7 @@ export default async function HorarioPage() {
                 <a
                   href={fileHref}
                   download={schedule?.fileName}
-                  className="btn-ghost text-sm"
+                  className="btn-sm btn-ghost"
                 >
                   <Download className="h-4 w-4" />
                   Descargar

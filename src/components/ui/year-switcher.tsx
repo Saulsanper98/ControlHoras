@@ -27,7 +27,7 @@ export function YearSwitcher({
             href={opt.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-sm font-medium tabular-nums transition",
+              "inline-flex min-h-11 items-center rounded-lg px-3 py-1.5 text-sm font-medium tabular-nums transition",
               active
                 ? "bg-brand-blue text-white"
                 : "text-slate-600 hover:bg-brand-navy/8 hover:text-brand-navy"

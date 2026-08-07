@@ -201,7 +201,7 @@ export default async function ControlesPage({
               {page > 1 && (
                 <Link
                   href={`/jefa/controles?${queryBase.toString()}&page=${page - 1}`}
-                  className="btn-ghost"
+                  className="btn-sm btn-ghost"
                 >
                   ← Anterior
                 </Link>
@@ -209,7 +209,7 @@ export default async function ControlesPage({
               {page < totalPages && (
                 <Link
                   href={`/jefa/controles?${queryBase.toString()}&page=${page + 1}`}
-                  className="btn-ghost"
+                  className="btn-sm btn-ghost"
                 >
                   Siguiente →
                 </Link>

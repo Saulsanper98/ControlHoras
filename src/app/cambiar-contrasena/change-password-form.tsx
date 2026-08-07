@@ -126,7 +126,7 @@ export function ChangePasswordForm() {
         aria-busy={pending}
         className="btn-primary w-full disabled:opacity-60"
       >
-        {pending ? "Guardando..." : "Cambiar contraseña"}
+        {pending ? "Guardando…" : "Cambiar contraseña"}
       </button>
     </form>
   );

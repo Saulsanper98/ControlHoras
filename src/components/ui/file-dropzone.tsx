@@ -33,6 +33,7 @@ export function FileDropzone({
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
+      aria-label={label}
       aria-disabled={disabled || undefined}
       onClick={() => !disabled && inputRef.current?.click()}
       onKeyDown={(e) => {
@@ -52,7 +53,7 @@ export function FileDropzone({
         if (!disabled) handleFiles(e.dataTransfer.files);
       }}
       className={cn(
-        "flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors",
+        "flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30",
         dragOver
           ? "border-brand-blue bg-brand-blue/10 text-brand-blue"
           : "border-brand-navy/18 bg-brand-navy/[0.03] hover:border-brand-blue/45 hover:bg-brand-navy/[0.055]",

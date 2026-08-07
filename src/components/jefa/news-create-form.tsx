@@ -106,7 +106,7 @@ export function NewsCreateForm() {
             </label>
           </div>
           <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-60">
-            Guardar
+            {pending ? "Guardando…" : "Guardar"}
           </button>
         </form>
       </Modal>

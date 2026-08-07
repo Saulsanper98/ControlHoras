@@ -72,7 +72,7 @@ export function OnboardingModal() {
         <button
           type="button"
           onClick={finish}
-          className="btn-ghost px-2 text-xs text-slate-400"
+          className="btn-sm btn-ghost text-slate-400"
         >
           Omitir introducción
         </button>

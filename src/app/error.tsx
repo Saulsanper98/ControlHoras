@@ -22,7 +22,7 @@ export default function Error({
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/12 text-red-500">
           <AlertTriangle className="h-6 w-6" />
         </div>
-        <h1 className="mb-1 text-lg font-semibold text-brand-navy">Algo salió mal</h1>
+        <h1 className="font-display mb-1 text-lg font-semibold text-brand-navy">Algo salió mal</h1>
         <p className="mb-6 text-sm text-slate-500">
           Ha ocurrido un error inesperado. Puedes intentarlo de nuevo; si el problema
           persiste, contacta con tu responsable.

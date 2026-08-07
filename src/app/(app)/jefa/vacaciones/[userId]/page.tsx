@@ -129,8 +129,10 @@ export default async function VacationDetailPage({
                   <p className="mt-0.5 text-xs text-slate-500">
                     {LEAVE_TYPE_LABEL[r.leaveType] ?? r.leaveType}
                     {r.employeeNotes ? ` · ${r.employeeNotes}` : ""}
-                    {r.rejectionReason ? ` · Motivo: ${r.rejectionReason}` : ""}
                   </p>
+                  {r.rejectionReason && (
+                    <p className="mt-0.5 text-xs text-red-700">{r.rejectionReason}</p>
+                  )}
                 </div>
                 <StatusBadge status={r.status} preset="leave" />
               </div>

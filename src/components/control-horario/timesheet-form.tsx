@@ -311,7 +311,7 @@ export function TimeSheetForm({
         const result = await signAsEmployeeAction(month, year, entries, notes, signatureDataUrl);
         if (result.ok) {
           setShowSignPad(false);
-          showToast("Parte firmado correctamente");
+          showToast("Control firmado correctamente");
           router.refresh();
         } else {
           showToast(result.error ?? "Error al firmar.", "error");
@@ -394,7 +394,7 @@ export function TimeSheetForm({
                   type="button"
                   onClick={() => void handlePdfDownload()}
                   disabled={pdfLoading}
-                  className="btn-ghost disabled:opacity-60"
+                  className="btn-sm btn-ghost disabled:opacity-60"
                 >
                   {pdfLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -466,13 +466,14 @@ export function TimeSheetForm({
                   type="checkbox"
                   checked={weekdaysOnly}
                   onChange={(e) => setWeekdaysOnly(e.target.checked)}
+                  className="accent-brand-blue"
                 />
                 Solo L–V
               </label>
               <button
                 type="button"
                 onClick={applyBulkShift}
-                className="btn-secondary"
+                className="btn-sm btn-secondary"
               >
                 <Wand2 className="h-4 w-4" />
                 Aplicar
@@ -481,7 +482,7 @@ export function TimeSheetForm({
                 type="button"
                 onClick={handleCopyPreviousMonth}
                 disabled={pending}
-                className="btn-ghost disabled:opacity-50"
+                className="btn-sm btn-ghost disabled:opacity-50"
               >
                 <Copy className="h-4 w-4" />
                 Copiar mes anterior
@@ -519,7 +520,7 @@ export function TimeSheetForm({
                   type="button"
                   onClick={() => setFilter(f)}
                   aria-pressed={filter === f}
-                  className={`rounded-md px-2 py-0.5 font-medium transition ${
+                  className={`inline-flex min-h-11 items-center rounded-md px-3 py-1.5 font-medium transition ${
                     filter === f
                       ? "bg-brand-blue/15 text-brand-blue"
                       : "hover:bg-brand-navy/6"
@@ -692,7 +693,7 @@ export function TimeSheetForm({
                   onClick={() => setShowSignPad(true)}
                   disabled={pending}
                   className="btn-primary"
-                  title="Firmar y enviar el parte"
+                  title="Firmar y enviar el control"
                   aria-label="Firmar y enviar"
                 >
                   <PenLine className="h-4 w-4" />
@@ -779,7 +780,7 @@ export function TimeSheetForm({
             <div className="flex flex-wrap gap-6">
               {employeeSignaturePath && (
                 <SignaturePreview
-                  label="Empleado"
+                  label="Firma del empleado"
                   signedAt={employeeSignedAt ? formatDateTimeShort(employeeSignedAt) : null}
                   src={`/api/uploads/${employeeSignaturePath}`}
                   alt="Firma del empleado"
@@ -787,7 +788,7 @@ export function TimeSheetForm({
               )}
               {responsableSignaturePath && (
                 <SignaturePreview
-                  label="Responsable"
+                  label="Firma de la responsable"
                   signedAt={responsableSignedAt ? formatDateTimeShort(responsableSignedAt) : null}
                   src={`/api/uploads/${responsableSignaturePath}`}
                   alt="Firma de la responsable"

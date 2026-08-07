@@ -150,11 +150,11 @@ export default async function AuditoriaPage({
               className="field-control w-full rounded-md px-3 py-2 text-sm"
             />
           </div>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn-primary btn-sm">
             Filtrar
           </button>
           {(action || actorQuery) && (
-            <Link href="/jefa/auditoria" className="btn-ghost">
+            <Link href="/jefa/auditoria" className="btn-sm btn-ghost">
               Limpiar
             </Link>
           )}
@@ -169,6 +169,13 @@ export default async function AuditoriaPage({
             action || actorQuery
               ? "No hay eventos que coincidan con los filtros."
               : "Todavía no hay eventos de auditoría registrados."
+          }
+          action={
+            action || actorQuery ? (
+              <Link href="/jefa/auditoria" className="btn-ghost">
+                Limpiar
+              </Link>
+            ) : undefined
           }
         />
       ) : (
@@ -228,20 +235,20 @@ export default async function AuditoriaPage({
             </p>
             <div className="flex gap-2">
               {hasPrev ? (
-                <Link href={pageHref(page - 1)} className="btn-ghost">
+                <Link href={pageHref(page - 1)} className="btn-sm btn-ghost">
                   Anterior
                 </Link>
               ) : (
-                <button type="button" disabled className="btn-ghost disabled:opacity-40">
+                <button type="button" disabled className="btn-sm btn-ghost disabled:opacity-40">
                   Anterior
                 </button>
               )}
               {hasNext ? (
-                <Link href={pageHref(page + 1)} className="btn-ghost">
+                <Link href={pageHref(page + 1)} className="btn-sm btn-ghost">
                   Siguiente
                 </Link>
               ) : (
-                <button type="button" disabled className="btn-ghost disabled:opacity-40">
+                <button type="button" disabled className="btn-sm btn-ghost disabled:opacity-40">
                   Siguiente
                 </button>
               )}

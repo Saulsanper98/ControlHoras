@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useActionState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { loginAction } from "@/app/login/actions";
 import { LoginVideoBackground } from "@/components/auth/login-video-background";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
   // Bloquea el relleno automático al montar; al enfocar se habilitan
   // username / current-password para sugerencias al escribir.
   const [unlockFields, setUnlockFields] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     router.prefetch(callbackUrl || "/");
@@ -151,20 +153,31 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
                 <label htmlFor="password" className="block text-sm font-medium text-white/90">
                   Contraseña
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  readOnly={!unlockFields}
-                  onFocus={() => setUnlockFields(true)}
-                  disabled={busy}
-                  aria-invalid={Boolean(state.error && !exiting)}
-                  aria-describedby={state.error && !exiting ? "login-error" : undefined}
-                  className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40 disabled:opacity-70"
-                  placeholder="••••••••"
-                />
+                <div className="relative mt-1">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    readOnly={!unlockFields}
+                    onFocus={() => setUnlockFields(true)}
+                    disabled={busy}
+                    aria-invalid={Boolean(state.error && !exiting)}
+                    aria-describedby={state.error && !exiting ? "login-error" : undefined}
+                    className="w-full rounded-md border border-white/25 bg-white/90 py-2 pl-3 pr-10 text-sm text-brand-navy placeholder:text-slate-400 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40 disabled:opacity-70"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    disabled={busy}
+                    className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy disabled:opacity-50"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               {state.error && !exiting && (

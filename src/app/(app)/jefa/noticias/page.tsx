@@ -34,9 +34,7 @@ export default async function JefaNoticiasPage() {
 
       {news.length >= NEWS_LIMIT && (
         <Alert variant="warning">
-          <p>
-            Se muestran las {NEWS_LIMIT} noticias más recientes. Hay más en el historial.
-          </p>
+          <p>Hay más noticias antiguas fuera de esta vista.</p>
         </Alert>
       )}
 

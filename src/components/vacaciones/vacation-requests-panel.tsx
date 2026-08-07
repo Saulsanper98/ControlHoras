@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarPlus, XCircle } from "lucide-react";
+import { Alert } from "@/components/ui/alert";
 import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
 import { FieldSelect } from "@/components/ui/field-select";
@@ -161,7 +162,9 @@ export function VacationRequestsPanel({
                   {formatRelativeTime(r.createdAt)}
                 </p>
                 {r.rejectionReason && (
-                  <p className="mt-0.5 text-xs text-red-600">Motivo: {r.rejectionReason}</p>
+                  <Alert variant="danger" className="mt-2 rounded-md border">
+                    <p className="text-xs">{r.rejectionReason}</p>
+                  </Alert>
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -186,8 +189,9 @@ export function VacationRequestsPanel({
       <Modal open={showModal} onClose={closeModal} title="Nueva solicitud">
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
+            <label htmlFor="vac-leave-type" className="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
             <FieldSelect
+              id="vac-leave-type"
               autoFocus
               value={leaveType}
               onChange={(v) => {

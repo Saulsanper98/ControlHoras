@@ -153,6 +153,7 @@ export function NewsItem({
               type="checkbox"
               checked={pinnedValue}
               onChange={(e) => setPinnedValue(e.target.checked)}
+              className="accent-brand-blue"
             />
             Fijar arriba
           </label>
@@ -161,6 +162,7 @@ export function NewsItem({
               type="checkbox"
               checked={draftValue}
               onChange={(e) => setDraftValue(e.target.checked)}
+              className="accent-brand-blue"
             />
             Guardar como borrador
           </label>
@@ -189,7 +191,7 @@ export function NewsItem({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            {pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" />}
+            {pinned && <Pin className="h-3.5 w-3.5 text-brand-blue" aria-hidden />}
             <StatusBadge status={badge} preset="news" />
             <p className="font-medium text-brand-navy">{title}</p>
           </div>

@@ -299,6 +299,16 @@ export default async function InformeHorasPage({
           icon={BarChart3}
           title="Sin resultados"
           description="No hay empleados que coincidan con los filtros seleccionados."
+          action={
+            hasFilters ? (
+              <Link
+                href={`/jefa/informes?month=${month}&year=${year}`}
+                className="btn-ghost"
+              >
+                Limpiar filtros
+              </Link>
+            ) : undefined
+          }
         />
       )}
     </div>

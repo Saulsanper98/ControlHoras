@@ -34,7 +34,7 @@ export default async function CambiarContrasenaPage() {
               Volver al portal
             </Link>
           )}
-          <h1 className="mb-1 text-xl font-semibold text-white">Cambiar contraseña</h1>
+          <h1 className="font-display mb-1 text-xl font-semibold text-white">Cambiar contraseña</h1>
           <p className="mb-6 text-sm text-slate-300">
             {mustChange
               ? "Por seguridad, debes cambiar tu contraseña antes de continuar."

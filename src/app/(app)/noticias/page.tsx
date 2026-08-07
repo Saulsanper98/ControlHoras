@@ -33,16 +33,14 @@ export default async function NoticiasPage() {
 
       {news.length >= NEWS_LIMIT && (
         <Alert variant="warning">
-          <p>
-            Se muestran las {NEWS_LIMIT} noticias más recientes. Puede haber más en el historial.
-          </p>
+          <p>Hay más noticias antiguas fuera de esta vista.</p>
         </Alert>
       )}
 
       {news.length === 0 ? (
         <EmptyState
           icon={Newspaper}
-          title="Todavía no hay noticias"
+          title="Sin noticias todavía"
           description="Cuando la responsable publique comunicados, aparecerán aquí."
         />
       ) : (
@@ -55,7 +53,7 @@ export default async function NoticiasPage() {
             >
               <div className="flex items-center gap-2">
                 {n.pinned && (
-                  <Pin className="h-3.5 w-3.5 shrink-0 text-brand-blue" aria-label="Fijada" />
+                  <Pin className="h-3.5 w-3.5 shrink-0 text-brand-blue" aria-hidden />
                 )}
                 <p className="font-medium text-brand-navy">{n.title}</p>
               </div>
