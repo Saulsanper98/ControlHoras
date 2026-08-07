@@ -8,8 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionTitle } from "@/components/ui/section-title";
-import { ListSurface, ListRow } from "@/components/ui/list-surface";
-import { formatRelativeTime } from "@/lib/format-relative-time";
+import { ListSurface } from "@/components/ui/list-surface";
+import { NewsCard } from "@/components/noticias/news-card";
 import { MONTH_NAMES_ES, APP_TIMEZONE } from "@/lib/format-date";
 import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
@@ -43,6 +43,14 @@ export default async function DashboardPage() {
     },
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
     take: 3,
+    select: {
+      id: true,
+      title: true,
+      body: true,
+      pinned: true,
+      publishedAt: true,
+      imagePath: true,
+    },
   });
 
   const role = session.user.role;
@@ -290,7 +298,14 @@ function NewsSection({
   news,
   viewAllHref,
 }: {
-  news: { id: string; title: string; body: string; publishedAt: Date }[];
+  news: {
+    id: string;
+    title: string;
+    body: string;
+    pinned: boolean;
+    publishedAt: Date;
+    imagePath: string | null;
+  }[];
   viewAllHref: string;
 }) {
   return (
@@ -310,20 +325,19 @@ function NewsSection({
       ) : (
         <ListSurface>
           {news.map((item) => (
-            <ListRow key={item.id} className="!py-0">
-              <Link
-                href={`/noticias/${item.id}`}
-                className="block py-3.5"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium text-brand-navy">{item.title}</p>
-                  <span className="shrink-0 text-xs text-slate-400">
-                    {formatRelativeTime(item.publishedAt)}
-                  </span>
-                </div>
-                <p className="mt-1 line-clamp-2 whitespace-pre-line text-sm text-slate-500">{item.body}</p>
-              </Link>
-            </ListRow>
+            <NewsCard
+              key={item.id}
+              variant="compact"
+              href={`/noticias/${item.id}`}
+              news={{
+                id: item.id,
+                title: item.title,
+                body: item.body,
+                pinned: item.pinned,
+                publishedAt: item.publishedAt,
+                imagePath: item.imagePath,
+              }}
+            />
           ))}
         </ListSurface>
       )}

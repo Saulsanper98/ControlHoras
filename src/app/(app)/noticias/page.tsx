@@ -1,42 +1,49 @@
-import { Newspaper, Pin } from "lucide-react";
+import Link from "next/link";
+import { Newspaper } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Alert } from "@/components/ui/alert";
 import { ListSurface } from "@/components/ui/list-surface";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
-import { NewsImage } from "@/components/noticias/news-image";
-import { formatRelativeTime } from "@/lib/format-relative-time";
-import Link from "next/link";
+import { NewsCard } from "@/components/noticias/news-card";
 
-const NEWS_LIMIT = 100;
+const PAGE_SIZE = 20;
 
-export default async function NoticiasPage() {
+export default async function NoticiasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
   const now = new Date();
-  const news = await prisma.news.findMany({
-    where: {
-      status: "PUBLICADA",
-      OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }],
-    },
-    orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
-    include: { publishedBy: true },
-    take: NEWS_LIMIT,
-  });
+  const where = {
+    status: "PUBLICADA" as const,
+    OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }],
+  };
+
+  const [news, total] = await Promise.all([
+    prisma.news.findMany({
+      where,
+      orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
+      include: { publishedBy: true },
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+    prisma.news.count({ where }),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Stagger>
         <PageHeader
           title="Noticias"
-          description="Todas las noticias y comunicados de la empresa."
+          description="Comunicados y novedades de la empresa."
         />
       </Stagger>
-
-      {news.length >= NEWS_LIMIT && (
-        <Alert variant="warning">
-          <p>Hay más noticias antiguas fuera de esta vista.</p>
-        </Alert>
-      )}
 
       {news.length === 0 ? (
         <EmptyState
@@ -45,37 +52,52 @@ export default async function NoticiasPage() {
           description="Cuando la responsable publique comunicados, aparecerán aquí."
         />
       ) : (
-        <ListSurface>
-          {news.map((n) => (
-            <Link
-              key={n.id}
-              href={`/noticias/${n.id}`}
-              className="block py-4 transition hover:bg-brand-navy/[0.03]"
-            >
-              <div className="space-y-1">
-                {n.pinned && (
-                  <span className="inline-flex w-fit items-center gap-1 rounded-full bg-brand-blue/12 px-2.5 py-0.5 text-xs font-medium text-brand-blue">
-                    <Pin className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                    Fijada
-                  </span>
-                )}
-                <p className="font-medium text-brand-navy">{n.title}</p>
-              </div>
-              <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
-              {n.imagePath && (
-                <NewsImage
-                  src={`/api/uploads/${n.imagePath}`}
-                  alt={n.title}
-                  className="mt-3 h-36 w-full rounded-lg object-cover"
-                  fallbackClassName="mt-3 h-36 w-full"
-                />
-              )}
-              <p className="mt-2 text-xs text-slate-500">
-                {formatRelativeTime(n.publishedAt)} · {n.publishedBy.name}
+        <>
+          <ListSurface>
+            {news.map((n) => (
+              <NewsCard
+                key={n.id}
+                variant="list"
+                href={`/noticias/${n.id}`}
+                news={{
+                  id: n.id,
+                  title: n.title,
+                  body: n.body,
+                  pinned: n.pinned,
+                  publishedAt: n.publishedAt,
+                  authorName: n.publishedBy.name,
+                  imagePath: n.imagePath,
+                }}
+              />
+            ))}
+          </ListSurface>
+
+          {totalPages > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+              <p className="text-slate-500">
+                Página {page} de {totalPages}
               </p>
-            </Link>
-          ))}
-        </ListSurface>
+              <div className="flex gap-2">
+                {page > 1 && (
+                  <Link href={`/noticias?page=${page - 1}`} className="btn-sm btn-ghost">
+                    Anterior
+                  </Link>
+                )}
+                {page < totalPages && (
+                  <Link href={`/noticias?page=${page + 1}`} className="btn-sm btn-ghost">
+                    Siguiente
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {total > PAGE_SIZE && page === totalPages && (
+        <Alert variant="info">
+          <p>Fin del listado ({total} noticias).</p>
+        </Alert>
       )}
     </div>
   );
