@@ -6,9 +6,10 @@
     "dev": "next dev -H :: -p 3000",
     "dev:stable": "bash ./scripts/dev-stable.sh",
     "dev:watchdog": "bash ./scripts/dev-watchdog.sh",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
