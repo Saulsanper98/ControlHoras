@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "env:lan": "node scripts/apply-lan-env.mjs",
     "db:setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "tsx prisma/seed.ts"
