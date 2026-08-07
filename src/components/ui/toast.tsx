@@ -1,13 +1,16 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { X } from "lucide-react";
 
 type ToastAction = { label: string; onClick: () => void };
+
+type ToastType = "success" | "error" | "warning";
 
 type Toast = {
   id: number;
   message: string;
-  type: "success" | "error";
+  type: ToastType;
   exiting?: boolean;
   action?: ToastAction;
 };
@@ -17,7 +20,7 @@ type ToastOptions = {
 };
 
 type ToastContextValue = {
-  showToast: (message: string, type?: "success" | "error", options?: ToastOptions) => void;
+  showToast: (message: string, type?: ToastType, options?: ToastOptions) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -25,20 +28,24 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  const dismissToast = useCallback((id: number) => {
+    setToasts((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+    );
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 200);
+  }, []);
+
   const showToast = useCallback(
-    (message: string, type: "success" | "error" = "success", options?: ToastOptions) => {
+    (message: string, type: ToastType = "success", options?: ToastOptions) => {
       const id = Date.now() + Math.random();
       setToasts((prev) => [...prev, { id, message, type, action: options?.action }]);
       window.setTimeout(() => {
-        setToasts((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
-        );
-        window.setTimeout(() => {
-          setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 200);
+        dismissToast(id);
       }, options?.action ? 8000 : 3800);
     },
-    []
+    [dismissToast]
   );
 
   const value = useMemo(() => ({ showToast }), [showToast]);
@@ -58,10 +65,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             } ${
               t.type === "success"
                 ? "bg-emerald-600 text-white"
-                : "bg-red-600 text-white"
+                : t.type === "warning"
+                  ? "bg-amber-500 text-white"
+                  : "bg-red-600 text-white"
             }`}
           >
-            <p>{t.message}</p>
+            <div className="flex items-start gap-2">
+              <p className="min-w-0 flex-1">{t.message}</p>
+              <button
+                type="button"
+                onClick={() => dismissToast(t.id)}
+                aria-label="Cerrar notificación"
+                className="hit-area -mr-1 -mt-0.5 shrink-0 rounded-md p-1 transition hover:bg-white/20"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
             {t.action && (
               <button
                 type="button"

@@ -2,15 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  BarChart3,
-  CalendarDays,
-  ClipboardList,
-  Search,
-  Shield,
-  Umbrella,
-  Users,
-} from "lucide-react";
+import { CalendarDays, ClipboardList, Search } from "lucide-react";
 import { employeeNav, jefaNav } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 import { Modal } from "@/components/ui/modal";
@@ -50,49 +42,13 @@ export function CommandPalette({ role }: { role: AppRole }) {
       icon: n.icon,
     }));
     if (role === "JEFA") {
-      base.push(
-        {
-          id: "next-controls",
-          label: "Controles pendientes de firmar",
-          href: "/jefa/controles",
-          icon: ClipboardList,
-          keywords: "firmar pendiente",
-        },
-        {
-          id: "vac-pending",
-          label: "Vacaciones pendientes",
-          href: "/jefa/vacaciones",
-          icon: Umbrella,
-          keywords: "aprobar vacaciones",
-        },
-        {
-          id: "employees",
-          label: "Lista de empleados",
-          href: "/jefa/empleados",
-          icon: Users,
-        },
-        {
-          id: "calendario",
-          label: "Calendario de vacaciones",
-          href: "/jefa/vacaciones/calendario",
-          icon: CalendarDays,
-          keywords: "calendario vacaciones",
-        },
-        {
-          id: "informes-csv",
-          label: "Exportar informe de horas",
-          href: "/jefa/informes",
-          icon: BarChart3,
-          keywords: "csv export horas informe",
-        },
-        {
-          id: "auditoria-logs",
-          label: "Registro de auditoría",
-          href: "/jefa/auditoria",
-          icon: Shield,
-          keywords: "logs historial auditoría",
-        }
-      );
+      base.push({
+        id: "calendario",
+        label: "Calendario de vacaciones",
+        href: "/jefa/vacaciones/calendario",
+        icon: CalendarDays,
+        keywords: "calendario vacaciones",
+      });
     } else {
       base.push({
         id: "my-control",

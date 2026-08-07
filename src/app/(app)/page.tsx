@@ -128,8 +128,11 @@ export default async function DashboardPage() {
                 ? `Resumen de ${MONTH_NAMES_ES[month - 1]} de ${year}`
                 : `${session.user.departmentName} · ${MONTH_NAMES_ES[month - 1]} de ${year}`}
             </p>
-            {showPersonal && timeSheet && (
-              <StatusBadge status={timeSheet.status} preset="timesheet" />
+            {showPersonal && (
+              <StatusBadge
+                status={timeSheet?.status ?? "SIN_CONTROL"}
+                preset="timesheet"
+              />
             )}
           </div>
         </div>

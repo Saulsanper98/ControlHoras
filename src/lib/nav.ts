@@ -30,17 +30,6 @@ export const employeeNav: NavItem[] = [
   { href: "/noticias", label: "Noticias", icon: Newspaper },
 ];
 
-export const jefaNav: NavItem[] = [
-  { href: "/", label: "Panel principal", icon: LayoutDashboard },
-  { href: "/jefa/controles", label: "Controles horarios", icon: ClipboardList },
-  { href: "/jefa/empleados", label: "Empleados", icon: Users },
-  { href: "/jefa/horarios", label: "Horarios", icon: CalendarClock },
-  { href: "/jefa/vacaciones", label: "Vacaciones y horas", icon: Umbrella },
-  { href: "/jefa/noticias", label: "Noticias", icon: Newspaper },
-  { href: "/jefa/informes", label: "Informe de horas", icon: BarChart3 },
-  { href: "/jefa/auditoria", label: "Auditoría", icon: Shield },
-];
-
 /** Secciones del menú de la responsable (Panel sin label de grupo). */
 export const jefaNavGroups: NavGroup[] = [
   {
@@ -76,6 +65,8 @@ export const jefaNavGroups: NavGroup[] = [
     items: [{ href: "/jefa/auditoria", label: "Auditoría", icon: Shield }],
   },
 ];
+
+export const jefaNav: NavItem[] = jefaNavGroups.flatMap((g) => g.items);
 
 /** Título corto para cabecera móvil según ruta. */
 /** Orden: rutas más específicas primero. */

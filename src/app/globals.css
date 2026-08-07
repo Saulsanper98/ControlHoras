@@ -323,15 +323,6 @@ body {
   background: var(--surface-row);
 }
 
-.surface-btn {
-  background: var(--surface-input);
-  border: 1px solid var(--surface-input-border);
-}
-
-.surface-btn:hover {
-  background: rgba(10, 34, 64, 0.06);
-}
-
 /* Checkboxes: sin blanco puro del navegador */
 input[type="checkbox"] {
   appearance: none;

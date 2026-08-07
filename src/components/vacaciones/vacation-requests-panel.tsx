@@ -92,7 +92,10 @@ export function VacationRequestsPanel({
     })();
   }
 
-  const yearRequests = requests.filter((r) => yearFromDateKey(r.startDate) === year);
+  const yearRequests = requests.filter(
+    (r) =>
+      yearFromDateKey(r.startDate) === year || yearFromDateKey(r.endDate) === year
+  );
 
   const estimatedDays = useMemo(() => {
     if (!startDate || !endDate || endDate < startDate) return null;

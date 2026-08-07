@@ -9,15 +9,9 @@ const STORAGE_KEY = "portal-onboarding-done";
 const STEPS = [
   {
     title: "Tu control horario",
-    body: "Rellena el mes, guarda borrador y fírmalo cuando esté listo. La responsable lo revisará después.",
+    body: "Rellena el mes, guarda borrador y fírmalo cuando esté listo. Al firmar, el control queda bloqueado hasta que la responsable lo apruebe o lo rechace con motivo.",
     href: "/control-horario",
     cta: "Ir al control horario",
-  },
-  {
-    title: "Firma y envío",
-    body: "Al firmar, el control queda bloqueado hasta que la responsable lo apruebe o lo rechace con motivo.",
-    href: "/control-horario",
-    cta: "Ver el control horario",
   },
   {
     title: "Vacaciones y horas",
