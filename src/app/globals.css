@@ -288,20 +288,6 @@ body {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.glass-panel-hover:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
-}
-
-.glass-panel-lift {
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.glass-panel-lift:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
-}
-
 .glass-panel-header {
   background: var(--glass-fill-header);
   border-bottom: 1px solid var(--glass-border);
@@ -314,18 +300,6 @@ body {
   position: absolute;
   border-radius: 9999px;
   pointer-events: none;
-}
-
-/* Controles sobre glass: semitransparentes, no cajas blancas puras */
-.surface-input {
-  background: var(--surface-input);
-  border: 1px solid var(--surface-input-border);
-}
-
-.surface-input:disabled,
-.surface-input[disabled] {
-  background: rgba(10, 34, 64, 0.06);
-  color: #94a3b8;
 }
 
 .surface-muted {
@@ -420,10 +394,6 @@ input[type="checkbox"]:disabled {
   background: var(--surface-panel);
   border: 1px solid rgba(10, 34, 64, 0.1);
   box-shadow: 0 12px 28px rgba(10, 34, 64, 0.12);
-}
-
-.btn-press:active {
-  transform: scale(0.98);
 }
 
 .tabular-nums {
@@ -736,8 +706,7 @@ input[type="checkbox"]:disabled {
   .animate-toast-out,
   .animate-modal-backdrop,
   .animate-modal-panel,
-  .animate-shimmer,
-  .glass-panel-lift:hover {
+  .animate-shimmer {
     animation: none;
     transform: none;
     transition: none;

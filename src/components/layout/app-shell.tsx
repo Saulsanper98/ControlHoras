@@ -34,6 +34,8 @@ export function AppShell({
   roleLabel,
   pendingSignatures,
   pendingVacations,
+  employeeRejectedTimesheet,
+  employeePendingVacations,
   inbox,
   children,
 }: {
@@ -42,6 +44,8 @@ export function AppShell({
   roleLabel: string;
   pendingSignatures: number | null;
   pendingVacations: number;
+  employeeRejectedTimesheet: number;
+  employeePendingVacations: number;
   inbox: {
     id: string;
     title: string;
@@ -150,6 +154,8 @@ export function AppShell({
             onNavigate={() => setOpen(false)}
             pendingSignatures={pendingSignatures}
             pendingVacations={pendingVacations}
+            employeeRejectedTimesheet={employeeRejectedTimesheet}
+            employeePendingVacations={employeePendingVacations}
           />
         </div>
         <div className="mx-3 mb-4 mt-auto rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3">

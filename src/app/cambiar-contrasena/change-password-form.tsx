@@ -2,7 +2,6 @@
 
 import { useActionState, useId, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Alert } from "@/components/ui/alert";
 import { changePasswordAction } from "./actions";
 
 const MIN_LENGTH = 8;
@@ -39,7 +38,8 @@ export function ChangePasswordForm() {
           <button
             type="button"
             onClick={() => setShowCurrent((v) => !v)}
-            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy"
+            disabled={pending}
+            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy disabled:opacity-50"
             aria-label={showCurrent ? "Ocultar contraseña actual" : "Mostrar contraseña actual"}
           >
             {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -68,7 +68,8 @@ export function ChangePasswordForm() {
           <button
             type="button"
             onClick={() => setShowNew((v) => !v)}
-            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy"
+            disabled={pending}
+            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy disabled:opacity-50"
             aria-label={showNew ? "Ocultar nueva contraseña" : "Mostrar nueva contraseña"}
           >
             {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -104,7 +105,8 @@ export function ChangePasswordForm() {
           <button
             type="button"
             onClick={() => setShowConfirm((v) => !v)}
-            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy"
+            disabled={pending}
+            className="hit-area absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:text-brand-navy disabled:opacity-50"
             aria-label={showConfirm ? "Ocultar confirmación" : "Mostrar confirmación"}
           >
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -113,11 +115,14 @@ export function ChangePasswordForm() {
       </div>
 
       {state.error && (
-        <div id={errorId} role="alert" aria-live="assertive">
-          <Alert variant="danger" className="rounded-md border border-y-0 bg-white/90">
-            {state.error}
-          </Alert>
-        </div>
+        <p
+          id={errorId}
+          role="alert"
+          aria-live="assertive"
+          className="rounded-md border border-red-400/30 bg-red-500/20 px-3 py-2 text-sm text-red-100 backdrop-blur-sm"
+        >
+          {state.error}
+        </p>
       )}
 
       <button

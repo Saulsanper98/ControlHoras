@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { Modal } from "@/components/ui/modal";
 
 /** Un solo paso: motivo + confirmar rechazo (sin ConfirmDialog previo). */
@@ -24,6 +25,8 @@ export function RejectReasonModal({
   confirmLabel?: string;
   reasonOptional?: boolean;
 }) {
+  const reasonId = useId();
+
   return (
     <Modal open={open} onClose={onClose} title={title}>
       <p className="mb-3 text-sm text-slate-600">
@@ -31,11 +34,11 @@ export function RejectReasonModal({
           ? "Puedes indicar un motivo (opcional). La persona afectada será notificada."
           : "Indica el motivo del rechazo."}
       </p>
-      <label htmlFor="reject-reason-field" className="mb-1 block text-xs font-medium text-slate-500">
+      <label htmlFor={reasonId} className="mb-1 block text-xs font-medium text-slate-500">
         Motivo{reasonOptional ? " (opcional)" : ""}
       </label>
       <textarea
-        id="reject-reason-field"
+        id={reasonId}
         data-autofocus
         value={reason}
         onChange={(e) => onReasonChange(e.target.value)}

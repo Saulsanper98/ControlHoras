@@ -79,6 +79,7 @@ export const SCHEDULE_STATUS_LABEL: Record<string, string> = {
   WITHOUT_SCHEDULE: "Sin horario",
   CURRENT: "Horario vigente",
   NEW: "Nuevo",
+  UPCOMING: "Próximamente",
 };
 
 export const SCHEDULE_STATUS_COLOR: Record<string, string> = {
@@ -86,6 +87,7 @@ export const SCHEDULE_STATUS_COLOR: Record<string, string> = {
   WITHOUT_SCHEDULE: "bg-amber-500/12 text-amber-800",
   CURRENT: "bg-emerald-500/12 text-emerald-800",
   NEW: "bg-brand-blue/12 text-brand-blue",
+  UPCOMING: "bg-amber-500/12 text-amber-800",
 };
 
 export const TEMP_EMPLOYEE_PASSWORD = "Cambiar123!";

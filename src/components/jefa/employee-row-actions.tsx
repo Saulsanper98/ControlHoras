@@ -134,7 +134,7 @@ export function EmployeeCreateForm({ departments }: { departments: Dept[] }) {
             type="button"
             disabled={pending}
             onClick={submit}
-            className="btn-primary w-full disabled:opacity-60"
+            className="btn-primary w-full"
           >
             Crear empleado
           </button>
@@ -288,7 +288,7 @@ export function EmployeeRowActions({
             type="button"
             disabled={pending}
             onClick={handleSave}
-            className="btn-primary w-full disabled:opacity-60"
+            className="btn-primary w-full"
           >
             Guardar cambios
           </button>

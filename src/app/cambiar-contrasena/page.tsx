@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ChangePasswordForm } from "./change-password-form";
 import { LoginVideoBackground } from "@/components/auth/login-video-background";
+import { SignOutButton } from "@/components/layout/sign-out-button";
 
 export default async function CambiarContrasenaPage() {
   const session = await auth();
@@ -41,6 +42,11 @@ export default async function CambiarContrasenaPage() {
               : "Actualiza tu contraseña de acceso."}
           </p>
           <ChangePasswordForm />
+          {mustChange && (
+            <div className="mt-4 border-t border-white/15 pt-4">
+              <SignOutButton />
+            </div>
+          )}
         </div>
       </div>
     </div>

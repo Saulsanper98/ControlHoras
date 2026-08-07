@@ -222,7 +222,7 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
         {!cardGone && (
           <p
             className={cn(
-              "mt-6 text-center text-[11px] tracking-[0.18em] text-white/55 uppercase animate-login-enter transition-opacity duration-300",
+              "mt-6 rounded-md bg-brand-navy/50 px-3 py-2 text-center text-[11px] tracking-[0.18em] text-white/80 uppercase animate-login-enter transition-opacity duration-300",
               exiting && "opacity-0"
             )}
             style={{ animationDelay: "220ms" }}

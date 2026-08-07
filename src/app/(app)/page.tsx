@@ -290,12 +290,7 @@ function NewsSection({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Newspaper className="h-4 w-4 text-brand-blue" />
-          <SectionTitle className="uppercase tracking-wide text-brand-navy/45">
-            Últimas noticias
-          </SectionTitle>
-        </div>
+        <SectionTitle>Últimas noticias</SectionTitle>
         <Link href={viewAllHref} className="text-sm font-medium text-brand-blue hover:underline">
           Ver todas
         </Link>
@@ -320,7 +315,7 @@ function NewsSection({
                     {formatRelativeTime(item.publishedAt)}
                   </span>
                 </div>
-                <p className="mt-1 line-clamp-2 text-sm text-slate-500">{item.body}</p>
+                <p className="mt-1 line-clamp-2 whitespace-pre-line text-sm text-slate-500">{item.body}</p>
               </Link>
             </ListRow>
           ))}

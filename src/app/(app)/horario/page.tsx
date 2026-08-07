@@ -39,6 +39,8 @@ export default async function HorarioPage() {
     schedule != null && Date.now() - schedule.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000;
   const isCurrent =
     schedule != null && toDateKey(schedule.validFrom) <= toDateKey(new Date());
+  const isUpcoming =
+    schedule != null && toDateKey(schedule.validFrom) > toDateKey(new Date());
   const fileHref = schedule ? `/api/uploads/${schedule.filePath}` : null;
 
   return (
@@ -97,6 +99,7 @@ export default async function HorarioPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium text-brand-navy">{schedule.fileName}</p>
+                    {isUpcoming && <StatusBadge status="UPCOMING" preset="schedule" />}
                     {isCurrent && <StatusBadge status="CURRENT" preset="schedule" />}
                     {isNew && <StatusBadge status="NEW" preset="schedule" />}
                   </div>

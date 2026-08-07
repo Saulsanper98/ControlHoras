@@ -203,7 +203,7 @@ export default async function AuditoriaPage({
           <ScrollShadow>
             <TableSurface>
               <table className="w-full min-w-[720px] text-left text-sm">
-                <thead className="border-b border-brand-navy/10 text-xs uppercase text-slate-500">
+                <thead className="border-b border-[color:var(--surface-divider)] text-xs uppercase text-slate-500">
                   <tr>
                     <th className="px-0 py-2 sm:px-3">Fecha</th>
                     <th className="px-3 py-2">Actor</th>
@@ -223,7 +223,7 @@ export default async function AuditoriaPage({
                       l.entityId ? ` · ${l.entityId.slice(0, 8)}…` : ""
                     }`;
                     return (
-                      <tr key={l.id} className="border-b border-brand-navy/5 last:border-0">
+                      <tr key={l.id} className="border-b border-[color:var(--surface-divider)] last:border-0">
                         <td className="whitespace-nowrap px-0 py-2 text-slate-500 sm:px-3">
                           {formatDateTimeShort(l.createdAt)}
                         </td>

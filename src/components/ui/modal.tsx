@@ -111,7 +111,7 @@ export function Modal({
             onClick={onClose}
             data-modal-close=""
             aria-label={closeLabel}
-            className="hit-area btn-press inline-flex items-center justify-center rounded-lg text-slate-400 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-400 transition hover:bg-brand-navy/8 hover:text-brand-navy active:scale-[0.98]"
           >
             <X className="h-5 w-5" />
           </button>

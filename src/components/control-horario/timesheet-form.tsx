@@ -419,7 +419,7 @@ export function TimeSheetForm({
                   type="button"
                   onClick={() => void handlePdfDownload()}
                   disabled={pdfLoading}
-                  className="btn-sm btn-ghost min-h-11 disabled:opacity-60"
+                  className="btn-sm btn-ghost min-h-11"
                 >
                   {pdfLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -508,7 +508,6 @@ export function TimeSheetForm({
                   type="checkbox"
                   checked={weekdaysOnly}
                   onChange={(e) => setWeekdaysOnly(e.target.checked)}
-                  className="accent-brand-blue"
                 />
                 Solo L–V
               </label>

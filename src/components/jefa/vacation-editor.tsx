@@ -146,7 +146,7 @@ export function VacationEditor({
             type="button"
             onClick={handleSaveBalance}
             disabled={pending}
-            className="btn-sm btn-primary disabled:opacity-60"
+            className="btn-sm btn-primary"
           >
             Guardar
           </button>
@@ -201,7 +201,7 @@ export function VacationEditor({
               type="button"
               onClick={handleAddAdjustment}
               disabled={pending}
-              className="btn-sm btn-secondary disabled:opacity-60"
+              className="btn-sm btn-secondary"
             >
               Añadir ajuste
             </button>

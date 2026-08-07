@@ -100,15 +100,15 @@ export function NewsCreateForm() {
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 text-sm text-slate-600">
-              <input type="checkbox" name="pinned" className="accent-brand-blue" />
+              <input type="checkbox" name="pinned" />
               Fijar arriba
             </label>
             <label className="flex items-center gap-2 text-sm text-slate-600">
-              <input type="checkbox" name="draft" className="accent-brand-blue" />
+              <input type="checkbox" name="draft" />
               Guardar como borrador
             </label>
           </div>
-          <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-60">
+          <button type="submit" disabled={pending} className="btn-primary w-full">
             {pending ? "Guardando…" : "Guardar"}
           </button>
         </form>

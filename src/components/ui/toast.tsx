@@ -53,13 +53,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div
-        className="pointer-events-none fixed bottom-4 right-4 z-[100] flex max-w-sm flex-col gap-2 md:bottom-6"
-        aria-live="polite"
-      >
+      <div className="pointer-events-none fixed bottom-4 right-4 z-[100] flex max-w-sm flex-col gap-2 md:bottom-6">
         {toasts.map((t) => (
           <div
             key={t.id}
+            role={t.type === "error" ? "alert" : "status"}
+            aria-live={t.type === "error" ? "assertive" : "polite"}
             className={`pointer-events-auto rounded-xl px-4 py-3 text-sm font-medium shadow-lg ring-1 ring-black/5 ${
               t.exiting ? "animate-toast-out" : "animate-toast-in"
             } ${

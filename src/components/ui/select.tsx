@@ -17,7 +17,6 @@ export function Select({
         {...props}
         className={cn(
           "field-control w-full appearance-none rounded-lg px-3 py-2 pr-9 text-sm font-medium text-brand-navy transition-colors",
-          "focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20",
           "disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}

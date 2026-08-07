@@ -51,11 +51,15 @@ export function Sidebar({
   onNavigate,
   pendingSignatures,
   pendingVacations,
+  employeeRejectedTimesheet,
+  employeePendingVacations,
 }: {
   role: AppRole;
   onNavigate?: () => void;
   pendingSignatures?: number | null;
   pendingVacations?: number;
+  employeeRejectedTimesheet?: number;
+  employeePendingVacations?: number;
 }) {
   const pathname = usePathname();
 
@@ -63,9 +67,17 @@ export function Sidebar({
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   function badgeFor(href: string): number | undefined {
-    if (role !== "JEFA") return undefined;
-    if (href === "/jefa/controles") return pendingSignatures ?? undefined;
-    if (href === "/jefa/vacaciones") return pendingVacations;
+    if (role === "JEFA") {
+      if (href === "/jefa/controles") return pendingSignatures ?? undefined;
+      if (href === "/jefa/vacaciones") return pendingVacations;
+      return undefined;
+    }
+    if (href === "/control-horario" && employeeRejectedTimesheet) {
+      return employeeRejectedTimesheet;
+    }
+    if (href === "/vacaciones" && employeePendingVacations) {
+      return employeePendingVacations;
+    }
     return undefined;
   }
 
@@ -102,6 +114,7 @@ export function Sidebar({
           item={item}
           active={isActive(item.href)}
           onNavigate={onNavigate}
+          badge={badgeFor(item.href)}
         />
       ))}
     </nav>

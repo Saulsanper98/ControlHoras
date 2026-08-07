@@ -77,7 +77,6 @@ export function EmployeesDirectory({
               type="checkbox"
               checked={onlyActive}
               onChange={(e) => setOnlyActive(e.target.checked)}
-              className="accent-brand-blue"
             />
             Solo activos
           </label>

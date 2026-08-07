@@ -6,6 +6,8 @@ import { SectionBlock } from "@/components/ui/list-surface";
 import { BackLink } from "@/components/ui/back-link";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stagger } from "@/components/ui/stagger";
+import { NewsImage } from "@/components/noticias/news-image";
+import { formatDateTimeShort } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 
 export default async function NoticiaDetallePage({
@@ -25,6 +27,8 @@ export default async function NoticiaDetallePage({
   });
   if (!news) notFound();
 
+  const publishedLabel = `${formatDateTimeShort(news.publishedAt)} (${formatRelativeTime(news.publishedAt)})`;
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Stagger>
@@ -33,7 +37,7 @@ export default async function NoticiaDetallePage({
           <BackLink href="/noticias">Volver a noticias</BackLink>
           <PageHeader
             title={news.title}
-            description={`${formatRelativeTime(news.publishedAt)} · ${news.publishedBy.name}`}
+            description={`${publishedLabel} · ${news.publishedBy.name}`}
           />
         </div>
       </Stagger>
@@ -45,8 +49,7 @@ export default async function NoticiaDetallePage({
           </p>
         )}
         {news.imagePath && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <NewsImage
             src={`/api/uploads/${news.imagePath}`}
             alt={news.title}
             className="max-h-[28rem] w-full rounded-lg object-cover"

@@ -157,7 +157,6 @@ export function NewsItem({
               type="checkbox"
               checked={pinnedValue}
               onChange={(e) => setPinnedValue(e.target.checked)}
-              className="accent-brand-blue"
             />
             Fijar arriba
           </label>
@@ -166,7 +165,6 @@ export function NewsItem({
               type="checkbox"
               checked={draftValue}
               onChange={(e) => setDraftValue(e.target.checked)}
-              className="accent-brand-blue"
             />
             Guardar como borrador
           </label>
@@ -179,7 +177,7 @@ export function NewsItem({
               type="button"
               onClick={handleSave}
               disabled={pending}
-              className="btn-primary disabled:opacity-60"
+              className="btn-primary"
             >
               <Check className="h-4 w-4" />
               Guardar

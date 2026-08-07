@@ -5,6 +5,7 @@ import { ListSurface } from "@/components/ui/list-surface";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
+import { NewsImage } from "@/components/noticias/news-image";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import Link from "next/link";
 
@@ -51,9 +52,9 @@ export default async function NoticiasPage() {
               href={`/noticias/${n.id}`}
               className="block py-4 transition hover:bg-brand-navy/[0.03]"
             >
-              <div className="flex items-center gap-2">
+              <div className="space-y-1">
                 {n.pinned && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-blue">
+                  <span className="inline-flex w-fit items-center gap-1 rounded-full bg-brand-blue/12 px-2.5 py-0.5 text-xs font-medium text-brand-blue">
                     <Pin className="h-3.5 w-3.5 shrink-0" aria-hidden />
                     Fijada
                   </span>
@@ -62,11 +63,11 @@ export default async function NoticiasPage() {
               </div>
               <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{n.body}</p>
               {n.imagePath && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <NewsImage
                   src={`/api/uploads/${n.imagePath}`}
                   alt={n.title}
-                  className="mt-3 h-36 w-full object-cover"
+                  className="mt-3 h-36 w-full rounded-lg object-cover"
+                  fallbackClassName="mt-3 h-36 w-full"
                 />
               )}
               <p className="mt-2 text-xs text-slate-500">

@@ -11,7 +11,7 @@ export function SectionTitle({
   as?: "h2" | "h3" | "p";
 }) {
   return (
-    <Tag className={cn("text-sm font-semibold text-brand-navy", className)}>
+    <Tag className={cn("font-display text-sm font-semibold text-brand-navy", className)}>
       {children}
     </Tag>
   );
@@ -28,7 +28,7 @@ export function SectionEyebrow({
   return (
     <p
       className={cn(
-        "mb-3 text-xs font-semibold uppercase tracking-wide text-brand-navy/55",
+        "text-caption mb-3 font-semibold uppercase tracking-wide text-brand-navy/55",
         className
       )}
     >

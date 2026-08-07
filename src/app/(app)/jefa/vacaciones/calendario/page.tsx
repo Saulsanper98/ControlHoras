@@ -146,7 +146,7 @@ export default async function VacationCalendarPage({
               href={calendarHref({ month: m })}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "rounded-lg px-2.5 py-1 text-xs font-medium capitalize transition",
+                "inline-flex min-h-11 items-center rounded-lg px-2.5 py-1 text-xs font-medium capitalize transition",
                 active
                   ? "bg-brand-blue text-white"
                   : "text-slate-600 hover:bg-brand-navy/8 hover:text-brand-navy"

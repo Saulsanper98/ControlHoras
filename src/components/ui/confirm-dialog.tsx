@@ -61,7 +61,13 @@ export function useConfirm() {
   const ctx = useContext(ConfirmContext);
   if (!ctx) {
     return {
-      confirm: async () => window.confirm("¿Continuar?"),
+      confirm: async (options: ConfirmOptions) => {
+        console.error(
+          "[useConfirm] ConfirmProvider is missing; confirmation rejected.",
+          options.title
+        );
+        return false;
+      },
     };
   }
   return ctx;

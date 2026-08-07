@@ -1,11 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const LOAD_TIMEOUT_MS = 15_000;
 
 export function SchedulePdfPreview({ src, title }: { src: string; title: string }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
+
+  useEffect(() => {
+    if (loaded || errored) return;
+
+    const timer = window.setTimeout(() => {
+      setErrored(true);
+    }, LOAD_TIMEOUT_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [loaded, errored]);
 
   if (errored) {
     return (
