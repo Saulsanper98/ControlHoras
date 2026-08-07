@@ -66,7 +66,7 @@ export function OnboardingModal() {
         <button
           type="button"
           onClick={finish}
-          className="btn-sm btn-ghost text-slate-400"
+          className="btn-sm btn-ghost text-slate-600"
         >
           Omitir introducción
         </button>
@@ -80,24 +80,18 @@ export function OnboardingModal() {
               Atrás
             </button>
           )}
-          {!isLast && current.href && (
-            <Link href={current.href} onClick={finish} className="btn-ghost">
+          {current.href && (
+            <Link href={current.href} onClick={() => setOpen(false)} className="btn-ghost">
               {current.cta}
             </Link>
           )}
-          {isLast ? (
-            <Link href={current.href} onClick={finish} className="btn-primary">
-              {current.cta}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s + 1)}
-              className="btn-primary"
-            >
-              Siguiente
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={isLast ? finish : () => setStep((s) => s + 1)}
+            className="btn-primary"
+          >
+            {isLast ? "Empezar" : "Siguiente"}
+          </button>
         </div>
       </div>
     </Modal>

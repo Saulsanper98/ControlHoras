@@ -43,7 +43,7 @@ export function Breadcrumbs({ tail }: { tail?: string }) {
 
   return (
     <nav aria-label="Ruta" className="mb-4 flex flex-wrap items-center gap-1 text-xs text-slate-500">
-      <Link href="/" className="inline-flex items-center hover:text-brand-blue">
+      <Link href="/" aria-label="Inicio" className="inline-flex items-center hover:text-brand-blue">
         <Home className="h-3.5 w-3.5" />
       </Link>
       {crumbs.slice(1).map((c, i) => (

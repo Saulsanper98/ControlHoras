@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SectionBlock } from "@/components/ui/list-surface";
 import { BackLink } from "@/components/ui/back-link";
 import { PageHeader } from "@/components/ui/page-header";
@@ -28,6 +29,7 @@ export default async function NoticiaDetallePage({
     <div className="mx-auto max-w-3xl space-y-6">
       <Stagger>
         <div>
+          <Breadcrumbs tail={news.title} />
           <BackLink href="/noticias">Volver a noticias</BackLink>
           <PageHeader
             title={news.title}

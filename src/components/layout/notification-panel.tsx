@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Bell, ClipboardList, MessageSquare, Umbrella } from "lucide-react";
-import { useEffect, useId, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   markAllNotificationsReadAction,
@@ -21,6 +21,58 @@ type InboxItem = {
   readAt: string | null;
 };
 
+function InboxMessage({
+  n,
+  onNavigate,
+  onMarkRead,
+  pending,
+}: {
+  n: InboxItem;
+  onNavigate: () => void;
+  onMarkRead: (id: string) => void;
+  pending: boolean;
+}) {
+  const content = (
+    <>
+      <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
+      <p className="text-xs text-slate-500">{n.body}</p>
+      <p className="mt-0.5 text-[11px] text-slate-400">
+        {formatRelativeTime(new Date(n.createdAt))}
+      </p>
+    </>
+  );
+
+  const className = `block w-full rounded-lg px-2 py-2 text-left text-sm hover:bg-brand-navy/6 ${
+    n.readAt ? "text-slate-500" : "text-brand-navy"
+  }`;
+
+  if (n.href) {
+    return (
+      <Link
+        href={n.href}
+        onClick={() => {
+          onNavigate();
+          if (!n.readAt) onMarkRead(n.id);
+        }}
+        className={className}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={pending || !!n.readAt}
+      onClick={() => onMarkRead(n.id)}
+      className={className}
+    >
+      {content}
+    </button>
+  );
+}
+
 export function NotificationPanel({
   pendingControls,
   pendingVacations,
@@ -35,10 +87,13 @@ export function NotificationPanel({
   const [mounted, setMounted] = useState(false);
   const [pending, startTransition] = useTransition();
   const panelId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const unreadInbox = inbox.filter((n) => !n.readAt).length;
+  const unreadInbox = inbox.filter((n) => !n.readAt);
+  const readInbox = inbox.filter((n) => n.readAt);
   const managerPending = (pendingControls ?? 0) + pendingVacations;
-  const total = managerPending + unreadInbox;
+  const total = managerPending + unreadInbox.length;
 
   useEffect(() => {
     setMounted(true);
@@ -46,11 +101,42 @@ export function NotificationPanel({
 
   useEffect(() => {
     if (!open) return;
+
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
+
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+
+    const t = window.setTimeout(() => {
+      const first = panelRef.current?.querySelector<HTMLElement>(
+        'a[href], button:not([disabled])'
+      );
+      first?.focus();
+    }, 20);
+
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener("keydown", onKey);
+      triggerRef.current?.focus();
+    };
   }, [open]);
 
   function markAll() {
@@ -60,9 +146,17 @@ export function NotificationPanel({
     });
   }
 
+  function markRead(id: string) {
+    startTransition(async () => {
+      await markNotificationReadAction(id);
+      router.refresh();
+    });
+  }
+
   return (
     <div className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="hit-area relative inline-flex items-center justify-center rounded-full text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
@@ -93,6 +187,7 @@ export function NotificationPanel({
               onClick={() => setOpen(false)}
             />
             <div
+              ref={panelRef}
               id={panelId}
               role="region"
               aria-label="Notificaciones"
@@ -102,7 +197,7 @@ export function NotificationPanel({
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Pendientes
                 </p>
-                {unreadInbox > 0 && (
+                {unreadInbox.length > 0 && (
                   <button
                     type="button"
                     disabled={pending}
@@ -114,7 +209,7 @@ export function NotificationPanel({
                 )}
               </div>
 
-              {total === 0 ? (
+              {total === 0 && readInbox.length === 0 ? (
                 <InlineEmpty>Todo al día</InlineEmpty>
               ) : (
                 <ul className="max-h-80 space-y-1 overflow-y-auto">
@@ -158,7 +253,7 @@ export function NotificationPanel({
                       </Link>
                     </li>
                   )}
-                  {inbox.length > 0 && (
+                  {unreadInbox.length > 0 && (
                     <li className="px-2 pb-0.5 pt-2">
                       <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         <MessageSquare className="h-3 w-3" />
@@ -166,43 +261,31 @@ export function NotificationPanel({
                       </p>
                     </li>
                   )}
-                  {inbox.map((n) => (
+                  {unreadInbox.map((n) => (
                     <li key={n.id}>
-                      {n.href ? (
-                        <Link
-                          href={n.href}
-                          onClick={() => {
-                            setOpen(false);
-                            if (!n.readAt) {
-                              startTransition(async () => {
-                                await markNotificationReadAction(n.id);
-                                router.refresh();
-                              });
-                            }
-                          }}
-                          className={`block rounded-lg px-2 py-2 text-sm hover:bg-brand-navy/6 ${
-                            n.readAt ? "text-slate-500" : "text-brand-navy"
-                          }`}
-                        >
-                          <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
-                          <p className="text-xs text-slate-500">{n.body}</p>
-                          <p className="mt-0.5 text-[11px] text-slate-400">
-                            {formatRelativeTime(new Date(n.createdAt))}
-                          </p>
-                        </Link>
-                      ) : (
-                        <div
-                          className={`block rounded-lg px-2 py-2 text-sm ${
-                            n.readAt ? "text-slate-500" : "text-brand-navy"
-                          }`}
-                        >
-                          <p className={n.readAt ? "font-medium" : "font-semibold"}>{n.title}</p>
-                          <p className="text-xs text-slate-500">{n.body}</p>
-                          <p className="mt-0.5 text-[11px] text-slate-400">
-                            {formatRelativeTime(new Date(n.createdAt))}
-                          </p>
-                        </div>
-                      )}
+                      <InboxMessage
+                        n={n}
+                        pending={pending}
+                        onNavigate={() => setOpen(false)}
+                        onMarkRead={markRead}
+                      />
+                    </li>
+                  ))}
+                  {readInbox.length > 0 && (
+                    <li className="px-2 pb-0.5 pt-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        Anteriores
+                      </p>
+                    </li>
+                  )}
+                  {readInbox.map((n) => (
+                    <li key={n.id}>
+                      <InboxMessage
+                        n={n}
+                        pending={pending}
+                        onNavigate={() => setOpen(false)}
+                        onMarkRead={markRead}
+                      />
                     </li>
                   ))}
                 </ul>

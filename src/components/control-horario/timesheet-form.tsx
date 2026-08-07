@@ -383,7 +383,7 @@ export function TimeSheetForm({
     <div className="space-y-4">
       <div className="border-y border-[color:var(--surface-divider)]">
         {/* Cabecera + resumen */}
-        <div className="border-b border-[color:var(--surface-divider)] py-4">
+        <div className="border-b border-[color:var(--surface-divider)] px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Link
@@ -419,7 +419,7 @@ export function TimeSheetForm({
                   type="button"
                   onClick={() => void handlePdfDownload()}
                   disabled={pdfLoading}
-                  className="btn-sm btn-ghost disabled:opacity-60"
+                  className="btn-sm btn-ghost min-h-11 disabled:opacity-60"
                 >
                   {pdfLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -439,6 +439,12 @@ export function TimeSheetForm({
               )}
             </div>
           </div>
+
+          {status === "RECHAZADO" && rejectionReason && (
+            <Alert variant="danger" title="Motivo del rechazo" className="mt-4">
+              <p className="whitespace-pre-wrap">{rejectionReason}</p>
+            </Alert>
+          )}
 
           <div
             className={`mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 ${
@@ -509,7 +515,7 @@ export function TimeSheetForm({
               <button
                 type="button"
                 onClick={applyBulkShift}
-                className="btn-sm btn-secondary"
+                className="btn-sm btn-secondary min-h-11"
               >
                 <Wand2 className="h-4 w-4" />
                 Aplicar
@@ -518,7 +524,7 @@ export function TimeSheetForm({
                 type="button"
                 onClick={handleCopyPreviousMonth}
                 disabled={pending}
-                className="btn-sm btn-ghost disabled:opacity-50"
+                className="btn-sm btn-ghost min-h-11 disabled:opacity-50"
               >
                 <Copy className="h-4 w-4" />
                 Copiar mes anterior
@@ -660,6 +666,7 @@ export function TimeSheetForm({
                         onChange={(v) => updateEntry(entry.day, { checkIn: v })}
                         variant="plain"
                         className="w-28"
+                        aria-label={`Entrada día ${entry.day}`}
                       />
                     </td>
                     <td className={tableCell}>
@@ -669,6 +676,7 @@ export function TimeSheetForm({
                         onChange={(v) => updateEntry(entry.day, { checkOut: v })}
                         variant="plain"
                         className="w-28"
+                        aria-label={`Salida día ${entry.day}`}
                       />
                     </td>
                     <td className={`${tableCell} tabular-nums text-slate-600`}>
@@ -691,6 +699,7 @@ export function TimeSheetForm({
                         onChange={(e) => updateEntry(entry.day, { notes: e.target.value })}
                         className="field-control-plain w-full min-w-[100px] px-2 py-1 text-sm"
                         placeholder="—"
+                        aria-label={`Observaciones día ${entry.day}`}
                       />
                     </td>
                   </tr>
@@ -714,7 +723,7 @@ export function TimeSheetForm({
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/92 px-3 py-2 backdrop-blur-md">
+          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/92 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md">
             <div className="flex items-center justify-between gap-2">
               <p className="min-w-0 text-xs tabular-nums text-brand-navy">
                 <strong>{totals.totalHours.toFixed(1)} h</strong>
@@ -843,12 +852,6 @@ export function TimeSheetForm({
           </div>
         )}
       </div>
-
-      {status === "RECHAZADO" && rejectionReason && (
-        <Alert variant="danger" title="Motivo del rechazo">
-          <p className="whitespace-pre-wrap">{rejectionReason}</p>
-        </Alert>
-      )}
 
       {showSignPad && (
         <SignatureModal

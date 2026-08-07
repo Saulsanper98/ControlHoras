@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { calculateDayHours } from "@/lib/timesheet-calc";
 import { formatWeekdayShort } from "@/lib/format-date";
 import { FieldSelect } from "@/components/ui/field-select";
@@ -15,6 +16,10 @@ const shiftOptions = [
   { value: "T", label: "Tarde" },
   { value: "N", label: "Noche" },
 ];
+
+function isHiddenFreeDay(entry: Entry, editable: boolean) {
+  return !editable && !entry.checkIn && !entry.checkOut && !entry.notes;
+}
 
 export function TimeSheetMobileDays({
   entries,
@@ -37,17 +42,37 @@ export function TimeSheetMobileDays({
   onApplyShift: (day: number, key: ShiftKey) => void;
   shiftKeyForEntry: (entry: Entry) => ShiftKey;
 }) {
+  const visibleEntries = useMemo(
+    () => entries.filter((entry) => !isHiddenFreeDay(entry, editable)),
+    [entries, editable]
+  );
+
+  const hiddenFreeDays = !editable ? entries.length - visibleEntries.length : 0;
+  const containerClass = `md:hidden${editable ? " pb-[4.5rem]" : ""}`;
+
   if (entries.length === 0) {
     return (
-      <div className="md:hidden">
+      <div className={containerClass}>
         <InlineEmpty>No hay días que coincidan con el filtro.</InlineEmpty>
       </div>
     );
   }
 
+  if (visibleEntries.length === 0 && hiddenFreeDays > 0) {
+    return (
+      <div className={containerClass}>
+        <InlineEmpty>
+          {hiddenFreeDays === 1
+            ? "Se oculta 1 día libre"
+            : `Se ocultan ${hiddenFreeDays} días libres`}
+        </InlineEmpty>
+      </div>
+    );
+  }
+
   return (
-    <div className="divide-y divide-[color:var(--surface-divider)] md:hidden">
-      {entries.map((entry) => {
+    <div className={`divide-y divide-[color:var(--surface-divider)] ${containerClass}`}>
+      {visibleEntries.map((entry) => {
         const hours = calculateDayHours(entry.checkIn, entry.checkOut);
         const weekday = formatWeekdayShort(year, month, entry.day);
         const isWeekend = [0, 6].includes(new Date(year, month - 1, entry.day).getDay());
@@ -56,8 +81,6 @@ export function TimeSheetMobileDays({
         const rowOptions =
           shiftKey === "" ? [{ value: "", label: "Personalizado" }, ...shiftOptions] : shiftOptions;
         const isToday = todayDay === entry.day;
-
-        if (!entry.checkIn && !entry.checkOut && !entry.notes && !editable) return null;
 
         return (
           <div
@@ -84,7 +107,7 @@ export function TimeSheetMobileDays({
               options={rowOptions}
               size="sm"
               variant="plain"
-              className="mb-2"
+              className="mb-2 [&_button]:min-h-11"
             />
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -96,7 +119,7 @@ export function TimeSheetMobileDays({
                 </label>
                 <TimeField
                   id={`mobile-in-${entry.day}`}
-                  aria-label="Entrada"
+                  aria-label={`Entrada día ${entry.day}`}
                   disabled={!editable}
                   value={entry.checkIn}
                   onChange={(v) => onUpdate(entry.day, { checkIn: v })}
@@ -112,7 +135,7 @@ export function TimeSheetMobileDays({
                 </label>
                 <TimeField
                   id={`mobile-out-${entry.day}`}
-                  aria-label="Salida"
+                  aria-label={`Salida día ${entry.day}`}
                   disabled={!editable}
                   value={entry.checkOut}
                   onChange={(v) => onUpdate(entry.day, { checkOut: v })}
@@ -121,13 +144,14 @@ export function TimeSheetMobileDays({
               </div>
             </div>
             <label className="mt-2 block">
-              <span className="sr-only">Observaciones del día {entry.day}</span>
+              <span className="sr-only">Observaciones día {entry.day}</span>
               <input
                 type="text"
                 disabled={!editable}
                 value={entry.notes}
                 onChange={(e) => onUpdate(entry.day, { notes: e.target.value })}
                 placeholder="Observaciones"
+                aria-label={`Observaciones día ${entry.day}`}
                 className="field-control-plain w-full px-2 py-1.5 text-sm text-brand-navy placeholder:text-slate-400 disabled:opacity-60"
               />
             </label>
@@ -143,6 +167,13 @@ export function TimeSheetMobileDays({
           </div>
         );
       })}
+      {hiddenFreeDays > 0 && (
+        <p className="px-4 py-3 text-center text-xs text-slate-500">
+          {hiddenFreeDays === 1
+            ? "Se oculta 1 día libre"
+            : `Se ocultan ${hiddenFreeDays} días libres`}
+        </p>
+      )}
     </div>
   );
 }

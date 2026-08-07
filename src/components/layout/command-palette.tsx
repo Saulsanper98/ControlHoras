@@ -146,6 +146,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={onInputKeyDown}
           placeholder="Escribe para buscar páginas…"
+          aria-label="Buscar páginas"
           className="field-control mb-3 w-full px-3 py-2 text-sm"
           aria-activedescendant={
             filtered[activeIndex] ? `cmd-${filtered[activeIndex].id}` : undefined

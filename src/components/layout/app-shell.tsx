@@ -11,7 +11,6 @@ import { NotificationPanel } from "@/components/layout/notification-panel";
 import { PageTransition } from "@/components/ui/page-transition";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { useDensity } from "@/lib/density";
-import { mobileTitleForPath } from "@/lib/nav";
 import type { AppRole } from "@/lib/roles";
 
 function atmosphereForPath(pathname: string) {
@@ -60,7 +59,7 @@ export function AppShell({
   const drawerId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
-  const mobileTitle = mobileTitleForPath(pathname);
+  const showDensityToggle = pathname.includes("/control-horario");
 
   useEffect(() => {
     setOpen(false);
@@ -110,6 +109,12 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen w-full">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-brand-navy focus:shadow-lg focus:ring-2 focus:ring-brand-blue"
+      >
+        Saltar al contenido principal
+      </a>
       {open && (
         <div
           className="fixed inset-0 z-40 bg-slate-900/50 md:hidden"
@@ -198,29 +203,27 @@ export function AppShell({
           >
             <Menu className="h-6 w-6" />
           </button>
-          <p className="font-display text-sm font-semibold text-brand-navy md:hidden">
-            {mobileTitle}
-          </p>
           <CommandPalette role={role} />
           <div className="flex-1" />
-          {/* Afecta solo a la tabla del control horario, no al resto de la app */}
-          <button
-            type="button"
-            onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
-            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
-            title="Densidad de tablas del control horario (solo esa pantalla)"
-            aria-label={
-              density === "compact"
-                ? "Activar modo cómodo de tablas del control horario"
-                : "Activar modo compacto de tablas del control horario"
-            }
-          >
-            {density === "compact" ? (
-              <Maximize2 className="h-4 w-4" />
-            ) : (
-              <Minimize2 className="h-4 w-4" />
-            )}
-          </button>
+          {showDensityToggle && (
+            <button
+              type="button"
+              onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
+              className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
+              title="Densidad de tablas del control horario (solo esa pantalla)"
+              aria-label={
+                density === "compact"
+                  ? "Activar modo cómodo de tablas del control horario"
+                  : "Activar modo compacto de tablas del control horario"
+              }
+            >
+              {density === "compact" ? (
+                <Maximize2 className="h-4 w-4" />
+              ) : (
+                <Minimize2 className="h-4 w-4" />
+              )}
+            </button>
+          )}
           <NotificationPanel
             pendingControls={pendingSignatures}
             pendingVacations={pendingVacations}
@@ -228,7 +231,10 @@ export function AppShell({
           />
         </header>
 
-        <main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10">
+        <main
+          id="main-content"
+          className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10"
+        >
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

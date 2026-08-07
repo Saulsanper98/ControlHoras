@@ -1,9 +1,21 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Alert } from "@/components/ui/alert";
 import { Modal } from "@/components/ui/modal";
+
+function setupHiDpiCanvas(pad: SignatureCanvas) {
+  const canvas = pad.getCanvas();
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.scale(ratio, ratio);
+  }
+}
 
 export function SignatureModal({
   title,
@@ -18,6 +30,12 @@ export function SignatureModal({
 }) {
   const padRef = useRef<SignatureCanvas>(null);
   const [emptyWarning, setEmptyWarning] = useState(false);
+
+  useLayoutEffect(() => {
+    const pad = padRef.current;
+    if (!pad) return;
+    setupHiDpiCanvas(pad);
+  }, []);
 
   function handleClear() {
     padRef.current?.clear();
@@ -44,6 +62,7 @@ export function SignatureModal({
           penColor="#0a2240"
           canvasProps={{
             className: "w-full min-h-40 h-[min(40vw,12rem)] sm:h-48 rounded-lg touch-none",
+            "aria-label": "Área de firma",
           }}
           onBegin={() => setEmptyWarning(false)}
         />
