@@ -158,11 +158,11 @@ export default async function JefaVacacionesPage({
         >
           <div className="flex flex-wrap items-center gap-3">
             <YearSwitcher
-              years={years}
               year={year}
-              hrefForYear={(y) =>
-                y === currentYear ? "/jefa/vacaciones" : `/jefa/vacaciones?year=${y}`
-              }
+              options={years.map((y) => ({
+                year: y,
+                href: y === currentYear ? "/jefa/vacaciones" : `/jefa/vacaciones?year=${y}`,
+              }))}
             />
             <Link href="/jefa/vacaciones/calendario" className="btn-secondary">
               <CalendarDays className="h-4 w-4" />

@@ -1,32 +1,30 @@
-"use client";
-
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/** Selector de año: chips (instantáneo) o se deja al formulario padre con Select. */
+/** Selector de año con chips. Recibe hrefs ya resueltos (no funciones: Server→Client safe). */
 export function YearSwitcher({
-  years,
   year,
-  hrefForYear,
+  options = [],
   className,
 }: {
-  years: number[];
   year: number;
-  hrefForYear: (y: number) => string;
+  options?: { year: number; href: string }[];
   className?: string;
 }) {
+  if (options.length === 0) return null;
+
   return (
     <div
       className={cn("flex flex-wrap gap-1.5", className)}
       role="group"
       aria-label="Seleccionar año"
     >
-      {years.map((y) => {
-        const active = y === year;
+      {options.map((opt) => {
+        const active = opt.year === year;
         return (
           <Link
-            key={y}
-            href={hrefForYear(y)}
+            key={opt.year}
+            href={opt.href}
             aria-current={active ? "page" : undefined}
             className={cn(
               "rounded-lg px-3 py-1.5 text-sm font-medium tabular-nums transition",
@@ -35,7 +33,7 @@ export function YearSwitcher({
                 : "text-slate-600 hover:bg-brand-navy/8 hover:text-brand-navy"
             )}
           >
-            {y}
+            {opt.year}
           </Link>
         );
       })}

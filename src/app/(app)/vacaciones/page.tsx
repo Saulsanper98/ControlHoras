@@ -106,9 +106,11 @@ export default async function VacacionesPage({
           description="Consulta tu saldo, solicita ausencias y revisa tu bolsa de horas."
         >
           <YearSwitcher
-            years={years}
             year={year}
-            hrefForYear={(y) => (y === currentYear ? "/vacaciones" : `/vacaciones?year=${y}`)}
+            options={years.map((y) => ({
+              year: y,
+              href: y === currentYear ? "/vacaciones" : `/vacaciones?year=${y}`,
+            }))}
           />
         </PageHeader>
       </Stagger>

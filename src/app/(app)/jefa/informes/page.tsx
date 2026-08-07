@@ -155,7 +155,13 @@ export default async function InformeHorasPage({
           )}
         </form>
         <div className="mt-4 border-t border-[color:var(--surface-divider)] pt-3">
-          <YearSwitcher years={yearOptions} year={year} hrefForYear={yearHref} />
+          <YearSwitcher
+            year={year}
+            options={yearOptions.map((y) => ({
+              year: y,
+              href: yearHref(y),
+            }))}
+          />
         </div>
       </SectionBlock>
 

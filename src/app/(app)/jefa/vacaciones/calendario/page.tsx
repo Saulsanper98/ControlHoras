@@ -111,9 +111,11 @@ export default async function VacationCalendarPage({
           description="Cobertura del equipo por día del mes."
         >
           <YearSwitcher
-            years={yearOptions}
             year={year}
-            hrefForYear={(y) => calendarHref({ year: y, month: 1 })}
+            options={yearOptions.map((y) => ({
+              year: y,
+              href: calendarHref({ year: y, month: 1 }),
+            }))}
           />
         </PageHeader>
       </div>
