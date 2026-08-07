@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Newspaper, Plus } from "lucide-react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Modal } from "@/components/ui/modal";
@@ -9,6 +10,7 @@ import { createNewsAction } from "@/app/(app)/jefa/noticias/actions";
 
 export function NewsCreateForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const { showToast } = useToast();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -25,6 +27,7 @@ export function NewsCreateForm() {
         setImageFile(null);
         showToast("Noticia guardada.");
         setOpen(false);
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al publicar.", "error");
       }

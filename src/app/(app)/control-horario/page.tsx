@@ -29,7 +29,7 @@ export default async function ControlHorarioPage({
     },
   });
 
-  const status = timeSheet?.status ?? "BORRADOR";
+  const status = timeSheet?.status ?? "SIN_CONTROL";
 
   return (
     <div className="space-y-6">

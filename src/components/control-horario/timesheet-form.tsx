@@ -94,7 +94,7 @@ export function TimeSheetForm({
   const { confirm } = useConfirm();
   const { showToast } = useToast();
   const { tableCell } = useDensity();
-  const editable = status === "BORRADOR" || status === "RECHAZADO";
+  const editable = status === "BORRADOR" || status === "RECHAZADO" || status === "SIN_CONTROL";
   const days = daysInMonth(month, year);
   const now = new Date();
   const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
@@ -306,6 +306,26 @@ export function TimeSheetForm({
         }
       });
     })();
+  }
+
+  async function openSignPad() {
+    if (summary.incompleteDays > 0) {
+      const ok = await confirm({
+        title: "Días incompletos",
+        message: `Hay ${summary.incompleteDays} día${summary.incompleteDays === 1 ? "" : "s"} con solo entrada o solo salida. ¿Firmar igual?`,
+        variant: "danger",
+        confirmLabel: "Firmar igual",
+      });
+      if (!ok) return;
+    }
+    const ok = await confirm({
+      title: "Firmar y enviar",
+      message:
+        "Al firmar, el control quedará bloqueado hasta que la responsable lo revise. ¿Continuar?",
+      confirmLabel: "Continuar a firmar",
+    });
+    if (!ok) return;
+    setShowSignPad(true);
   }
 
   function handleSign(signatureDataUrl: string) {
@@ -715,7 +735,7 @@ export function TimeSheetForm({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowSignPad(true)}
+                  onClick={() => void openSignPad()}
                   disabled={pending}
                   className="btn-primary"
                   title="Firmar y enviar el control"

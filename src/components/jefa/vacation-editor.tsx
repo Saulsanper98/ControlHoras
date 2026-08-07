@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
 import { useToast } from "@/components/ui/toast";
@@ -34,6 +35,7 @@ export function VacationEditor({
 }) {
   const { showToast } = useToast();
   const { confirm } = useConfirm();
+  const router = useRouter();
   const [totalDays, setTotalDays] = useState(initialTotalDays);
   const [usedDays, setUsedDays] = useState(initialUsedDays);
   const [notes, setNotes] = useState(initialNotes);
@@ -46,6 +48,7 @@ export function VacationEditor({
       const result = await saveVacationBalanceAction(userId, year, totalDays, usedDays, notes);
       if (result.ok) {
         showToast("Saldo de vacaciones guardado.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al guardar.", "error");
       }
@@ -64,6 +67,7 @@ export function VacationEditor({
         setHours("");
         setReason("");
         showToast("Ajuste de horas añadido.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al añadir el ajuste.", "error");
       }
@@ -82,6 +86,7 @@ export function VacationEditor({
       const result = await deleteHourAdjustmentAction(id, userId);
       if (result.ok) {
         showToast("Ajuste eliminado.");
+        router.refresh();
       } else {
         showToast(result.error ?? "Error al eliminar el ajuste.", "error");
       }

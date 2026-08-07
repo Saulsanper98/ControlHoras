@@ -127,7 +127,7 @@ export default async function DashboardPage() {
             <p className="text-brand-navy/55">
               {role === "JEFA"
                 ? `Resumen de ${MONTH_NAMES_ES[month - 1]} de ${year}`
-                : `${session.user.departmentName} · ${MONTH_NAMES_ES[month - 1]} de ${year}`}
+                : `${session.user.departmentName ?? "Sin departamento"} · ${MONTH_NAMES_ES[month - 1]} de ${year}`}
             </p>
             {showPersonal && (
               <StatusBadge
