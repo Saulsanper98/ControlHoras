@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { clearSessionCookies, hasSessionCookie } from "@/lib/clear-session-cookies";
 
 const PUBLIC_PATHS = ["/login"];
 const CHANGE_PASSWORD_PATH = "/cambiar-contrasena";
@@ -8,6 +9,17 @@ const CHANGE_PASSWORD_PATH = "/cambiar-contrasena";
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+
+  // Cookie JWT cifrada con otro AUTH_SECRET → Auth.js deja req.auth=null
+  // pero sigue logueando JWTSessionError en cada request. La borramos.
+  if (!req.auth && hasSessionCookie(req)) {
+    if (!isPublic) {
+      const loginUrl = new URL("/login", req.nextUrl.origin);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return clearSessionCookies(req, NextResponse.redirect(loginUrl));
+    }
+    return clearSessionCookies(req, NextResponse.next());
+  }
 
   if (!req.auth && !isPublic) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -33,14 +45,7 @@ export default auth(async (req) => {
     if (!dbUser || !dbUser.active) {
       const loginUrl = new URL("/login", req.nextUrl.origin);
       const response = NextResponse.redirect(loginUrl);
-      // Cierra la sesión de forma robusta ante variaciones del nombre de
-      // cookie de Auth.js (authjs.session-token / __Secure-authjs.session-token).
-      for (const cookie of req.cookies.getAll()) {
-        if (cookie.name.includes("session-token")) {
-          response.cookies.delete(cookie.name);
-        }
-      }
-      return response;
+      return clearSessionCookies(req, response);
     }
 
     const role = dbUser.role;

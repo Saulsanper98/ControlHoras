@@ -52,10 +52,20 @@ let env = fs.readFileSync(envPath, "utf8");
 env = upsertEnv(env, "AUTH_URL", authUrl);
 env = upsertEnv(env, "AUTH_TRUST_HOST", "true");
 
-// Asegura secreto de desarrollo si falta (Auth.js lo exige).
-if (!/^AUTH_SECRET=.+/m.test(env) || /AUTH_SECRET="genera-uno-con/m.test(env)) {
-  const secret = Buffer.from(`dev-${ip}-${Date.now()}`).toString("base64url");
+// Asegura secreto de desarrollo si falta o es el placeholder del example.
+// NUNCA rotar un secreto ya válido: eso invalida cookies y provoca
+// JWTSessionError "no matching decryption secret".
+const secretMatch = env.match(/^AUTH_SECRET="?([^"\n]*)"?$/m);
+const currentSecret = secretMatch?.[1]?.trim() ?? "";
+const needsSecret =
+  !currentSecret ||
+  currentSecret.startsWith("genera-uno-con") ||
+  currentSecret === "change-me";
+if (needsSecret) {
+  // Estable por máquina (IP), no Date.now(): reinicios no rompen sesiones.
+  const secret = Buffer.from(`portal-empleado-dev-secret-${ip}`).toString("base64url");
   env = upsertEnv(env, "AUTH_SECRET", secret);
+  console.log("OK — AUTH_SECRET de desarrollo fijado (estable)");
 }
 
 fs.writeFileSync(envPath, env, "utf8");
