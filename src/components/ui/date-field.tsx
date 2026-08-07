@@ -120,7 +120,12 @@ export function DateField({
       setOpen(false);
     }
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        setOpen(false);
+      }
     }
     function handleReposition() {
       positionPanel();
@@ -176,6 +181,7 @@ export function DateField({
     createPortal(
       <div
         ref={panelRef}
+        data-portal-menu
         role="dialog"
         aria-label={label ?? "Calendario"}
         style={panelStyle}

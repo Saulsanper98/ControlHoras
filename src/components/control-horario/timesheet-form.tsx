@@ -27,7 +27,12 @@ import { useToast } from "@/components/ui/toast";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useDensity } from "@/lib/density";
 import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
-import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
+import {
+  calculateDayHours,
+  daysInMonth,
+  isSuspiciousShift,
+  sumDayHours,
+} from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
 import { formatDateTimeShort, formatWeekdayShort } from "@/lib/format-date";
 import { SignatureModal } from "@/components/signature/signature-pad";
@@ -310,13 +315,16 @@ export function TimeSheetForm({
 
   async function openSignPad() {
     if (summary.incompleteDays > 0) {
-      const ok = await confirm({
-        title: "Días incompletos",
-        message: `Hay ${summary.incompleteDays} día${summary.incompleteDays === 1 ? "" : "s"} con solo entrada o solo salida. ¿Firmar igual?`,
-        variant: "danger",
-        confirmLabel: "Firmar igual",
-      });
-      if (!ok) return;
+      showToast(
+        `Hay ${summary.incompleteDays} día${summary.incompleteDays === 1 ? "" : "s"} con solo entrada o solo salida. Complétalos antes de firmar.`,
+        "error"
+      );
+      return;
+    }
+    const hasFilledDay = entries.some((e) => e.checkIn && e.checkOut);
+    if (!hasFilledDay && attachments.length === 0) {
+      showToast("Rellena al menos un día o adjunta un archivo antes de firmar.", "error");
+      return;
     }
     const ok = await confirm({
       title: "Firmar y enviar",
@@ -379,8 +387,17 @@ export function TimeSheetForm({
     label: SHIFTS[key].label,
   }));
 
+  const signBlocked = summary.incompleteDays > 0;
+
   return (
     <div className="space-y-4">
+      {signBlocked && (
+        <Alert variant="warning" title="Días incompletos">
+          Hay {summary.incompleteDays} día{summary.incompleteDays === 1 ? "" : "s"} con solo
+          entrada o solo salida. Complétalos antes de firmar.
+        </Alert>
+      )}
+
       <div className="border-y border-[color:var(--surface-divider)]">
         {/* Cabecera + resumen */}
         <div className="border-b border-[color:var(--surface-divider)] px-4 py-4 sm:px-5">
@@ -390,6 +407,7 @@ export function TimeSheetForm({
                 href={prevHref}
                 aria-label="Mes anterior"
                 onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
                   e.preventDefault();
                   void navigateMonth(prevHref, prev.month, prev.year);
                 }}
@@ -404,6 +422,7 @@ export function TimeSheetForm({
                 href={nextHref}
                 aria-label="Mes siguiente"
                 onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
                   e.preventDefault();
                   void navigateMonth(nextHref, next.month, next.year);
                 }}
@@ -440,9 +459,16 @@ export function TimeSheetForm({
             </div>
           </div>
 
-          {status === "RECHAZADO" && rejectionReason && (
-            <Alert variant="danger" title="Motivo del rechazo" className="mt-4">
-              <p className="whitespace-pre-wrap">{rejectionReason}</p>
+          {status === "RECHAZADO" && (
+            <Alert
+              variant="danger"
+              title={rejectionReason?.trim() ? "Motivo del rechazo" : "Control rechazado"}
+              className="mt-4"
+            >
+              <p className="whitespace-pre-wrap">
+                {rejectionReason?.trim() ||
+                  "Tu control fue rechazado. Corrígelo y vuelve a enviarlo."}
+              </p>
             </Alert>
           )}
 
@@ -586,11 +612,12 @@ export function TimeSheetForm({
           shiftKeyForEntry={shiftKeyForEntry}
         />
 
-        <ScrollShadow className="hidden md:block">
+        <ScrollShadow className={`hidden md:block${editable ? " pb-20" : ""}`}>
           {filteredEntries.length === 0 ? (
             <InlineEmpty>No hay días que coincidan con el filtro.</InlineEmpty>
           ) : (
           <table className="w-full min-w-[720px] text-sm">
+            {/* thead sticky top no funciona dentro de ScrollShadow (overflow-x-auto); skip seguro */}
             <thead className="sticky top-0 z-10 bg-[color:var(--app-gradient-top)]">
               <tr className="border-b border-[color:var(--surface-divider)] text-left text-[11px] uppercase tracking-wide text-slate-500">
                 <th className={tableCell}>Día</th>
@@ -625,13 +652,21 @@ export function TimeSheetForm({
                   shiftKey === ""
                     ? [{ value: "", label: "Personalizado" }, ...shiftOptions]
                     : shiftOptions;
+                const suspicious = isSuspiciousShift(hours);
 
                 return (
                   <tr
                     key={entry.day}
+                    title={
+                      suspicious
+                        ? "Turno de más de 16 h — revisa entrada y salida"
+                        : undefined
+                    }
                     className={`border-b border-[color:var(--surface-divider)] last:border-0 ${
                       holidayName ? "row-holiday" : isWeekend ? "row-weekend" : ""
-                    } ${todayDay === entry.day ? "bg-brand-blue/[0.04]" : ""}`}
+                    } ${todayDay === entry.day ? "bg-brand-blue/[0.04]" : ""} ${
+                      suspicious ? "border-l-2 border-l-amber-500 text-amber-900" : ""
+                    }`}
                   >
                     <td className={`${tableCell} whitespace-nowrap`}>
                       <span className="font-medium text-brand-navy">{entry.day}</span>{" "}
@@ -744,9 +779,13 @@ export function TimeSheetForm({
                 <button
                   type="button"
                   onClick={() => void openSignPad()}
-                  disabled={pending}
+                  disabled={pending || signBlocked}
                   className="btn-primary"
-                  title="Firmar y enviar el control"
+                  title={
+                    signBlocked
+                      ? "Completa los días con solo entrada o solo salida antes de firmar"
+                      : "Firmar y enviar el control"
+                  }
                   aria-label="Firmar y enviar"
                 >
                   <PenLine className="h-4 w-4" />
@@ -760,7 +799,9 @@ export function TimeSheetForm({
           </div>
         )}
 
-        <div className="border-t border-[color:var(--surface-divider)] py-4">
+        <div
+          className={`border-t border-[color:var(--surface-divider)] py-4${editable ? " md:pb-20" : ""}`}
+        >
           <label htmlFor="monthly-notes" className="block text-sm font-medium text-brand-navy">
             Notas del mes
           </label>
@@ -774,7 +815,9 @@ export function TimeSheetForm({
           />
         </div>
 
-        <div className="border-t border-[color:var(--surface-divider)] py-4">
+        <div
+          className={`border-t border-[color:var(--surface-divider)] py-4${editable ? " md:pb-20" : ""}`}
+        >
           <p className="mb-3 flex items-center gap-2 text-sm font-medium text-brand-navy">
             <Paperclip className="h-4 w-4" />
             Adjuntos (PDF/Excel)

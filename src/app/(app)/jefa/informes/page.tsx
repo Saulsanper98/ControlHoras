@@ -160,11 +160,12 @@ export default async function InformeHorasPage({
           )}
         </form>
         <div className="mt-4 border-t border-[color:var(--surface-divider)] pt-3">
-          <label htmlFor="inf-year-switcher" className="mb-2 block text-xs font-medium text-slate-500">
+          <label id="inf-year-label" className="mb-2 block text-xs font-medium text-slate-500">
             Año
           </label>
           <YearSwitcher
             id="inf-year-switcher"
+            labelledBy="inf-year-label"
             year={year}
             options={yearOptions.map((y) => ({
               year: y,
@@ -231,7 +232,7 @@ export default async function InformeHorasPage({
               </span>
             </SectionEyebrow>
             <ScrollShadow>
-              <TableSurface>
+              <TableSurface scroll={false}>
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead className="border-b border-[color:var(--surface-divider)] text-xs uppercase text-slate-500">
                     <tr>

@@ -11,7 +11,7 @@ import { Select } from "@/components/ui/select";
 import { YearSwitcher } from "@/components/ui/year-switcher";
 import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
-import { MONTH_NAMES_ES } from "@/lib/format-date";
+import { MONTH_NAMES_ES, dateKeyToUtcNoon, toDateKey } from "@/lib/format-date";
 import { daysInMonth } from "@/lib/timesheet-calc";
 import { LEAVE_TYPE_COLOR, LEAVE_TYPE_LABEL } from "@/lib/labels";
 import { cn } from "@/lib/utils";
@@ -33,12 +33,14 @@ export default async function VacationCalendarPage({
   const departmentId = params.department || undefined;
   const showAllTypes = params.tipos === "todos";
 
-  const monthStart = new Date(year, month - 1, 1);
-  const monthEnd = new Date(year, month, 0);
+  const monthStartKey = `${year}-${String(month).padStart(2, "0")}-01`;
   const days = daysInMonth(month, year);
-  const firstDow = (monthStart.getDay() + 6) % 7;
-  const todayKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  const monthEndKey = `${year}-${String(month).padStart(2, "0")}-${String(days).padStart(2, "0")}`;
+  const monthStart = dateKeyToUtcNoon(monthStartKey);
+  const monthEnd = dateKeyToUtcNoon(monthEndKey);
+  // Lunes=0 … Domingo=6 (civil, mediodía UTC)
+  const firstDow = (dateKeyToUtcNoon(monthStartKey).getUTCDay() + 6) % 7;
+  const todayKey = toDateKey(now);
 
   const [departments, approved] = await Promise.all([
     prisma.department.findMany({ orderBy: { name: "asc" } }),
@@ -65,8 +67,10 @@ export default async function VacationCalendarPage({
 
   const peopleByDay = new Map<number, DayPerson[]>();
   for (const r of approved) {
-    const from = r.startDate < monthStart ? 1 : r.startDate.getDate();
-    const to = r.endDate > monthEnd ? days : r.endDate.getDate();
+    const startKey = toDateKey(r.startDate);
+    const endKey = toDateKey(r.endDate);
+    const from = startKey < monthStartKey ? 1 : Number(startKey.slice(8, 10));
+    const to = endKey > monthEndKey ? days : Number(endKey.slice(8, 10));
     for (let d = from; d <= to; d++) {
       const list = peopleByDay.get(d) ?? [];
       list.push({
@@ -272,9 +276,9 @@ export default async function VacationCalendarPage({
               {Array.from({ length: days }, (_, i) => {
                 const day = i + 1;
                 const people = peopleByDay.get(day) ?? [];
-                const weekend = [0, 6].includes(new Date(year, month - 1, day).getDay());
-                const isToday =
-                  isCurrentMonth && `${year}-${month}-${day}` === todayKey;
+                const dayKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                const weekend = [0, 6].includes(dateKeyToUtcNoon(dayKey).getUTCDay());
+                const isToday = dayKey === todayKey;
                 return (
                   <div
                     key={day}

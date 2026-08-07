@@ -14,9 +14,10 @@ const ZERO: DayHours = {
   nightHours: 0,
 };
 
-function toHours(time: string): number {
-  const [h, m] = time.split(":").map(Number);
-  return h + m / 60;
+function toHours(time: string): number | null {
+  const match = time.trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return null;
+  return Number(match[1]) + Number(match[2]) / 60;
 }
 
 function round2(n: number): number {
@@ -38,6 +39,7 @@ export function calculateDayHours(checkIn: string, checkOut: string): DayHours {
 
   const start = toHours(checkIn);
   const end = toHours(checkOut);
+  if (start === null || end === null) return ZERO;
 
   // E7: =24*MOD(D7-B7,1) — duración dentro de un día, con salto de madrugada
   const totalHours = ((end - start) % 24 + 24) % 24;

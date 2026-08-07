@@ -201,7 +201,7 @@ export default async function AuditoriaPage({
       ) : (
         <>
           <ScrollShadow>
-            <TableSurface>
+            <TableSurface scroll={false}>
               <table className="w-full min-w-[720px] text-left text-sm">
                 <thead className="border-b border-[color:var(--surface-divider)] text-xs uppercase text-slate-500">
                   <tr>

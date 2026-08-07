@@ -55,7 +55,7 @@ export function TimeSheetGrid({
   );
 
   return (
-    <TableSurface>
+    <TableSurface scroll={false}>
       <table className="w-full min-w-[820px] text-sm">
         <thead>
           <tr className="border-b border-brand-navy/10 text-left text-xs uppercase tracking-wide text-slate-500">

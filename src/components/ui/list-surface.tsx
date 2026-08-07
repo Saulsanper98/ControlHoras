@@ -67,14 +67,18 @@ export function SectionBlock({
 export function TableSurface({
   children,
   className,
+  scroll = true,
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Si false, no aplica overflow-x-auto (p. ej. cuando ScrollShadow envuelve la tabla). */
+  scroll?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "overflow-x-auto border-y border-[color:var(--surface-divider)]",
+        scroll && "overflow-x-auto",
+        "border-y border-[color:var(--surface-divider)]",
         className
       )}
     >

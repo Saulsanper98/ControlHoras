@@ -5,6 +5,34 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function collectFocusable(root: ParentNode): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+}
+
+/** Incluye campos en portales abiertos (FieldSelect, DateField, TimeField). */
+function getFocusable(panel: HTMLElement): HTMLElement[] {
+  const result = collectFocusable(panel);
+  const seen = new Set(result);
+
+  const portalRoots = document.querySelectorAll<HTMLElement>(
+    '[data-portal-menu], [role="listbox"], [role="dialog"]'
+  );
+  for (const root of portalRoots) {
+    if (panel.contains(root)) continue;
+    for (const el of collectFocusable(root)) {
+      if (!seen.has(el)) {
+        seen.add(el);
+        result.push(el);
+      }
+    }
+  }
+
+  return result;
+}
+
 export function Modal({
   open,
   onClose,
@@ -36,9 +64,7 @@ export function Modal({
         return;
       }
       if (e.key !== "Tab" || !panelRef.current) return;
-      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
+      const focusable = getFocusable(panelRef.current);
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];

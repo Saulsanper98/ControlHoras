@@ -128,6 +128,7 @@ export function FieldSelect({
     createPortal(
       <ul
         ref={menuRef}
+        data-portal-menu
         role="listbox"
         aria-labelledby={triggerId}
         style={menuStyle}

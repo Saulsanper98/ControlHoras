@@ -123,6 +123,7 @@ export function TimeField({
     createPortal(
       <div
         ref={panelRef}
+        data-portal-menu
         role="dialog"
         aria-label="Selector de hora"
         style={panelStyle}
