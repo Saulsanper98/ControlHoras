@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionTitle } from "@/components/ui/section-title";
+import { ListSurface, ListRow } from "@/components/ui/list-surface";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
@@ -177,7 +178,7 @@ export default async function DashboardPage() {
               {nextPending && (
                 <Link
                   href={`/jefa/controles/${nextPending.id}`}
-                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.035]"
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.03]"
                 >
                   <div>
                     <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
@@ -198,7 +199,7 @@ export default async function DashboardPage() {
                 <Link
                   key={r.id}
                   href="/jefa/vacaciones"
-                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.035]"
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.03]"
                 >
                   <div>
                     <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
@@ -306,23 +307,24 @@ function NewsSection({
           description="Cuando la responsable publique novedades, aparecerán aquí."
         />
       ) : (
-        <div className="divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)]">
+        <ListSurface>
           {news.map((item) => (
-            <Link
-              key={item.id}
-              href={`/noticias/${item.id}`}
-              className="block py-3.5 transition hover:bg-brand-navy/[0.035]"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-medium text-brand-navy">{item.title}</p>
-                <span className="shrink-0 text-xs text-slate-400">
-                  {formatRelativeTime(item.publishedAt)}
-                </span>
-              </div>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-500">{item.body}</p>
-            </Link>
+            <ListRow key={item.id} className="!py-0">
+              <Link
+                href={`/noticias/${item.id}`}
+                className="block py-3.5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-brand-navy">{item.title}</p>
+                  <span className="shrink-0 text-xs text-slate-400">
+                    {formatRelativeTime(item.publishedAt)}
+                  </span>
+                </div>
+                <p className="mt-1 line-clamp-2 text-sm text-slate-500">{item.body}</p>
+              </Link>
+            </ListRow>
           ))}
-        </div>
+        </ListSurface>
       )}
     </div>
   );

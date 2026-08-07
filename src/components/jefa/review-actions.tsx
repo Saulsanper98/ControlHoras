@@ -66,7 +66,7 @@ export function ReviewActions({ timeSheetId }: { timeSheetId: string }) {
         </button>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-4 py-3 backdrop-blur-sm md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/92 px-4 py-3 backdrop-blur-md md:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-2">
           <button
             type="button"

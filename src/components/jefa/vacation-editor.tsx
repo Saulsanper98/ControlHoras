@@ -107,7 +107,7 @@ export function VacationEditor({
               min="0"
               value={totalDays}
               onChange={(e) => setTotalDays(Number(e.target.value))}
-              className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-24 px-2 py-1.5 text-sm"
             />
           </div>
           <div>
@@ -121,7 +121,7 @@ export function VacationEditor({
               min="0"
               value={usedDays}
               onChange={(e) => setUsedDays(Number(e.target.value))}
-              className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-24 px-2 py-1.5 text-sm"
             />
           </div>
           <div className="min-w-[160px] flex-1">
@@ -133,14 +133,14 @@ export function VacationEditor({
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="field-control w-full rounded-md px-2 py-1.5 text-sm"
+              className="field-control w-full px-2 py-1.5 text-sm"
             />
           </div>
           <button
             type="button"
             onClick={handleSaveBalance}
             disabled={pending}
-            className="btn-primary disabled:opacity-60"
+            className="btn-sm btn-primary disabled:opacity-60"
           >
             Guardar
           </button>
@@ -176,7 +176,7 @@ export function VacationEditor({
                 step="0.5"
                 value={hours}
                 onChange={(e) => setHours(e.target.value)}
-                className="field-control w-24 rounded-md px-2 py-1.5 text-sm"
+                className="field-control w-24 px-2 py-1.5 text-sm"
               />
             </div>
             <div className="min-w-[160px] flex-1">
@@ -188,14 +188,14 @@ export function VacationEditor({
                 type="text"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="field-control w-full rounded-md px-2 py-1.5 text-sm"
+                className="field-control w-full px-2 py-1.5 text-sm"
               />
             </div>
             <button
               type="button"
               onClick={handleAddAdjustment}
               disabled={pending}
-              className="btn-secondary disabled:opacity-60"
+              className="btn-sm btn-secondary disabled:opacity-60"
             >
               Añadir ajuste
             </button>

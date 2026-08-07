@@ -59,7 +59,7 @@ export function NewsCreateForm() {
               placeholder="Título de la noticia"
               required
               data-autofocus
-              className="field-control w-full rounded-md px-3 py-2 text-sm"
+              className="field-control w-full px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -72,7 +72,7 @@ export function NewsCreateForm() {
               placeholder="Texto de la noticia"
               rows={4}
               required
-              className="field-control w-full rounded-md px-3 py-2 text-sm"
+              className="field-control w-full px-3 py-2 text-sm"
             />
           </div>
           <div>

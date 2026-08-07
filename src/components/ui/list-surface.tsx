@@ -34,7 +34,7 @@ export function ListRow({
     <div
       className={cn(
         "py-3.5",
-        interactive && "transition hover:bg-brand-navy/[0.035]",
+        interactive && "transition hover:bg-brand-navy/[0.03]",
         className
       )}
     >

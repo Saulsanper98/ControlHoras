@@ -9,7 +9,7 @@ import { Stagger } from "@/components/ui/stagger";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionEyebrow } from "@/components/ui/section-title";
-import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
+import { ListSurface, ListRow, SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
 
 const PAGE_SIZE = 20;
@@ -73,6 +73,7 @@ export default async function ControlesPage({
   ]);
 
   const hasFilters = Boolean(departmentId || month || year);
+  const isFullyEmpty = pending.length === 0 && drafts.length === 0 && othersTotal === 0;
   const totalPages = Math.max(1, Math.ceil(othersTotal / PAGE_SIZE));
 
   const queryBase = new URLSearchParams();
@@ -142,26 +143,34 @@ export default async function ControlesPage({
         </form>
       </SectionBlock>
 
+      {isFullyEmpty ? (
+        <EmptyState
+          icon={ClipboardList}
+          title={
+            hasFilters ? "Ningún control coincide con los filtros" : "No hay controles horarios"
+          }
+          description={
+            hasFilters
+              ? "Prueba con otros criterios o quita los filtros para ver todos los controles."
+              : "Cuando un empleado cree o envíe un control, aparecerá aquí."
+          }
+          action={
+            hasFilters ? (
+              <Link href="/jefa/controles" className="btn-primary">
+                Limpiar filtros
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : (
+        <>
       <section>
         <SectionEyebrow>Pendientes de firma ({pending.length})</SectionEyebrow>
         {pending.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
-            title={
-              hasFilters ? "Ningún control coincide con los filtros" : "No hay controles pendientes"
-            }
-            description={
-              hasFilters
-                ? "Prueba con otros criterios o quita los filtros para ver todos los controles."
-                : "Cuando un empleado envíe su control, aparecerá aquí para firmar."
-            }
-            action={
-              hasFilters ? (
-                <Link href="/jefa/controles" className="btn-primary">
-                  Limpiar filtros
-                </Link>
-              ) : undefined
-            }
+            title="No hay controles pendientes"
+            description="Cuando un empleado envíe su control, aparecerá aquí para firmar."
           />
         ) : (
           <ListSurface>
@@ -218,6 +227,8 @@ export default async function ControlesPage({
           )}
         </section>
       )}
+        </>
+      )}
     </div>
   );
 }
@@ -234,10 +245,11 @@ function TimeSheetRow({
   };
 }) {
   return (
-    <Link
-      href={`/jefa/controles/${t.id}`}
-      className="flex items-center justify-between gap-3 py-3 transition hover:bg-brand-navy/[0.03]"
-    >
+    <ListRow className="!py-0">
+      <Link
+        href={`/jefa/controles/${t.id}`}
+        className="flex items-center justify-between gap-3 py-3"
+      >
       <div>
         <p className="font-medium text-brand-navy">{t.user.name}</p>
         <p className="text-sm text-slate-500">
@@ -245,6 +257,7 @@ function TimeSheetRow({
         </p>
       </div>
       <StatusBadge status={t.status} />
-    </Link>
+      </Link>
+    </ListRow>
   );
 }

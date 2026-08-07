@@ -115,7 +115,7 @@ export function NewsItem({
             type="text"
             value={titleValue}
             onChange={(e) => setTitleValue(e.target.value)}
-            className="field-control w-full rounded-md px-3 py-2 text-sm"
+            className="field-control w-full px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -127,7 +127,7 @@ export function NewsItem({
             value={bodyValue}
             onChange={(e) => setBodyValue(e.target.value)}
             rows={4}
-            className="field-control w-full rounded-md px-3 py-2 text-sm"
+            className="field-control w-full px-3 py-2 text-sm"
           />
         </div>
         <div>

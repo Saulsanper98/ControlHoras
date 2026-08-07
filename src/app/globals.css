@@ -34,7 +34,8 @@
   --app-canvas: #c8d5e4;
   --app-gradient-top: #d5e2ef;
   --app-gradient-bottom: #b8c9db;
-  --app-sticky: #dce6f0;
+  /* Sticky bars: tint navy (no blanco lavado frente al canvas) */
+  --app-sticky: #b9c9db;
 
   /* Elevación */
   --shadow-rest: 0 1px 0 var(--glass-highlight) inset, 0 8px 28px rgba(10, 34, 64, 0.07);

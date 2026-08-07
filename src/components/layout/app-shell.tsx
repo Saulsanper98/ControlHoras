@@ -203,11 +203,12 @@ export function AppShell({
           </p>
           <CommandPalette role={role} />
           <div className="flex-1" />
+          {/* Afecta solo a la tabla del control horario, no al resto de la app */}
           <button
             type="button"
             onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
             className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
-            title="Densidad de tablas del control horario"
+            title="Densidad de tablas del control horario (solo esa pantalla)"
             aria-label={
               density === "compact"
                 ? "Activar modo cómodo de tablas del control horario"

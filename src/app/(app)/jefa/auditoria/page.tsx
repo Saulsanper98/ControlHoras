@@ -147,7 +147,7 @@ export default async function AuditoriaPage({
               type="search"
               defaultValue={actorQuery ?? ""}
               placeholder="Nombre o email…"
-              className="field-control w-full rounded-md px-3 py-2 text-sm"
+              className="field-control w-full px-3 py-2 text-sm"
             />
           </div>
           <button type="submit" className="btn-primary btn-sm">

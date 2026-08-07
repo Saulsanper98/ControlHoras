@@ -146,11 +146,15 @@ export function TimeSheetForm({
   const summary = useMemo(() => {
     let workedDays = 0;
     let freeDays = 0;
+    let incompleteDays = 0;
     for (const entry of entries) {
-      if (entry.checkIn && entry.checkOut) workedDays += 1;
-      else if (!entry.checkIn && !entry.checkOut) freeDays += 1;
+      const hasIn = Boolean(entry.checkIn);
+      const hasOut = Boolean(entry.checkOut);
+      if (hasIn && hasOut) workedDays += 1;
+      else if (!hasIn && !hasOut) freeDays += 1;
+      else if (hasIn !== hasOut) incompleteDays += 1;
     }
-    return { workedDays, freeDays, holidayCount: monthHolidays.size };
+    return { workedDays, freeDays, incompleteDays, holidayCount: monthHolidays.size };
   }, [entries, monthHolidays.size]);
 
   const filteredEntries = useMemo(() => {
@@ -322,13 +326,18 @@ export function TimeSheetForm({
     });
   }
 
-  async function navigateMonth(href: string) {
+  async function navigateMonth(href: string, targetMonth: number, targetYear: number) {
     if (isDirty && editable) {
       const ok = await confirm({
         title: "Cambios sin guardar",
         message: "Tienes cambios sin guardar. ¿Cambiar de mes de todos modos?",
       });
       if (!ok) return;
+    }
+    const currentOrdinal = now.getFullYear() * 12 + (now.getMonth() + 1);
+    const targetOrdinal = targetYear * 12 + targetMonth;
+    if (targetOrdinal > currentOrdinal + 1) {
+      showToast("Estás entrando en un mes muy adelantado; probablemente aún no tenga datos.", "warning");
     }
     router.push(href);
   }
@@ -361,10 +370,8 @@ export function TimeSheetForm({
                 href={prevHref}
                 aria-label="Mes anterior"
                 onClick={(e) => {
-                  if (isDirty && editable) {
-                    e.preventDefault();
-                    void navigateMonth(prevHref);
-                  }
+                  e.preventDefault();
+                  void navigateMonth(prevHref, prev.month, prev.year);
                 }}
                 className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
@@ -377,10 +384,8 @@ export function TimeSheetForm({
                 href={nextHref}
                 aria-label="Mes siguiente"
                 onClick={(e) => {
-                  if (isDirty && editable) {
-                    e.preventDefault();
-                    void navigateMonth(nextHref);
-                  }
+                  e.preventDefault();
+                  void navigateMonth(nextHref, next.month, next.year);
                 }}
                 className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
@@ -415,7 +420,11 @@ export function TimeSheetForm({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
+          <div
+            className={`mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 ${
+              summary.incompleteDays > 0 ? "lg:grid-cols-5" : "lg:grid-cols-4"
+            }`}
+          >
             <div>
               <p className="text-[11px] uppercase tracking-wide text-slate-500">Trabajados</p>
               <p className="text-lg font-semibold tabular-nums text-brand-navy">{summary.workedDays}</p>
@@ -424,6 +433,12 @@ export function TimeSheetForm({
               <p className="text-[11px] uppercase tracking-wide text-slate-500">Libres</p>
               <p className="text-lg font-semibold tabular-nums text-brand-navy">{summary.freeDays}</p>
             </div>
+            {summary.incompleteDays > 0 && (
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-slate-500">Incompletos</p>
+                <p className="text-lg font-semibold tabular-nums text-amber-700">{summary.incompleteDays}</p>
+              </div>
+            )}
             <div>
               <p className="text-[11px] uppercase tracking-wide text-slate-500">Festivos</p>
               <p className="text-lg font-semibold tabular-nums text-amber-700">{summary.holidayCount}</p>
@@ -679,7 +694,7 @@ export function TimeSheetForm({
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-3 py-2 backdrop-blur-sm">
+          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/92 px-3 py-2 backdrop-blur-md">
             <div className="flex items-center justify-between gap-2">
               <p className="min-w-0 text-xs tabular-nums text-brand-navy">
                 <strong>{totals.totalHours.toFixed(1)} h</strong>
