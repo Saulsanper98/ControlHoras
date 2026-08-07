@@ -5,6 +5,9 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionBlock } from "@/components/ui/list-surface";
 import { SectionTitle } from "@/components/ui/section-title";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Stagger } from "@/components/ui/stagger";
+import { SchedulePdfPreview } from "@/components/horario/schedule-pdf-preview";
 import { formatDate } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
@@ -37,38 +40,40 @@ export default async function HorarioPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="Mi horario"
-        description={
-          departmentName
-            ? `Horario del departamento ${departmentName}.`
-            : "Consulta el horario de trabajo asignado por tu responsable."
-        }
-      >
-        {fileHref && (
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={fileHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              {canPreview ? <ExternalLink className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-              {canPreview ? "Abrir PDF" : "Descargar"}
-            </a>
-            {canPreview && (
+      <Stagger>
+        <PageHeader
+          title="Mi horario"
+          description={
+            departmentName
+              ? `Horario del departamento ${departmentName}.`
+              : "Consulta el horario de trabajo asignado por tu responsable."
+          }
+        >
+          {fileHref && (
+            <div className="flex flex-wrap items-center gap-2">
               <a
                 href={fileHref}
-                download={schedule?.fileName}
-                className="btn-ghost text-sm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
               >
-                <Download className="h-4 w-4" />
-                Descargar
+                {canPreview ? <ExternalLink className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+                {canPreview ? "Abrir PDF" : "Descargar"}
               </a>
-            )}
-          </div>
-        )}
-      </PageHeader>
+              {canPreview && (
+                <a
+                  href={fileHref}
+                  download={schedule?.fileName}
+                  className="btn-ghost text-sm"
+                >
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </a>
+              )}
+            </div>
+          )}
+        </PageHeader>
+      </Stagger>
 
       {!schedule ? (
         <EmptyState
@@ -89,14 +94,8 @@ export default async function HorarioPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium text-brand-navy">{schedule.fileName}</p>
-                    <span className="rounded-md bg-emerald-500/12 px-2 py-0.5 text-xs font-medium text-emerald-800">
-                      Horario vigente
-                    </span>
-                    {isNew && (
-                      <span className="rounded-md bg-brand-blue/12 px-2 py-0.5 text-xs font-semibold text-brand-blue">
-                        Nuevo
-                      </span>
-                    )}
+                    <StatusBadge status="CURRENT" preset="schedule" />
+                    {isNew && <StatusBadge status="NEW" preset="schedule" />}
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
                     {isExcel ? "Excel" : canPreview ? "PDF" : "Archivo"} · subido{" "}
@@ -147,13 +146,7 @@ export default async function HorarioPage() {
               <SectionTitle className="mb-3 uppercase tracking-wide text-brand-navy/45">
                 Vista previa
               </SectionTitle>
-              <div className="mx-auto max-w-4xl overflow-hidden border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
-                <iframe
-                  src={fileHref!}
-                  title="Horario asignado"
-                  className="h-[min(75vh,52rem)] w-full"
-                />
-              </div>
+              <SchedulePdfPreview src={fileHref!} title="Horario asignado" />
             </section>
           ) : (
             <p className="flex items-start gap-3 border-y border-[color:var(--surface-divider)] py-5 text-sm text-slate-600">

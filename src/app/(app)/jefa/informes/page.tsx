@@ -9,13 +9,11 @@ import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionEyebrow } from "@/components/ui/section-title";
 import { SectionBlock, TableSurface, ListSurface } from "@/components/ui/list-surface";
+import { Stagger } from "@/components/ui/stagger";
+import { YearSwitcher } from "@/components/ui/year-switcher";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { MONTH_NAMES_ES } from "@/lib/format-date";
 import { buildInformeHoras } from "@/lib/informe-horas";
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
 
 export default async function InformeHorasPage({
   searchParams,
@@ -57,21 +55,40 @@ export default async function InformeHorasPage({
   if (departmentId) query.set("department", departmentId);
   if (status) query.set("status", status);
   const csvHref = `/api/informes/horas?${query.toString()}`;
+  const canExport = rows.length > 0;
 
   const missing = rows.filter((r) => !r.hasSheet);
   const hasFilters = Boolean(departmentId || status);
 
+  function yearHref(y: number) {
+    const q = new URLSearchParams();
+    q.set("month", String(month));
+    q.set("year", String(y));
+    if (departmentId) q.set("department", departmentId);
+    if (status) q.set("status", status);
+    return `/jefa/informes?${q.toString()}`;
+  }
+
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="Informe de horas"
-        description={`Totales de ${MONTH_NAMES[month - 1]} de ${year} por empleado y departamento.`}
-      >
-        <a href={csvHref} className="btn-primary">
-          <Download className="h-4 w-4" />
-          Exportar CSV
-        </a>
-      </PageHeader>
+      <Stagger>
+        <PageHeader
+          title="Informe de horas"
+          description={`Totales de ${MONTH_NAMES_ES[month - 1]} de ${year} por empleado y departamento.`}
+        >
+          {canExport ? (
+            <a href={csvHref} className="btn-primary">
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </a>
+          ) : (
+            <button type="button" disabled className="btn-primary disabled:opacity-50">
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </button>
+          )}
+        </PageHeader>
+      </Stagger>
 
       <SectionBlock>
         <form method="get" className="flex flex-wrap items-end gap-3">
@@ -80,7 +97,7 @@ export default async function InformeHorasPage({
               Mes
             </label>
             <Select id="inf-month" name="month" defaultValue={month}>
-              {MONTH_NAMES.map((m, i) => (
+              {MONTH_NAMES_ES.map((m, i) => (
                 <option key={m} value={i + 1}>
                   {m}
                 </option>
@@ -137,6 +154,9 @@ export default async function InformeHorasPage({
             </Link>
           )}
         </form>
+        <div className="mt-4 border-t border-[color:var(--surface-divider)] pt-3">
+          <YearSwitcher years={yearOptions} year={year} hrefForYear={yearHref} />
+        </div>
       </SectionBlock>
 
       <div className="grid grid-cols-2 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
@@ -167,7 +187,14 @@ export default async function InformeHorasPage({
                 className="flex items-center justify-between gap-3 py-3 text-sm"
               >
                 <div>
-                  <p className="font-medium text-brand-navy">{r.name}</p>
+                  <p className="font-medium text-brand-navy">
+                    <Link
+                      href={`/jefa/vacaciones/${r.userId}?year=${year}`}
+                      className="hover:text-brand-blue hover:underline"
+                    >
+                      {r.name}
+                    </Link>
+                  </p>
                   <p className="text-slate-500">{r.dept}</p>
                 </div>
                 <StatusBadge status="SIN_CONTROL" />
@@ -217,7 +244,12 @@ export default async function InformeHorasPage({
                               {r.name}
                             </Link>
                           ) : (
-                            r.name
+                            <Link
+                              href={`/jefa/vacaciones/${r.userId}?year=${year}`}
+                              className="hover:text-brand-blue hover:underline"
+                            >
+                              {r.name}
+                            </Link>
                           )}
                         </td>
                         <td className="px-3 py-2.5">

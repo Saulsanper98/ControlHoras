@@ -6,10 +6,7 @@ import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { formatDate } from "@/lib/format-date";
-import { formatRelativeTime } from "@/lib/format-relative-time";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
-import { StatusBadge } from "@/components/ui/status-badge";
-import Link from "next/link";
 
 export function NewsItem({
   id,
