@@ -7,6 +7,10 @@ import { Modal } from "@/components/ui/modal";
 import { DateField } from "@/components/ui/date-field";
 import { FieldSelect } from "@/components/ui/field-select";
 import { ListSurface } from "@/components/ui/list-surface";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionTitle } from "@/components/ui/section-title";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { useToast } from "@/components/ui/toast";
 import { countVacationDays } from "@/lib/holidays";
 import { formatDate, yearFromDateKey } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
@@ -15,20 +19,6 @@ import {
   cancelVacationRequestAction,
   createVacationRequestAction,
 } from "@/app/(app)/vacaciones/actions";
-
-const STATUS_LABEL: Record<string, string> = {
-  PENDIENTE: "Pendiente",
-  APROBADA: "Aprobada",
-  RECHAZADA: "Rechazada",
-  CANCELADA: "Cancelada",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  PENDIENTE: "bg-amber-500/15 text-amber-800",
-  APROBADA: "bg-emerald-500/15 text-emerald-800",
-  RECHAZADA: "bg-red-500/15 text-red-800",
-  CANCELADA: "bg-brand-navy/8 text-slate-500",
-};
 
 type RequestRow = {
   id: string;
@@ -51,13 +41,14 @@ export function VacationRequestsPanel({
 }) {
   const router = useRouter();
   const { confirm } = useConfirm();
+  const { showToast } = useToast();
   const [pending, startTransition] = useTransition();
   const [showModal, setShowModal] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
   const [leaveType, setLeaveType] = useState<"VACACIONES" | "ASUNTOS_PROPIOS" | "MEDIO_DIA">("VACACIONES");
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   function closeModal() {
     setShowModal(false);
@@ -65,18 +56,19 @@ export function VacationRequestsPanel({
     setEndDate("");
     setNotes("");
     setLeaveType("VACACIONES");
+    setError(null);
   }
 
   function handleCreate() {
-    setMessage(null);
+    setError(null);
     startTransition(async () => {
       const result = await createVacationRequestAction(startDate, endDate, notes, leaveType);
       if (result.ok) {
         closeModal();
-        setMessage({ type: "success", text: "Solicitud enviada correctamente." });
+        showToast("Solicitud enviada correctamente.");
         router.refresh();
       } else {
-        setMessage({ type: "error", text: result.error ?? "Error al enviar." });
+        setError(result.error ?? "Error al enviar.");
       }
     });
   }
@@ -90,13 +82,14 @@ export function VacationRequestsPanel({
         confirmLabel: "Cancelar solicitud",
       });
       if (!ok) return;
-      setMessage(null);
+      setError(null);
       startTransition(async () => {
         const result = await cancelVacationRequestAction(id);
         if (result.ok) {
+          showToast("Solicitud cancelada.");
           router.refresh();
         } else {
-          setMessage({ type: "error", text: result.error ?? "Error al cancelar." });
+          setError(result.error ?? "Error al cancelar.");
         }
       });
     })();
@@ -121,7 +114,7 @@ export function VacationRequestsPanel({
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-brand-navy">Mis solicitudes</h2>
+          <SectionTitle>Mis solicitudes</SectionTitle>
           <p className="mt-0.5 text-xs text-slate-500">
             Vacaciones, asuntos propios o medio día · {year}
           </p>
@@ -129,27 +122,31 @@ export function VacationRequestsPanel({
         <button
           type="button"
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-dark"
+          className="btn-primary"
         >
           <CalendarPlus className="h-4 w-4" />
           Nueva solicitud
         </button>
       </div>
 
-      {message && (
-        <p
-          className={`mt-4 rounded-lg px-3 py-2 text-sm ${
-            message.type === "success" ? "bg-emerald-500/12 text-emerald-800" : "bg-red-500/12 text-red-700"
-          }`}
-        >
-          {message.text}
+      {error && (
+        <p className="mt-4 rounded-lg bg-red-500/12 px-3 py-2 text-sm text-red-700">
+          {error}
         </p>
       )}
 
       {yearRequests.length === 0 ? (
-        <p className="mt-4 border-y border-[color:var(--surface-divider)] py-6 text-sm text-slate-500">
-          Sin solicitudes para {year}. Pulsa «Nueva solicitud» para empezar.
-        </p>
+        <EmptyState
+          className="mt-4"
+          icon={CalendarPlus}
+          title={`Sin solicitudes para ${year}`}
+          description="Pulsa «Nueva solicitud» para pedir vacaciones, asuntos propios o medio día."
+          action={
+            <button type="button" onClick={() => setShowModal(true)} className="btn-primary">
+              Nueva solicitud
+            </button>
+          }
+        />
       ) : (
         <ListSurface className="mt-4">
           {yearRequests.map((r) => (
@@ -175,18 +172,16 @@ export function VacationRequestsPanel({
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[r.status]}`}>
-                  {STATUS_LABEL[r.status]}
-                </span>
+                <StatusBadge status={r.status} preset="leave" />
                 {r.status === "PENDIENTE" && (
                   <button
                     type="button"
                     onClick={() => handleCancel(r.id)}
                     disabled={pending}
-                    aria-label="Cancelar solicitud"
-                    className="rounded-md p-1 text-slate-400 transition hover:bg-red-500/10 hover:text-red-600"
+                    className="btn-ghost px-2 py-1 text-xs text-slate-500 hover:text-red-600"
                   >
                     <XCircle className="h-4 w-4" />
+                    Cancelar
                   </button>
                 )}
               </div>
@@ -271,18 +266,14 @@ export function VacationRequestsPanel({
           </div>
 
           <div className="flex justify-end gap-2 pt-1">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-navy/6"
-            >
+            <button type="button" onClick={closeModal} className="btn-ghost">
               Cancelar
             </button>
             <button
               type="button"
               onClick={handleCreate}
               disabled={pending || !startDate || !endDate}
-              className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-dark disabled:opacity-50"
+              className="btn-primary"
             >
               {pending ? "Enviando…" : "Enviar solicitud"}
             </button>

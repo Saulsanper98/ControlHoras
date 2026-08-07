@@ -1,15 +1,18 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Umbrella, Clock, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stagger } from "@/components/ui/stagger";
 import { ListSurface } from "@/components/ui/list-surface";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionEyebrow, SectionTitle } from "@/components/ui/section-title";
 import { VacationRequestsPanel } from "@/components/vacaciones/vacation-requests-panel";
 import { VacationProgressBar, VacationTimeline } from "@/components/vacaciones/vacation-progress";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { formatDate, formatDateShort, toDateKey } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
+import { cn } from "@/lib/utils";
 
 export default async function VacacionesPage({
   searchParams,
@@ -86,26 +89,23 @@ export default async function VacacionesPage({
           title="Vacaciones y horas"
           description="Consulta tu saldo, solicita ausencias y revisa tu bolsa de horas."
         >
-          <form method="get" className="flex items-end gap-2">
-            <div className="w-28">
-              <label htmlFor="vac-year" className="mb-1 block text-xs font-medium text-slate-500">
-                Año
-              </label>
-              <Select id="vac-year" name="year" defaultValue={String(year)}>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <button
-              type="submit"
-              className="btn-press rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Ver
-            </button>
-          </form>
+          <nav className="flex flex-wrap gap-1" aria-label="Seleccionar año">
+            {years.map((y) => (
+              <Link
+                key={y}
+                href={y === currentYear ? "/vacaciones" : `/vacaciones?year=${y}`}
+                className={cn(
+                  "rounded-lg px-3 py-1.5 text-sm font-medium transition",
+                  y === year
+                    ? "bg-brand-blue text-white"
+                    : "text-slate-600 hover:bg-brand-navy/6"
+                )}
+                aria-current={y === year ? "page" : undefined}
+              >
+                {y}
+              </Link>
+            ))}
+          </nav>
         </PageHeader>
       </Stagger>
 
@@ -160,10 +160,8 @@ export default async function VacacionesPage({
 
       {balance?.notes && (
         <section className="border-y border-[color:var(--surface-divider)] py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Notas de la responsable
-          </p>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-brand-navy">{balance.notes}</p>
+          <SectionEyebrow className="mb-1">Notas de la responsable</SectionEyebrow>
+          <p className="whitespace-pre-wrap text-sm text-brand-navy">{balance.notes}</p>
         </section>
       )}
 
@@ -186,10 +184,10 @@ export default async function VacacionesPage({
 
       {teamApproved.length > 0 && (
         <section>
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-brand-navy">
+          <SectionTitle className="mb-3 flex items-center gap-2">
             <Users className="h-4 w-4 text-brand-blue" />
             Vacaciones del equipo (aprobadas)
-          </h2>
+          </SectionTitle>
           <ListSurface>
             {teamApproved.map((r) => (
               <div key={r.id} className="flex justify-between gap-2 py-3 text-sm">
@@ -211,11 +209,13 @@ export default async function VacacionesPage({
       )}
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-brand-navy">Historial de ajustes de horas</h2>
+        <SectionTitle className="mb-3">Historial de ajustes de horas</SectionTitle>
         {adjustments.length === 0 ? (
-          <p className="border-y border-brand-navy/10 py-6 text-sm text-slate-500">
-            Sin ajustes registrados en {year}.
-          </p>
+          <EmptyState
+            icon={Clock}
+            title={`Sin ajustes en ${year}`}
+            description="Cuando la responsable registre horas extras o descuentos, aparecerán aquí."
+          />
         ) : (
           <ListSurface>
             {adjustments.map((a) => (

@@ -25,6 +25,12 @@ const STEPS = [
     href: "/vacaciones",
     cta: "Ver vacaciones",
   },
+  {
+    title: "Horario y noticias",
+    body: "En Mi horario verás el cuadrante vigente de tu departamento. En Noticias encontrarás los comunicados internos de la empresa.",
+    href: "/horario",
+    cta: "Ver mi horario",
+  },
 ];
 
 export function OnboardingModal() {
@@ -50,13 +56,6 @@ export function OnboardingModal() {
       onClose={finish}
       title={`Bienvenido · Paso ${step + 1} de ${STEPS.length}`}
     >
-      <button
-        type="button"
-        onClick={finish}
-        className="absolute right-14 top-6 text-xs text-slate-400 hover:text-brand-navy"
-      >
-        Omitir
-      </button>
       <p className="font-display text-base font-semibold text-brand-navy">{current.title}</p>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">{current.body}</p>
       <div className="mt-2 flex gap-1">
@@ -67,35 +66,34 @@ export function OnboardingModal() {
           />
         ))}
       </div>
-      <div className="mt-6 flex justify-between gap-2">
-        {step > 0 ? (
-          <button
-            type="button"
-            onClick={() => setStep((s) => s - 1)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-brand-navy/6"
-          >
-            Atrás
-          </button>
-        ) : (
-          <span />
-        )}
-        {step < STEPS.length - 1 ? (
-          <button
-            type="button"
-            onClick={() => setStep((s) => s + 1)}
-            className="btn-press rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-          >
-            Siguiente
-          </button>
-        ) : (
-          <Link
-            href={current.href}
-            onClick={finish}
-            className="btn-press rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-          >
-            {current.cta}
-          </Link>
-        )}
+      <div className="mt-6 flex items-center justify-between gap-2">
+        <button type="button" onClick={finish} className="btn-ghost px-2 text-xs text-slate-400">
+          Omitir
+        </button>
+        <div className="flex gap-2">
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={() => setStep((s) => s - 1)}
+              className="btn-ghost"
+            >
+              Atrás
+            </button>
+          )}
+          {step < STEPS.length - 1 ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => s + 1)}
+              className="btn-primary"
+            >
+              Siguiente
+            </button>
+          ) : (
+            <Link href={current.href} onClick={finish} className="btn-primary">
+              {current.cta}
+            </Link>
+          )}
+        </div>
       </div>
     </Modal>
   );

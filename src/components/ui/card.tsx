@@ -36,7 +36,14 @@ export function StatCard({
     <div className="flex items-start justify-between gap-3 py-1">
       <div>
         <p className="text-sm text-slate-500">{label}</p>
-        <p className="mt-1 text-2xl font-semibold tracking-tight text-brand-navy">{value}</p>
+        <p
+          className={cn(
+            "mt-1 font-semibold tracking-tight text-brand-navy",
+            value.length > 12 ? "text-lg leading-snug" : "text-2xl"
+          )}
+        >
+          {value}
+        </p>
         {hint && <p className="mt-1 text-xs text-brand-navy/45">{hint}</p>}
       </div>
       <Icon className="mt-1 h-5 w-5 shrink-0 text-brand-blue/80" />

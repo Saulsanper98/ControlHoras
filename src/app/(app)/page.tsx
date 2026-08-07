@@ -5,20 +5,15 @@ import { prisma } from "@/lib/prisma";
 import { StatCard } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { formatRelativeTime } from "@/lib/format-relative-time";
+import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ];
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Enviado, pendiente de la responsable",
-  FIRMADO_RESPONSABLE: "Firmado y cerrado",
-  RECHAZADO: "Rechazado",
-};
 
 function greeting(date: Date): string {
   const h = date.getHours();
@@ -103,16 +98,16 @@ export default async function DashboardPage() {
     ? Number(vacationBalance.totalDays) - Number(vacationBalance.usedDays)
     : null;
   const horasAcumuladas = Number(hourAdjustments._sum.hours ?? 0);
+  const timesheetStatus = timeSheet?.status ?? "SIN_CONTROL";
+  const timesheetStatusLabel =
+    TIMESHEET_STATUS_LABEL[timesheetStatus] ?? timesheetStatus;
 
   return (
     <div className="space-y-8">
       <Stagger>
         <div>
           <h1 className="font-display text-2xl font-semibold text-brand-navy sm:text-3xl">
-            {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}{" "}
-            <span className="animate-wave" aria-hidden="true">
-              👋
-            </span>
+            {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}
           </h1>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <p className="text-brand-navy/55">
@@ -120,18 +115,8 @@ export default async function DashboardPage() {
                 ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
                 : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
             </p>
-            {showPersonal && timeSheet?.status === "FIRMADO_EMPLEADO" && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800">
-                Control enviado
-              </span>
-            )}
-            {showPersonal && timeSheet?.status === "RECHAZADO" && (
-              <Link
-                href="/control-horario"
-                className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-medium text-red-800 hover:underline"
-              >
-                Control rechazado — corrígelo
-              </Link>
+            {showPersonal && timeSheet && (
+              <StatusBadge status={timeSheet.status} preset="timesheet" />
             )}
             {showPersonal && (!timeSheet || timeSheet.status === "BORRADOR") && now.getDate() >= 25 && (
               <Link
@@ -241,7 +226,7 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Control horario de este mes"
-              value={timeSheet ? STATUS_LABEL[timeSheet.status] : "Sin empezar"}
+              value={timesheetStatusLabel}
               icon={ClipboardList}
               href="/control-horario"
             />

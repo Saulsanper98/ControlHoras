@@ -3,6 +3,11 @@
 import { cn } from "@/lib/utils";
 import { monthFromDateKey, yearFromDateKey } from "@/lib/format-date";
 
+const MONTH_SHORT = [
+  "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+];
+
 export function VacationProgressBar({
   total,
   used,
@@ -97,12 +102,12 @@ export function VacationTimeline({
                   !hasApproved && hasPending && "bg-amber-500/20 text-amber-800",
                   count === 0 && "bg-brand-navy/5 text-slate-400"
                 )}
-                title={`${count} solicitud${count === 1 ? "" : "es"}`}
+                title={`${MONTH_SHORT[i]} · ${count} solicitud${count === 1 ? "" : "es"}`}
               >
                 {count || "·"}
               </div>
-              <span className="text-[9px] uppercase text-slate-400">
-                {["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]}
+              <span className="text-[10px] font-medium text-slate-500">
+                {MONTH_SHORT[i]}
               </span>
             </div>
           );

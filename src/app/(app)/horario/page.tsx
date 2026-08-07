@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionBlock } from "@/components/ui/list-surface";
+import { SectionTitle } from "@/components/ui/section-title";
+import { formatDate } from "@/lib/format-date";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 
@@ -44,15 +46,27 @@ export default async function HorarioPage() {
         }
       >
         {fileHref && (
-          <a
-            href={fileHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-dark"
-          >
-            {canPreview ? <ExternalLink className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-            {canPreview ? "Abrir PDF" : "Descargar"}
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={fileHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+            >
+              {canPreview ? <ExternalLink className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+              {canPreview ? "Abrir PDF" : "Descargar"}
+            </a>
+            {canPreview && (
+              <a
+                href={fileHref}
+                download={schedule?.fileName}
+                className="btn-ghost text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Descargar
+              </a>
+            )}
+          </div>
         )}
       </PageHeader>
 
@@ -75,8 +89,11 @@ export default async function HorarioPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium text-brand-navy">{schedule.fileName}</p>
+                    <span className="rounded-md bg-emerald-500/12 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                      Horario vigente
+                    </span>
                     {isNew && (
-                      <span className="rounded-full bg-brand-blue/12 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-blue">
+                      <span className="rounded-md bg-brand-blue/12 px-2 py-0.5 text-xs font-semibold text-brand-blue">
                         Nuevo
                       </span>
                     )}
@@ -103,7 +120,7 @@ export default async function HorarioPage() {
                   Vigente desde
                 </dt>
                 <dd className="mt-1 text-sm font-medium tabular-nums text-brand-navy">
-                  {schedule.validFrom.toLocaleDateString("es-ES", {
+                  {formatDate(schedule.validFrom, {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
@@ -115,7 +132,7 @@ export default async function HorarioPage() {
                   Publicado
                 </dt>
                 <dd className="mt-1 text-sm font-medium tabular-nums text-brand-navy">
-                  {schedule.createdAt.toLocaleDateString("es-ES", {
+                  {formatDate(schedule.createdAt, {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
@@ -127,20 +144,10 @@ export default async function HorarioPage() {
 
           {canPreview ? (
             <section>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
-                  Vista previa
-                </h2>
-                <a
-                  href={fileHref!}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-brand-blue hover:underline"
-                >
-                  Abrir en pestaña nueva
-                </a>
-              </div>
-              <div className="overflow-hidden border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
+              <SectionTitle className="mb-3 uppercase tracking-wide text-brand-navy/45">
+                Vista previa
+              </SectionTitle>
+              <div className="mx-auto max-w-4xl overflow-hidden border-y border-[color:var(--surface-divider)] bg-brand-navy/[0.03]">
                 <iframe
                   src={fileHref!}
                   title="Horario asignado"
