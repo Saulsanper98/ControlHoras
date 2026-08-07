@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { TableSurface } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { formatDateTime } from "@/lib/format-date";
 
 const ACTION_LABEL: Record<string, string> = {
   TIMESHEET_SIGNED: "Control firmado",
@@ -72,7 +73,7 @@ export default async function AuditoriaPage() {
                 {logs.map((l) => (
                   <tr key={l.id} className="border-b border-brand-navy/5 last:border-0">
                     <td className="whitespace-nowrap px-0 py-2 text-slate-500 sm:px-3">
-                      {l.createdAt.toLocaleString("es-ES")}
+                      {formatDateTime(l.createdAt)}
                     </td>
                     <td className="px-3 py-2">{l.actor?.name ?? "Sistema"}</td>
                     <td className="px-3 py-2 font-medium text-brand-navy">

@@ -11,6 +11,7 @@ export function ScrollShadow({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
 
   useEffect(() => {
@@ -18,7 +19,9 @@ export function ScrollShadow({
     if (!el) return;
 
     function check() {
-      setShowRight(el!.scrollWidth - el!.scrollLeft - el!.clientWidth > 4);
+      const node = el!;
+      setShowLeft(node.scrollLeft > 4);
+      setShowRight(node.scrollWidth - node.scrollLeft - node.clientWidth > 4);
     }
 
     check();
@@ -35,10 +38,16 @@ export function ScrollShadow({
       <div ref={ref} className="overflow-x-auto">
         {children}
       </div>
+      {showLeft && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[color:var(--app-gradient-top)]/90 to-transparent"
+        />
+      )}
       {showRight && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#d5e2ef]/90 to-transparent"
+          className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[color:var(--app-gradient-top)]/90 to-transparent"
         />
       )}
     </div>

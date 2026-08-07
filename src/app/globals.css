@@ -30,6 +30,12 @@
   --text-body: 0.875rem;
   --text-caption: 0.75rem;
 
+  /* Fondos de app (sin hex sueltos en componentes) */
+  --app-canvas: #c8d5e4;
+  --app-gradient-top: #d5e2ef;
+  --app-gradient-bottom: #b8c9db;
+  --app-sticky: #dce6f0;
+
   /* Elevación */
   --shadow-rest: 0 1px 0 var(--glass-highlight) inset, 0 8px 28px rgba(10, 34, 64, 0.07);
   --shadow-hover: 0 1px 0 var(--glass-highlight) inset, 0 12px 36px rgba(10, 34, 64, 0.11);
@@ -56,6 +62,120 @@ body {
 
 .font-display {
   font-family: var(--font-display);
+}
+
+.text-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.text-h2 {
+  font-size: var(--text-h2);
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: var(--text-caption);
+  line-height: 1.4;
+}
+
+/* Botones canónicos */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--color-brand-blue);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-brand-blue-dark);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--surface-input-border);
+  background: var(--surface-input);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-brand-navy);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(10, 34, 64, 0.08);
+}
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(10, 34, 64, 0.06);
+  color: var(--color-brand-navy);
+}
+.btn-ghost:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background: #dc2626;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+.btn-danger:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.hit-area {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }
 
 /* Textura sutil anti-flat */

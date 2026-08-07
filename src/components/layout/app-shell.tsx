@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu, X, KeyRound, Maximize2, Minimize2 } from "lucide-react";
@@ -15,7 +15,9 @@ import type { AppRole } from "@/lib/roles";
 
 function atmosphereForPath(pathname: string) {
   if (pathname.includes("vacaciones")) return "warm";
-  if (pathname.includes("control")) return "cool";
+  if (pathname.includes("control") || pathname.includes("informe")) return "cool";
+  if (pathname.includes("horario")) return "cool";
+  if (pathname.includes("noticia")) return "default";
   return "default";
 }
 
@@ -47,10 +49,26 @@ export function AppShell({
   const pathname = usePathname();
   const { density, setDensity } = useDensity();
   const atmosphere = atmosphereForPath(pathname);
+  const drawerId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      menuButtonRef.current?.focus();
+    };
+  }, [open]);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -63,23 +81,30 @@ export function AppShell({
       )}
 
       <aside
+        id={drawerId}
         className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 -translate-x-full flex-col bg-brand-navy transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
           open ? "translate-x-0" : ""
         }`}
+        aria-label="Barra lateral"
       >
         <div className="flex items-center justify-between gap-2 border-b border-white/10 px-4 py-6 md:justify-center">
-          <img src="/brand/logo.svg" alt="Logo de la empresa" className="h-10 w-auto" />
+          <img src="/brand/logo.svg" alt="CCMGC" className="h-10 w-auto" width={120} height={40} />
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="text-slate-300 hover:text-white md:hidden"
+            className="hit-area inline-flex items-center justify-center text-slate-300 hover:text-white md:hidden"
             aria-label="Cerrar menú"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="flex-1 px-3 py-4">
-          <Sidebar role={role} onNavigate={() => setOpen(false)} />
+        <div className="flex-1 overflow-y-auto px-3 py-4">
+          <Sidebar
+            role={role}
+            onNavigate={() => setOpen(false)}
+            pendingSignatures={pendingSignatures}
+            pendingVacations={pendingVacations}
+          />
         </div>
         <div className="mx-3 mb-4 mt-auto rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3">
           <div className="mb-2 px-3 text-xs">
@@ -88,7 +113,7 @@ export function AppShell({
           </div>
           <Link
             href="/cambiar-contrasena"
-            className="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-brand-navy-light hover:text-white"
+            className="mb-1 flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-brand-navy-light hover:text-white"
           >
             <KeyRound className="h-4 w-4" />
             Cambiar contraseña
@@ -97,9 +122,9 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#c8d5e4]">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[color:var(--app-canvas)]">
         <div aria-hidden="true" className="bg-atmosphere pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,#d5e2ef_0%,#b8c9db_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--app-gradient-top)_0%,var(--app-gradient-bottom)_100%)]" />
           <div
             className="glass-orb -left-24 top-[-12%] h-[440px] w-[440px] opacity-85 transition-opacity duration-700"
             style={{
@@ -122,14 +147,17 @@ export function AppShell({
 
         <header className="glass-panel-header relative z-30 flex items-center gap-3 px-4 py-3">
           <button
+            ref={menuButtonRef}
             type="button"
             onClick={() => setOpen(true)}
-            className="text-brand-navy md:hidden"
+            className="hit-area inline-flex items-center justify-center text-brand-navy md:hidden"
             aria-label="Abrir menú"
+            aria-expanded={open}
+            aria-controls={drawerId}
           >
             <Menu className="h-6 w-6" />
           </button>
-          <img src="/brand/logo.svg" alt="Logo de la empresa" className="h-7 w-auto md:hidden" />
+          <p className="font-display text-sm font-semibold text-brand-navy md:hidden">Portal</p>
           <CommandPalette role={role} />
           <div className="flex-1" />
           <button
@@ -137,7 +165,7 @@ export function AppShell({
             onClick={() => setDensity(density === "compact" ? "comfortable" : "compact")}
             className="hidden rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy md:block"
             title={density === "compact" ? "Modo cómodo" : "Modo compacto"}
-            aria-label="Cambiar densidad de tablas"
+            aria-label={density === "compact" ? "Activar modo cómodo" : "Activar modo compacto"}
           >
             {density === "compact" ? (
               <Maximize2 className="h-4 w-4" />

@@ -6,6 +6,7 @@ import { FileDropzone } from "@/components/ui/file-dropzone";
 import { DateField } from "@/components/ui/date-field";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { formatDate } from "@/lib/format-date";
 import { deleteScheduleAction, uploadScheduleAction } from "@/app/(app)/jefa/horarios/actions";
 
 type Schedule = {
@@ -101,7 +102,7 @@ export function ScheduleUploadRow({
               <span className="text-slate-500">
                 Vigente desde{" "}
                 <span className="tabular-nums text-brand-navy/80">
-                  {new Date(schedule.validFrom).toLocaleDateString("es-ES")}
+                  {formatDate(schedule.validFrom)}
                 </span>
               </span>
             </div>
@@ -157,7 +158,7 @@ export function ScheduleUploadRow({
                   {idx === 0 ? " · actual" : ""}
                 </a>
                 <p className="text-xs text-slate-500">
-                  Vigente {new Date(h.validFrom).toLocaleDateString("es-ES")}
+                  Vigente {formatDate(h.validFrom)}
                 </p>
               </div>
               {idx > 0 && (

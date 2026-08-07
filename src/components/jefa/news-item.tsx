@@ -5,6 +5,7 @@ import { Pin, Pencil, Trash2, X, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { FileDropzone } from "@/components/ui/file-dropzone";
+import { formatDate } from "@/lib/format-date";
 import { deleteNewsAction, updateNewsAction } from "@/app/(app)/jefa/noticias/actions";
 
 export function NewsItem({
@@ -172,7 +173,7 @@ export function NewsItem({
             />
           )}
           <p className="mt-2 text-xs text-slate-500">
-            {new Date(publishedAt).toLocaleDateString("es-ES")}
+            {formatDate(publishedAt)}
           </p>
         </div>
         <div className="flex shrink-0 gap-1">

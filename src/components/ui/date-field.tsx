@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { holidaysInMonth } from "@/lib/holidays";
+import { formatDate } from "@/lib/format-date";
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const MONTH_NAMES = [
@@ -30,13 +31,8 @@ function toISODate(date: Date): string {
 }
 
 function formatDisplay(value: string): string {
-  const date = parseISODate(value);
-  if (!date) return "";
-  return date.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
+  return formatDate(value);
 }
 
 function startOfCalendarGrid(year: number, month: number): Date {

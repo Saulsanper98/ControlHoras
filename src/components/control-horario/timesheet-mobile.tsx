@@ -37,7 +37,7 @@ export function TimeSheetMobileDays({
   shiftKeyForEntry: (entry: Entry) => ShiftKey;
 }) {
   return (
-    <div className="divide-y divide-brand-navy/8 md:hidden">
+    <div className="divide-y divide-[color:var(--surface-divider)] md:hidden">
       {entries.map((entry) => {
         const hours = calculateDayHours(entry.checkIn, entry.checkOut);
         const weekday = formatWeekdayShort(year, month, entry.day);
@@ -48,7 +48,7 @@ export function TimeSheetMobileDays({
           shiftKey === "" ? [{ value: "", label: "Personalizado" }, ...shiftOptions] : shiftOptions;
         const isToday = todayDay === entry.day;
 
-        if (!entry.checkIn && !entry.checkOut && !editable) return null;
+        if (!entry.checkIn && !entry.checkOut && !entry.notes && !editable) return null;
 
         return (
           <div
@@ -91,8 +91,25 @@ export function TimeSheetMobileDays({
                 variant="plain"
               />
             </div>
+            <label className="mt-2 block">
+              <span className="sr-only">Observaciones del día {entry.day}</span>
+              <input
+                type="text"
+                disabled={!editable}
+                value={entry.notes}
+                onChange={(e) => onUpdate(entry.day, { notes: e.target.value })}
+                placeholder="Observaciones"
+                className="field-control-plain w-full px-2 py-1.5 text-sm text-brand-navy placeholder:text-slate-400 disabled:opacity-60"
+              />
+            </label>
             <p className="mt-2 text-xs tabular-nums text-slate-500">
               Total: {hours.totalHours.toFixed(2)} h
+              {(hours.overtimeHours > 0 || hours.nightHours > 0) && (
+                <span className="text-slate-400">
+                  {" "}
+                  · Extra {hours.overtimeHours.toFixed(1)} · Noct. {hours.nightHours.toFixed(1)}
+                </span>
+              )}
             </p>
           </div>
         );
