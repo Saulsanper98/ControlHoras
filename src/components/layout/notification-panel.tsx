@@ -65,7 +65,7 @@ export function NotificationPanel({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative rounded-full p-2 text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
+        className="hit-area relative inline-flex items-center justify-center rounded-full text-slate-500 transition hover:bg-brand-navy/10 hover:text-brand-navy"
         aria-label={
           total > 0
             ? `${total} notificaciones pendientes`

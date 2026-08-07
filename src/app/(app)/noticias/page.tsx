@@ -1,5 +1,6 @@
 import { Newspaper, Pin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Alert } from "@/components/ui/alert";
 import { ListSurface } from "@/components/ui/list-surface";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -29,6 +30,14 @@ export default async function NoticiasPage() {
           description="Todas las noticias y comunicados de la empresa."
         />
       </Stagger>
+
+      {news.length >= NEWS_LIMIT && (
+        <Alert variant="warning">
+          <p>
+            Se muestran las {NEWS_LIMIT} noticias más recientes. Puede haber más en el historial.
+          </p>
+        </Alert>
+      )}
 
       {news.length === 0 ? (
         <EmptyState

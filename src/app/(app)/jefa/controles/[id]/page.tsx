@@ -3,12 +3,14 @@ import { Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { TimeSheetGrid } from "@/components/control-horario/timesheet-grid";
 import { ReviewActions } from "@/components/jefa/review-actions";
+import { Alert } from "@/components/ui/alert";
 import { PageHeader } from "@/components/ui/page-header";
 import { BackLink } from "@/components/ui/back-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
+import { SignaturePreview } from "@/components/ui/signature-preview";
 import { requireManagerSession } from "@/lib/auth-helpers";
-import { formatDateTime } from "@/lib/format-date";
+import { formatDateTimeShort } from "@/lib/format-date";
 import { sumDayHours } from "@/lib/timesheet-calc";
 
 const MONTH_NAMES = [
@@ -132,10 +134,9 @@ export default async function ControlDetailPage({
       )}
 
       {timeSheet.rejectionReason && (
-        <p className="border-y border-red-200/80 bg-red-500/10 py-3 text-sm text-red-800">
-          <span className="font-medium">Motivo del rechazo: </span>
-          {timeSheet.rejectionReason}
-        </p>
+        <Alert variant="danger" title="Motivo del rechazo">
+          <p>{timeSheet.rejectionReason}</p>
+        </Alert>
       )}
 
       {timeSheet.attachments.length > 0 && (
@@ -160,38 +161,28 @@ export default async function ControlDetailPage({
       {(employeeSignature || responsableSignature) && (
         <div className="flex flex-wrap gap-6">
           {employeeSignature && (
-            <div>
-              <p className="mb-1 text-xs text-slate-500">
-                Firma del empleado
-                {employeeSignature.signedAt && (
-                  <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                    · {formatDateTime(employeeSignature.signedAt)}
-                  </span>
-                )}
-              </p>
-              <img
-                src={`/api/uploads/${employeeSignature.imagePath}`}
-                alt="Firma del empleado"
-                className="surface-input h-16 rounded-md p-2"
-              />
-            </div>
+            <SignaturePreview
+              label="Firma del empleado"
+              signedAt={
+                employeeSignature.signedAt
+                  ? formatDateTimeShort(employeeSignature.signedAt)
+                  : null
+              }
+              src={`/api/uploads/${employeeSignature.imagePath}`}
+              alt="Firma del empleado"
+            />
           )}
           {responsableSignature && (
-            <div>
-              <p className="mb-1 text-xs text-slate-500">
-                Firma de la responsable
-                {responsableSignature.signedAt && (
-                  <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                    · {formatDateTime(responsableSignature.signedAt)}
-                  </span>
-                )}
-              </p>
-              <img
-                src={`/api/uploads/${responsableSignature.imagePath}`}
-                alt="Firma de la responsable"
-                className="surface-input h-16 rounded-md p-2"
-              />
-            </div>
+            <SignaturePreview
+              label="Firma de la responsable"
+              signedAt={
+                responsableSignature.signedAt
+                  ? formatDateTimeShort(responsableSignature.signedAt)
+                  : null
+              }
+              src={`/api/uploads/${responsableSignature.imagePath}`}
+              alt="Firma de la responsable"
+            />
           )}
         </div>
       )}

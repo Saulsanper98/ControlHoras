@@ -122,7 +122,7 @@ export function EmployeesDirectory({
         <EmptyState
           icon={Search}
           title="Sin coincidencias"
-          description="Prueba otro término de búsqueda o muestra también los inactivos."
+          description="Prueba otro término de búsqueda o desactiva «Solo activos»."
         />
       ) : null}
     </div>

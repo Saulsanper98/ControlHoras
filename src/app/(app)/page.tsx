@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Alert } from "@/components/ui/alert";
 import { StatCard } from "@/components/ui/stat-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Stagger } from "@/components/ui/stagger";
@@ -130,31 +131,41 @@ export default async function DashboardPage() {
             {showPersonal && timeSheet && (
               <StatusBadge status={timeSheet.status} preset="timesheet" />
             )}
-            {controlCta && (
-              <Link
-                href={controlCta.href}
-                className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 hover:underline"
-              >
-                {controlCta.label}
-              </Link>
-            )}
           </div>
         </div>
       </Stagger>
 
-      {showPersonal && timeSheet?.status === "RECHAZADO" && (
-        <Link
-          href="/control-horario"
-          className="block border-y border-red-300/50 bg-red-500/10 px-4 py-3 transition hover:bg-red-500/14"
+      {controlCta && (
+        <Alert
+          variant="warning"
+          action={
+            <Link
+              href={controlCta.href}
+              className="inline-flex items-center gap-1 font-semibold text-brand-blue hover:underline"
+            >
+              Ir al control <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
         >
-          <p className="text-sm font-medium text-red-800">Tu control horario fue rechazado</p>
-          <p className="mt-1 text-sm text-brand-navy">
-            {timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}
-          </p>
-          <p className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue">
-            Ir a corregir <ArrowRight className="h-4 w-4" />
-          </p>
-        </Link>
+          <p>{controlCta.label}</p>
+        </Alert>
+      )}
+
+      {showPersonal && timeSheet?.status === "RECHAZADO" && (
+        <Alert
+          variant="danger"
+          title="Tu control horario fue rechazado"
+          action={
+            <Link
+              href="/control-horario"
+              className="inline-flex items-center gap-1 font-semibold text-brand-blue hover:underline"
+            >
+              Ir a corregir <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
+        >
+          <p>{timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}</p>
+        </Alert>
       )}
       {showManagement && (
         <div className="animate-fade-slide-up space-y-5" style={{ animationDelay: "90ms" }}>

@@ -7,8 +7,8 @@ import { Modal } from "@/components/ui/modal";
 import { ListSurface } from "@/components/ui/list-surface";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionEyebrow } from "@/components/ui/section-title";
+import { RejectReasonModal } from "@/components/ui/reject-reason-modal";
 import { useToast } from "@/components/ui/toast";
-import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   approveVacationRequestAction,
   rejectVacationRequestAction,
@@ -29,7 +29,6 @@ type PendingRequest = {
 export function PendingVacationRequests({ requests }: { requests: PendingRequest[] }) {
   const router = useRouter();
   const { showToast } = useToast();
-  const { confirm } = useConfirm();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [rejectId, setRejectId] = useState<string | null>(null);
@@ -59,16 +58,6 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
       }
       showToast(result.error ?? "Error al aprobar.", "error");
     });
-  }
-
-  async function openReject(id: string) {
-    const ok = await confirm({
-      title: "Rechazar solicitud",
-      message: "¿Rechazar esta solicitud de ausencia? El empleado será notificado.",
-      variant: "danger",
-      confirmLabel: "Continuar",
-    });
-    if (ok) setRejectId(id);
   }
 
   function handleReject() {
@@ -120,14 +109,14 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                   type="button"
                   onClick={() => handleApprove(r.id)}
                   disabled={busy || pendingId !== null}
-                  className="btn-primary bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60"
+                  className="btn-success disabled:opacity-60"
                 >
                   <Check className="h-4 w-4" />
                   {busy ? "…" : "Aprobar"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => void openReject(r.id)}
+                  onClick={() => setRejectId(r.id)}
                   disabled={busy || pendingId !== null}
                   className="btn-ghost text-red-700 hover:bg-red-500/10 disabled:opacity-60"
                 >
@@ -167,7 +156,7 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
                 type="button"
                 disabled={pendingId !== null}
                 onClick={() => handleApprove(overlapPrompt.id, true)}
-                className="btn-primary bg-amber-600 hover:bg-amber-700 disabled:opacity-60"
+                className="btn-warning disabled:opacity-60"
               >
                 Aprobar igual
               </button>
@@ -176,36 +165,18 @@ export function PendingVacationRequests({ requests }: { requests: PendingRequest
         )}
       </Modal>
 
-      <Modal
+      <RejectReasonModal
         open={Boolean(rejectId)}
-        onClose={() => setRejectId(null)}
+        onClose={() => {
+          setRejectId(null);
+          setReason("");
+        }}
         title="Rechazar solicitud"
-      >
-        <label htmlFor="vac-reject-reason" className="mb-1 block text-xs font-medium text-slate-500">
-          Motivo (opcional)
-        </label>
-        <textarea
-          id="vac-reject-reason"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="Motivo del rechazo"
-          rows={3}
-          className="field-control w-full rounded-md px-3 py-2 text-sm"
-        />
-        <div className="mt-4 flex justify-end gap-2">
-          <button type="button" onClick={() => setRejectId(null)} className="btn-ghost">
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={handleReject}
-            disabled={pendingId !== null}
-            className="btn-danger disabled:opacity-60"
-          >
-            Rechazar
-          </button>
-        </div>
-      </Modal>
+        reason={reason}
+        onReasonChange={setReason}
+        onConfirm={handleReject}
+        pending={pendingId !== null}
+      />
     </section>
   );
 }

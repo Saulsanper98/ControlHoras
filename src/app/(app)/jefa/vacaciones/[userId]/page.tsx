@@ -6,10 +6,13 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ListSurface } from "@/components/ui/list-surface";
 import { SectionTitle } from "@/components/ui/section-title";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { YearSwitcher } from "@/components/ui/year-switcher";
 import { VacationProgressBar } from "@/components/vacaciones/vacation-progress";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { formatDate, formatDateShort } from "@/lib/format-date";
 import { LEAVE_TYPE_LABEL } from "@/lib/labels";
+import { CalendarDays } from "lucide-react";
 
 export default async function VacationDetailPage({
   params,
@@ -26,7 +29,7 @@ export default async function VacationDetailPage({
   const currentYear = new Date().getFullYear();
   const year = Number(sp.year) || currentYear;
 
-  const [employee, balance, adjustments, yearRequests] = await Promise.all([
+  const [employee, balance, adjustments, yearRequests, balanceYears] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, include: { department: true } }),
     prisma.vacationBalance.findUnique({ where: { userId_year: { userId, year } } }),
     prisma.hourAdjustment.findMany({
@@ -38,9 +41,19 @@ export default async function VacationDetailPage({
       where: { userId, year },
       orderBy: { startDate: "desc" },
     }),
+    prisma.vacationBalance.findMany({
+      where: { userId },
+      select: { year: true },
+      distinct: ["year"],
+      orderBy: { year: "desc" },
+    }),
   ]);
 
   if (!employee || employee.role !== "EMPLEADO") notFound();
+
+  const years = [
+    ...new Set([currentYear, currentYear - 1, ...balanceYears.map((b) => b.year), year]),
+  ].sort((a, b) => b - a);
 
   const pendingDays = yearRequests
     .filter(
@@ -60,6 +73,14 @@ export default async function VacationDetailPage({
         <PageHeader
           title={employee.name}
           description={`${employee.department?.name ?? "—"} · Saldo y bolsa ${year}`}
+        />
+        <YearSwitcher
+          className="mt-3"
+          year={year}
+          options={years.map((y) => ({
+            year: y,
+            href: `/jefa/vacaciones/${userId}?year=${y}`,
+          }))}
         />
       </div>
 
@@ -86,7 +107,11 @@ export default async function VacationDetailPage({
       <section>
         <SectionTitle className="mb-3">Solicitudes {year}</SectionTitle>
         {yearRequests.length === 0 ? (
-          <p className="text-sm text-slate-500">Sin solicitudes este año.</p>
+          <EmptyState
+            icon={CalendarDays}
+            title="Sin solicitudes"
+            description={`No hay solicitudes de ausencia en ${year}.`}
+          />
         ) : (
           <ListSurface>
             {yearRequests.map((r) => (

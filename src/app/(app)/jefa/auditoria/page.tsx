@@ -9,7 +9,7 @@ import { SectionBlock, TableSurface } from "@/components/ui/list-surface";
 import { Select } from "@/components/ui/select";
 import { Stagger } from "@/components/ui/stagger";
 import { requireManagerSession } from "@/lib/auth-helpers";
-import { formatDateTime } from "@/lib/format-date";
+import { formatDateTimeShort } from "@/lib/format-date";
 
 const TAKE = 50;
 
@@ -194,7 +194,7 @@ export default async function AuditoriaPage({
                     return (
                       <tr key={l.id} className="border-b border-brand-navy/5 last:border-0">
                         <td className="whitespace-nowrap px-0 py-2 text-slate-500 sm:px-3">
-                          {formatDateTime(l.createdAt)}
+                          {formatDateTimeShort(l.createdAt)}
                         </td>
                         <td className="px-3 py-2">{l.actor?.name ?? "Sistema"}</td>
                         <td className="px-3 py-2 font-medium text-brand-navy">

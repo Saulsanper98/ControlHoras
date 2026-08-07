@@ -147,8 +147,21 @@ export default async function ControlesPage({
         {pending.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
-            title="No hay controles pendientes"
-            description="Cuando un empleado envíe su control, aparecerá aquí para firmar."
+            title={
+              hasFilters ? "Ningún control coincide con los filtros" : "No hay controles pendientes"
+            }
+            description={
+              hasFilters
+                ? "Prueba con otros criterios o quita los filtros para ver todos los controles."
+                : "Cuando un empleado envíe su control, aparecerá aquí para firmar."
+            }
+            action={
+              hasFilters ? (
+                <Link href="/jefa/controles" className="btn-primary">
+                  Limpiar filtros
+                </Link>
+              ) : undefined
+            }
           />
         ) : (
           <ListSurface>

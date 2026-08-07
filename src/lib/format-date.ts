@@ -91,6 +91,19 @@ export function formatDateTime(value: Date | string): string {
   }).format(asDate(value));
 }
 
+/** Fecha + hora compacta sin segundos, p. ej. "6/8/2026 14:32". */
+export function formatDateTimeShort(value: Date | string): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    timeZone: APP_TIMEZONE,
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(asDate(value));
+}
+
 export function formatWeekdayShort(year: number, month: number, day: number): string {
   const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
   return new Intl.DateTimeFormat("es-ES", {

@@ -108,13 +108,10 @@ export default async function InformeHorasPage({
             <label htmlFor="inf-year" className="mb-1 block text-xs font-medium text-slate-500">
               Año
             </label>
-            <Select id="inf-year" name="year" defaultValue={year}>
-              {yearOptions.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </Select>
+            <input type="hidden" name="year" value={year} />
+            <p id="inf-year" className="field-control px-3 py-2 text-sm tabular-nums text-brand-navy">
+              {year}
+            </p>
           </div>
           <div className="w-44">
             <label htmlFor="inf-dept" className="mb-1 block text-xs font-medium text-slate-500">

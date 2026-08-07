@@ -165,7 +165,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-lg p-2 text-brand-navy transition hover:bg-brand-navy/10 md:hidden"
+        className="hit-area inline-flex items-center justify-center rounded-lg text-brand-navy transition hover:bg-brand-navy/10 md:hidden"
         aria-label={`Buscar páginas (${shortcutLabel})`}
       >
         <Search className="h-5 w-5" />
@@ -173,7 +173,7 @@ export function CommandPalette({ role }: { role: AppRole }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden h-10 min-w-[200px] items-center gap-2 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.05] px-3.5 text-sm text-slate-600 transition hover:bg-brand-navy/[0.08] md:flex"
+        className="hidden min-h-11 min-w-[200px] items-center gap-2 rounded-xl border border-brand-navy/10 bg-brand-navy/[0.05] px-3.5 text-sm text-slate-600 transition hover:bg-brand-navy/[0.08] md:flex"
         title={`Buscar (${shortcutLabel})`}
       >
         <Search className="h-4 w-4 text-brand-blue/85" />

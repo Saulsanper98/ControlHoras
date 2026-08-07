@@ -18,6 +18,10 @@ import {
 import { FieldSelect } from "@/components/ui/field-select";
 import { TimeField } from "@/components/ui/time-field";
 import { ScrollShadow } from "@/components/ui/scroll-shadow";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import { Alert } from "@/components/ui/alert";
+import { InlineEmpty } from "@/components/ui/inline-empty";
+import { SignaturePreview } from "@/components/ui/signature-preview";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -25,7 +29,7 @@ import { useDensity } from "@/lib/density";
 import { TimeSheetMobileDays } from "@/components/control-horario/timesheet-mobile";
 import { calculateDayHours, daysInMonth, sumDayHours } from "@/lib/timesheet-calc";
 import { holidaysInMonth } from "@/lib/holidays";
-import { formatDateTime, formatWeekdayShort } from "@/lib/format-date";
+import { formatDateTimeShort, formatWeekdayShort } from "@/lib/format-date";
 import { SignatureModal } from "@/components/signature/signature-pad";
 import {
   copyFromPreviousMonthAction,
@@ -247,6 +251,12 @@ export function TimeSheetForm({
     });
   }
 
+  function handleUploadFile(file: File) {
+    const formData = new FormData();
+    formData.set("file", file);
+    handleUpload(formData);
+  }
+
   async function handlePdfDownload() {
     if (!timeSheetId || pdfLoading) return;
     setPdfLoading(true);
@@ -356,7 +366,7 @@ export function TimeSheetForm({
                     void navigateMonth(prevHref);
                   }
                 }}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
+                className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Link>
@@ -372,7 +382,7 @@ export function TimeSheetForm({
                     void navigateMonth(nextHref);
                   }
                 }}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
+                className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/6 hover:text-brand-navy"
               >
                 <ChevronRight className="h-4 w-4" />
               </Link>
@@ -658,7 +668,7 @@ export function TimeSheetForm({
         </ScrollShadow>
 
         {editable && (
-          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-3 py-2 backdrop-blur-sm md:hidden">
+          <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/95 px-3 py-2 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-2">
               <p className="min-w-0 text-xs tabular-nums text-brand-navy">
                 <strong>{totals.totalHours.toFixed(1)} h</strong>
@@ -672,7 +682,10 @@ export function TimeSheetForm({
                   className="btn-secondary"
                 >
                   <Save className="h-4 w-4" />
-                  {pendingAction === "save" ? "Guardando…" : "Guardar"}
+                  <span className="md:hidden">{pendingAction === "save" ? "Guardando…" : "Guardar"}</span>
+                  <span className="hidden md:inline">
+                    {pendingAction === "save" ? "Guardando…" : "Guardar borrador"}
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -683,7 +696,10 @@ export function TimeSheetForm({
                   aria-label="Firmar y enviar"
                 >
                   <PenLine className="h-4 w-4" />
-                  {pendingAction === "sign" ? "Firmando…" : "Firmar"}
+                  <span className="md:hidden">{pendingAction === "sign" ? "Firmando…" : "Firmar"}</span>
+                  <span className="hidden md:inline">
+                    {pendingAction === "sign" ? "Firmando…" : "Firmar y enviar"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -711,7 +727,7 @@ export function TimeSheetForm({
           </p>
 
           {attachments.length === 0 ? (
-            <p className="mb-3 text-sm text-slate-500">Sin adjuntos</p>
+            <InlineEmpty className="mb-3 py-2">Sin adjuntos</InlineEmpty>
           ) : (
             <ul className="mb-3 divide-y divide-[color:var(--surface-divider)]">
               {attachments.map((a) => (
@@ -740,29 +756,20 @@ export function TimeSheetForm({
           )}
 
           {editable && (
-            <form action={handleUpload} className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  type="file"
-                  name="file"
-                  accept=".pdf,.xlsx,.xls"
-                  disabled={uploadPending}
-                  className="min-w-0 flex-1 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-blue/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-blue disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={pending || uploadPending}
-                  className="btn-secondary disabled:opacity-50"
-                >
-                  {uploadPending ? "Subiendo…" : "Subir"}
-                </button>
-              </div>
+            <div className="space-y-2">
+              <FileDropzone
+                accept=".pdf,.xlsx,.xls,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                disabled={pending || uploadPending}
+                pending={uploadPending}
+                label="Arrastra un PDF o Excel, o haz clic"
+                onFile={handleUploadFile}
+              />
               {uploadPending && (
                 <div className="h-1 overflow-hidden rounded-full bg-brand-navy/10">
                   <div className="animate-shimmer h-full w-1/3 rounded-full bg-brand-blue/60" />
                 </div>
               )}
-            </form>
+            </div>
           )}
         </div>
 
@@ -771,38 +778,20 @@ export function TimeSheetForm({
             <p className="mb-3 text-sm font-medium text-brand-navy">Firmas</p>
             <div className="flex flex-wrap gap-6">
               {employeeSignaturePath && (
-                <div>
-                  <p className="mb-1 text-xs text-slate-500">
-                    Empleado
-                    {employeeSignedAt && (
-                      <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                        · {formatDateTime(employeeSignedAt)}
-                      </span>
-                    )}
-                  </p>
-                  <img
-                    src={`/api/uploads/${employeeSignaturePath}`}
-                    alt="Firma del empleado"
-                    className="h-16 rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] p-2"
-                  />
-                </div>
+                <SignaturePreview
+                  label="Empleado"
+                  signedAt={employeeSignedAt ? formatDateTimeShort(employeeSignedAt) : null}
+                  src={`/api/uploads/${employeeSignaturePath}`}
+                  alt="Firma del empleado"
+                />
               )}
               {responsableSignaturePath && (
-                <div>
-                  <p className="mb-1 text-xs text-slate-500">
-                    Responsable
-                    {responsableSignedAt && (
-                      <span className="ml-1 text-slate-400" suppressHydrationWarning>
-                        · {formatDateTime(responsableSignedAt)}
-                      </span>
-                    )}
-                  </p>
-                  <img
-                    src={`/api/uploads/${responsableSignaturePath}`}
-                    alt="Firma de la responsable"
-                    className="h-16 rounded-lg border border-[color:var(--surface-divider)] bg-[color:var(--surface-muted)] p-2"
-                  />
-                </div>
+                <SignaturePreview
+                  label="Responsable"
+                  signedAt={responsableSignedAt ? formatDateTimeShort(responsableSignedAt) : null}
+                  src={`/api/uploads/${responsableSignaturePath}`}
+                  alt="Firma de la responsable"
+                />
               )}
             </div>
           </div>
@@ -810,33 +799,9 @@ export function TimeSheetForm({
       </div>
 
       {status === "RECHAZADO" && rejectionReason && (
-        <div className="rounded-lg border border-red-200/80 bg-red-500/10 px-4 py-3 text-sm text-red-800">
-          <p className="font-medium">Motivo del rechazo</p>
-          <p className="mt-1 whitespace-pre-wrap">{rejectionReason}</p>
-        </div>
-      )}
-
-      {editable && (
-        <div className="hidden flex-wrap items-center gap-3 md:flex">
-          <button type="button" onClick={handleSave} disabled={pending} className="btn-secondary">
-            <Save className="h-4 w-4" />
-            {pendingAction === "save" ? "Guardando…" : "Guardar borrador"}
-          </button>
-          <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
-              onClick={() => setShowSignPad(true)}
-              disabled={pending}
-              className="btn-primary"
-              title="Firmar y enviar el parte"
-              aria-label="Firmar y enviar"
-            >
-              <PenLine className="h-4 w-4" />
-              {pendingAction === "sign" ? "Firmando…" : "Firmar y enviar"}
-            </button>
-            <p className="text-[11px] text-slate-500">La firma guarda y envía el parte</p>
-          </div>
-        </div>
+        <Alert variant="danger" title="Motivo del rechazo">
+          <p className="whitespace-pre-wrap">{rejectionReason}</p>
+        </Alert>
       )}
 
       {showSignPad && (

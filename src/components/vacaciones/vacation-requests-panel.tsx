@@ -171,7 +171,7 @@ export function VacationRequestsPanel({
                     type="button"
                     onClick={() => handleCancel(r.id)}
                     disabled={pending}
-                    className="btn-ghost px-2 py-1 text-xs text-slate-500 hover:text-red-600"
+                    className="btn-sm btn-ghost text-slate-500 hover:text-red-600"
                   >
                     <XCircle className="h-4 w-4" />
                     Cancelar

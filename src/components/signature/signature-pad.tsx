@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
+import { Alert } from "@/components/ui/alert";
 import { Modal } from "@/components/ui/modal";
 
 export function SignatureModal({
@@ -49,9 +50,9 @@ export function SignatureModal({
       </div>
 
       {emptyWarning && (
-        <p role="alert" className="mt-2 text-sm text-amber-700">
-          Dibuja tu firma antes de confirmar.
-        </p>
+        <Alert variant="warning" className="mt-2 border-x-0">
+          <p>Dibuja tu firma antes de confirmar.</p>
+        </Alert>
       )}
 
       <div className="mt-4 flex items-center justify-between">

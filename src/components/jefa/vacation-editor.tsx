@@ -5,12 +5,13 @@ import { Trash2 } from "lucide-react";
 import { ListSurface, SectionBlock } from "@/components/ui/list-surface";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm-dialog";
-import { formatDate } from "@/lib/format-date";
+import { formatDateTimeShort } from "@/lib/format-date";
 import {
   addHourAdjustmentAction,
   deleteHourAdjustmentAction,
   saveVacationBalanceAction,
 } from "@/app/(app)/jefa/vacaciones/actions";
+import { InlineEmpty } from "@/components/ui/inline-empty";
 
 type Adjustment = { id: string; hours: number; reason: string; createdAt: string; createdByName: string };
 
@@ -58,7 +59,7 @@ export function VacationEditor({
       return;
     }
     startTransition(async () => {
-      const result = await addHourAdjustmentAction(userId, parsed, reason);
+      const result = await addHourAdjustmentAction(userId, parsed, reason, year);
       if (result.ok) {
         setHours("");
         setReason("");
@@ -202,7 +203,7 @@ export function VacationEditor({
         </SectionBlock>
 
         {adjustments.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-500">Sin ajustes registrados.</p>
+          <InlineEmpty className="mt-3 py-2">Sin ajustes registrados.</InlineEmpty>
         ) : (
           <ListSurface className="mt-3">
             {adjustments.map((a) => (
@@ -217,7 +218,7 @@ export function VacationEditor({
                   </span>
                   <span className="ml-2 text-slate-500">{a.reason}</span>
                   <span className="ml-2 text-xs text-slate-500">
-                    {formatDate(a.createdAt)} · {a.createdByName}
+                    {formatDateTimeShort(a.createdAt)} · {a.createdByName}
                   </span>
                 </div>
                 <button

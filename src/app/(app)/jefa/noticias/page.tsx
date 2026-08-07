@@ -3,6 +3,7 @@ import { Newspaper } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { NewsCreateForm } from "@/components/jefa/news-create-form";
 import { NewsItem } from "@/components/jefa/news-item";
+import { Alert } from "@/components/ui/alert";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListSurface } from "@/components/ui/list-surface";
@@ -32,9 +33,11 @@ export default async function JefaNoticiasPage() {
       </Stagger>
 
       {news.length >= NEWS_LIMIT && (
-        <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-900">
-          Se muestran las {NEWS_LIMIT} noticias más recientes. Hay más en el historial.
-        </p>
+        <Alert variant="warning">
+          <p>
+            Se muestran las {NEWS_LIMIT} noticias más recientes. Hay más en el historial.
+          </p>
+        </Alert>
       )}
 
       {news.length === 0 ? (

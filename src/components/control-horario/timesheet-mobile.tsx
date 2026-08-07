@@ -3,6 +3,7 @@
 import { calculateDayHours } from "@/lib/timesheet-calc";
 import { formatWeekdayShort } from "@/lib/format-date";
 import { FieldSelect } from "@/components/ui/field-select";
+import { InlineEmpty } from "@/components/ui/inline-empty";
 import { TimeField } from "@/components/ui/time-field";
 
 type Entry = { day: number; checkIn: string; checkOut: string; notes: string };
@@ -36,6 +37,14 @@ export function TimeSheetMobileDays({
   onApplyShift: (day: number, key: ShiftKey) => void;
   shiftKeyForEntry: (entry: Entry) => ShiftKey;
 }) {
+  if (entries.length === 0) {
+    return (
+      <div className="md:hidden">
+        <InlineEmpty>No hay días que coincidan con el filtro.</InlineEmpty>
+      </div>
+    );
+  }
+
   return (
     <div className="divide-y divide-[color:var(--surface-divider)] md:hidden">
       {entries.map((entry) => {

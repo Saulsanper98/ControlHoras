@@ -185,7 +185,7 @@ export function DateField({
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
             aria-label="Mes anterior"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -196,7 +196,7 @@ export function DateField({
           <button
             type="button"
             onClick={() => shiftMonth(1)}
-            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
+            className="hit-area inline-flex items-center justify-center rounded-lg text-slate-500 transition hover:bg-brand-navy/8 hover:text-brand-navy"
             aria-label="Mes siguiente"
           >
             <ChevronRight className="h-4 w-4" />

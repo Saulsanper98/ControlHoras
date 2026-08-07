@@ -90,7 +90,7 @@ export function TimeField({
           type="button"
           disabled={disabled}
           onClick={() => setOpen((v) => !v)}
-          className="absolute right-0.5 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-brand-navy/6 hover:text-brand-blue disabled:opacity-40"
+          className="hit-area absolute right-0.5 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded text-slate-400 hover:bg-brand-navy/6 hover:text-brand-blue disabled:opacity-40"
           aria-label="Horas rápidas"
         >
           <Clock className="h-3.5 w-3.5" />
@@ -127,7 +127,7 @@ export function TimeField({
                 setOpen(false);
                 inputRef.current?.focus();
               }}
-              className="rounded-md bg-brand-blue px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-blue/90"
+              className="btn-sm btn-primary"
             >
               Aplicar
             </button>

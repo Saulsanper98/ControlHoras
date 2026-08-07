@@ -18,6 +18,14 @@ function newsBadgeStatus(status: string, scheduledAt: string | null | undefined)
   return "BORRADOR";
 }
 
+function toLocalDatetimeInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function NewsItem({
   id,
   title,
@@ -44,6 +52,7 @@ export function NewsItem({
   const [bodyValue, setBodyValue] = useState(body);
   const [pinnedValue, setPinnedValue] = useState(pinned);
   const [draftValue, setDraftValue] = useState(status === "BORRADOR");
+  const [scheduledValue, setScheduledValue] = useState(toLocalDatetimeInput(scheduledAt));
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -58,6 +67,7 @@ export function NewsItem({
     formData.set("body", bodyValue);
     if (pinnedValue) formData.set("pinned", "on");
     if (draftValue) formData.set("draft", "on");
+    if (scheduledValue) formData.set("scheduledAt", scheduledValue);
     if (imageFile) formData.set("image", imageFile);
     startTransition(async () => {
       const result = await updateNewsAction(id, formData);
@@ -123,6 +133,18 @@ export function NewsItem({
             disabled={pending}
             label={imageFile ? imageFile.name : "Cambiar imagen"}
             onFile={setImageFile}
+          />
+        </div>
+        <div>
+          <label htmlFor={`news-edit-scheduled-${id}`} className="mb-1 block text-xs font-medium text-slate-500">
+            Programar publicación
+          </label>
+          <input
+            id={`news-edit-scheduled-${id}`}
+            type="datetime-local"
+            value={scheduledValue}
+            onChange={(e) => setScheduledValue(e.target.value)}
+            className="field-control w-full px-2 py-2 text-sm"
           />
         </div>
         <div className="flex flex-wrap items-center gap-4">

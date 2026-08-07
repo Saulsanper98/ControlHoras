@@ -83,12 +83,18 @@ export async function updateNewsAction(
   const body = String(formData.get("body") ?? "").trim();
   const pinned = formData.get("pinned") === "on";
   const asDraft = formData.get("draft") === "on";
+  const scheduledRaw = String(formData.get("scheduledAt") ?? "").trim();
   const file = formData.get("image");
 
   if (!title || !body) return { ok: false, error: "Título y contenido son obligatorios." };
 
   const existing = await prisma.news.findUnique({ where: { id } });
   if (!existing) return { ok: false, error: "Noticia no encontrada." };
+
+  const scheduledAt = scheduledRaw ? new Date(scheduledRaw) : null;
+  if (scheduledRaw && Number.isNaN(scheduledAt?.getTime())) {
+    return { ok: false, error: "Fecha de programación inválida." };
+  }
 
   let imagePath = existing.imagePath;
   if (file instanceof File && file.size > 0) {
@@ -112,7 +118,13 @@ export async function updateNewsAction(
       body,
       pinned,
       imagePath,
-      status: asDraft ? "BORRADOR" : "PUBLICADA",
+      status: asDraft || (scheduledAt && scheduledAt > new Date()) ? "BORRADOR" : "PUBLICADA",
+      scheduledAt,
+      ...(scheduledAt && scheduledAt > new Date()
+        ? { publishedAt: scheduledAt }
+        : !asDraft
+          ? { publishedAt: existing.publishedAt ?? new Date() }
+          : {}),
     },
   });
 

@@ -26,7 +26,11 @@ export default async function EmpleadosPage() {
       <Stagger>
         <PageHeader
           title="Empleados"
-          description={`${activeCount} activos de ${users.length} en total, agrupados por departamento.`}
+          description={
+            users.length === 0
+              ? "Da de alta empleados para gestionar controles y vacaciones por departamento."
+              : `${activeCount} activos de ${users.length} en total, agrupados por departamento.`
+          }
         >
           <EmployeeCreateForm departments={departments} />
         </PageHeader>

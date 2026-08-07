@@ -120,7 +120,7 @@ export function ScheduleUploadRow({
             <button
               type="button"
               onClick={() => setShowPreview((v) => !v)}
-              className="btn-ghost text-xs"
+              className="btn-sm btn-ghost"
             >
               <ChevronDown
                 className={`h-3.5 w-3.5 transition ${showPreview ? "rotate-180" : ""}`}
@@ -132,7 +132,7 @@ export function ScheduleUploadRow({
             <button
               type="button"
               onClick={() => setShowHistory((v) => !v)}
-              className="btn-ghost text-xs"
+              className="btn-sm btn-ghost"
             >
               {showHistory ? "Ocultar historial" : `Historial (${history.length})`}
             </button>

@@ -12,7 +12,7 @@ import { VacationProgressBar, VacationTimeline } from "@/components/vacaciones/v
 import { requireEmployeeSession } from "@/lib/auth-helpers";
 import {
   formatDateShort,
-  formatDateTime,
+  formatDateTimeShort,
   toDateKey,
   yearFromDateKey,
 } from "@/lib/format-date";
@@ -240,7 +240,7 @@ export default async function VacacionesPage({
                   <span className="ml-2 text-sm text-slate-600">{a.reason}</span>
                 </div>
                 <span className="shrink-0 text-xs text-slate-500">
-                  {formatDateTime(a.createdAt)} · {a.createdBy.name}
+                  {formatDateTimeShort(a.createdAt)} · {a.createdBy.name}
                 </span>
               </div>
             ))}

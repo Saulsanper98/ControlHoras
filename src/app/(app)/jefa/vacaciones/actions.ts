@@ -54,7 +54,8 @@ export async function saveVacationBalanceAction(
 export async function addHourAdjustmentAction(
   userId: string,
   hours: number,
-  reason: string
+  reason: string,
+  year: number
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
@@ -62,6 +63,9 @@ export async function addHourAdjustmentAction(
     return { ok: false, error: "Indica un número de horas distinto de cero." };
   }
   if (!reason.trim()) return { ok: false, error: "Indica un motivo." };
+  if (!Number.isFinite(year) || year < 2000 || year > 2100) {
+    return { ok: false, error: "Año no válido." };
+  }
 
   const target = await requireActiveEmployee(userId);
   if (!target.ok) return target;
@@ -69,7 +73,7 @@ export async function addHourAdjustmentAction(
   await prisma.hourAdjustment.create({
     data: {
       userId,
-      year: new Date().getFullYear(),
+      year,
       hours,
       reason: reason.trim(),
       createdById: session.user.id,
