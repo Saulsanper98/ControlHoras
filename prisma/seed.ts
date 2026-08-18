@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+const JEFA_EMAIL = "responsableom@movilidadgc.org";
+const LEGACY_JEFA_EMAIL = "responsableoperaciones@movilidadgc.org";
+
 const DEFAULT_PASSWORD = "Cambiar123!";
 
 type SeedUser = {
@@ -78,8 +81,18 @@ async function main() {
 
   // La jefa (responsable de operaciones) tiene su propia cuenta real, sin
   // departamento asignado y sin control horario propio.
+  const legacyJefa = await prisma.user.findUnique({
+    where: { email: LEGACY_JEFA_EMAIL },
+  });
+  if (legacyJefa) {
+    await prisma.user.update({
+      where: { email: LEGACY_JEFA_EMAIL },
+      data: { email: JEFA_EMAIL },
+    });
+  }
+
   await prisma.user.upsert({
-    where: { email: "responsableoperaciones@movilidadgc.org" },
+    where: { email: JEFA_EMAIL },
     update: {
       name: "Responsable de Operaciones",
       role: "JEFA",
@@ -88,11 +101,9 @@ async function main() {
     },
     create: {
       name: "Responsable de Operaciones",
-      email: "responsableoperaciones@movilidadgc.org",
+      email: JEFA_EMAIL,
       passwordHash,
       role: "JEFA",
-      // Solo en creación: no queremos forzar el cambio de contraseña de
-      // nuevo a una cuenta que ya lo hizo, cada vez que se re-ejecuta el seed.
       mustChangePassword: true,
     },
   });
@@ -148,7 +159,7 @@ async function main() {
   }
 
   console.log("Seed completada. Contraseña temporal para todos los usuarios nuevos: %s", DEFAULT_PASSWORD);
-  console.log("  responsableoperaciones@movilidadgc.org (JEFA)");
+  console.log("  %s (JEFA)", JEFA_EMAIL);
   console.log(`  ${created} cuentas creadas/actualizadas a partir del roster real.`);
   console.log("  Saul@movilidadgc.org -> EMPLEADO (Sistemas), sin acceso a las opciones de la jefa.");
   console.log(`  Cuentas antiguas desactivadas: ${LEGACY_EMPLOYEE_EMAILS.join(", ")}`);
