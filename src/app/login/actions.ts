@@ -72,11 +72,12 @@ export async function loginAction(
       };
     }
     if (error instanceof AuthError) {
-      const code = "type" in error ? String(error.type) : error.name;
+      const authError = error as AuthError & { type?: string };
+      const code = authError.type ?? authError.name;
       if (code === "CredentialsSignin") {
         return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
       }
-      console.error("[login] AuthError:", code, error.message);
+      console.error("[login] AuthError:", code, authError.message);
       return {
         error: "No se pudo iniciar sesión. Recarga la página e inténtalo de nuevo.",
         redirectTo: null,
