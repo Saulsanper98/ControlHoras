@@ -25,26 +25,41 @@ function isDatabaseUnreachable(error: unknown): boolean {
   );
 }
 
+function firstNonEmpty(formData: FormData, keys: string[]): string {
+  for (const key of keys) {
+    const values = formData.getAll(key);
+    for (const value of values) {
+      if (typeof value !== "string") continue;
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return "";
+}
+
 export async function loginAction(
   _prevState: { error: string | null; redirectTo?: string | null },
   formData: FormData
 ): Promise<{ error: string | null; redirectTo?: string | null }> {
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
+  // Gestores de contraseñas a veces inyectan otro input name=password vacío.
+  const email = firstNonEmpty(formData, ["email", "username", "loginEmail"]);
+  const password = firstNonEmpty(formData, ["password", "loginPassword"]);
   const rawCallback = String(formData.get("callbackUrl") ?? "/");
-  // Solo rutas relativas internas (evita open-redirect).
   const callbackUrl =
     rawCallback.startsWith("/") && !rawCallback.startsWith("//") ? rawCallback : "/";
 
+  if (!email || !password) {
+    return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
+  }
+
   try {
-    // Sin redirect automático: el cliente anima la salida y navega después.
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
 
-    if (result?.error) {
+    if (result && typeof result === "object" && "error" in result && result.error) {
       return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
     }
 
@@ -57,7 +72,15 @@ export async function loginAction(
       };
     }
     if (error instanceof AuthError) {
-      return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
+      const code = "type" in error ? String(error.type) : error.name;
+      if (code === "CredentialsSignin") {
+        return { error: "Usuario o contraseña incorrectos.", redirectTo: null };
+      }
+      console.error("[login] AuthError:", code, error.message);
+      return {
+        error: "No se pudo iniciar sesión. Recarga la página e inténtalo de nuevo.",
+        redirectTo: null,
+      };
     }
     throw error;
   }

@@ -141,10 +141,9 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
                   // rellene la cuenta al cargar, pero permite sugerencias al escribir.
                   readOnly={!unlockFields}
                   onFocus={() => setUnlockFields(true)}
-                  disabled={busy}
                   aria-invalid={Boolean(state.error && !exiting)}
                   aria-describedby={state.error && !exiting ? "login-error" : undefined}
-                  className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40 disabled:opacity-70"
+                  className="mt-1 w-full rounded-md border border-white/25 bg-white/90 px-3 py-2 text-sm text-brand-navy placeholder:text-slate-400 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40"
                   placeholder="nombre@empresa.com"
                 />
               </div>
@@ -162,7 +161,6 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
                     autoComplete="current-password"
                     readOnly={!unlockFields}
                     onFocus={() => setUnlockFields(true)}
-                    disabled={busy}
                     aria-invalid={Boolean(state.error && !exiting)}
                     aria-describedby={state.error && !exiting ? "login-error" : undefined}
                     className="w-full rounded-md border border-white/25 bg-white/90 py-2 pl-3 pr-10 text-sm text-brand-navy placeholder:text-slate-400 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40 disabled:opacity-70"

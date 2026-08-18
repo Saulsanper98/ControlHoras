@@ -80,7 +80,12 @@ async function main() {
   // departamento asignado y sin control horario propio.
   await prisma.user.upsert({
     where: { email: "responsableoperaciones@movilidadgc.org" },
-    update: { name: "Responsable de Operaciones", role: "JEFA" },
+    update: {
+      name: "Responsable de Operaciones",
+      role: "JEFA",
+      passwordHash,
+      active: true,
+    },
     create: {
       name: "Responsable de Operaciones",
       email: "responsableoperaciones@movilidadgc.org",
@@ -104,6 +109,10 @@ async function main() {
           role: u.role ?? "EMPLEADO",
           departmentId,
           active: true,
+          // En desarrollo el roster debe poder entrar siempre con la clave
+          // temporal; si no se actualiza el hash, un usuario ya creado queda
+          // con una contraseña antigua y el login falla.
+          passwordHash,
         },
         create: {
           name: u.name,
@@ -111,7 +120,6 @@ async function main() {
           passwordHash,
           role: u.role ?? "EMPLEADO",
           departmentId,
-          // Solo en creación, por el mismo motivo que arriba.
           mustChangePassword: true,
         },
       });

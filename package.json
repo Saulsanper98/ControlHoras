@@ -13,7 +13,8 @@
     "env:lan": "node scripts/apply-lan-env.mjs",
     "db:setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "db:reset": "prisma migrate reset --force",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset-passwords": "node scripts/reset-dev-passwords.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
