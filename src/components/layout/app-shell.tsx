@@ -245,7 +245,7 @@ export function AppShell({
 
         <main
           id="main-content"
-          className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8 md:px-10"
+          className="relative z-10 min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 md:px-10"
         >
           <PageTransition>{children}</PageTransition>
         </main>

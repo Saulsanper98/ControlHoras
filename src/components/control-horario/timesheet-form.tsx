@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { FieldSelect } from "@/components/ui/field-select";
 import { TimeField } from "@/components/ui/time-field";
-import { ScrollShadow } from "@/components/ui/scroll-shadow";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Alert } from "@/components/ui/alert";
 import { InlineEmpty } from "@/components/ui/inline-empty";
@@ -612,12 +611,13 @@ export function TimeSheetForm({
           shiftKeyForEntry={shiftKeyForEntry}
         />
 
-        <ScrollShadow className={`hidden md:block${editable ? " pb-20" : ""}`}>
+        <div className={`w-full min-w-0 max-md:hidden${editable ? " pb-20" : ""}`}>
           {filteredEntries.length === 0 ? (
             <InlineEmpty>No hay días que coincidan con el filtro.</InlineEmpty>
           ) : (
+          <div className="w-full overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
-            {/* thead sticky top no funciona dentro de ScrollShadow (overflow-x-auto); skip seguro */}
+            {/* thead sticky top no funciona dentro de overflow-x-auto; skip seguro */}
             <thead className="sticky top-0 z-10 bg-[color:var(--app-gradient-top)]">
               <tr className="border-b border-[color:var(--surface-divider)] text-left text-[11px] uppercase tracking-wide text-slate-500">
                 <th className={tableCell}>Día</th>
@@ -753,8 +753,9 @@ export function TimeSheetForm({
               </tr>
             </tfoot>
           </table>
+          </div>
           )}
-        </ScrollShadow>
+        </div>
 
         {editable && (
           <div className="sticky bottom-0 z-10 border-t border-[color:var(--surface-divider)] bg-[color:var(--app-sticky)]/92 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md">

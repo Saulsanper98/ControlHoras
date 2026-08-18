@@ -48,7 +48,7 @@ export function TimeSheetMobileDays({
   );
 
   const hiddenFreeDays = !editable ? entries.length - visibleEntries.length : 0;
-  const containerClass = `md:hidden${editable ? " pb-[4.5rem]" : ""}`;
+  const containerClass = editable ? "md:hidden pb-[4.5rem]" : "md:hidden";
 
   if (entries.length === 0) {
     return (
