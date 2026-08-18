@@ -17,11 +17,15 @@ echo [3/5] prisma generate
 call npx prisma generate
 if errorlevel 1 goto :fail
 
-echo [4/5] reset BD + migraciones + seed
+echo [4/6] reset BD + migraciones + seed
 call npx prisma migrate reset --force
 if errorlevel 1 goto :fail
 
-echo [5/5] arrancando servidor en 0.0.0.0:3000
+echo [5/6] fijar contraseña Cambiar123! en todas las cuentas
+call node scripts\reset-dev-passwords.mjs
+if errorlevel 1 goto :fail
+
+echo [6/6] arrancando servidor en 0.0.0.0:3000
 echo.
 call npm run dev
 goto :eof

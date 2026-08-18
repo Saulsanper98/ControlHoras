@@ -1,9 +1,10 @@
 /**
- * Escribe/actualiza .env para acceso por IP LAN.
- * No hace falta editar .env a mano: lo hace este script.
+ * Prepara .env para desarrollo en LAN.
+ * NO escribe AUTH_URL: con AUTH_TRUST_HOST el host lo toma de la petición
+ * (localhost o 192.168.x.x). Si AUTH_URL apunta a localhost y abres por IP,
+ * el login falla.
  *
  * Uso: node scripts/apply-lan-env.mjs
- *      node scripts/apply-lan-env.mjs 192.168.12.45
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -35,8 +36,11 @@ function upsertEnv(content, key, value) {
   return `${content.trimEnd()}\n${line}\n`;
 }
 
+function stripEnv(content, key) {
+  return content.replace(new RegExp(`^${key}=.*\\r?\\n?`, "m"), "");
+}
+
 const ip = detectLanIp();
-const authUrl = `http://${ip}:3000`;
 
 if (!fs.existsSync(envPath)) {
   if (fs.existsSync(examplePath)) {
@@ -44,17 +48,13 @@ if (!fs.existsSync(envPath)) {
     console.log("Creado .env desde .env.example");
   } else {
     fs.writeFileSync(envPath, "", "utf8");
-    console.log("Creado .env vacío");
   }
 }
 
 let env = fs.readFileSync(envPath, "utf8");
-env = upsertEnv(env, "AUTH_URL", authUrl);
+env = stripEnv(env, "AUTH_URL");
 env = upsertEnv(env, "AUTH_TRUST_HOST", "true");
 
-// Asegura secreto de desarrollo si falta o es el placeholder del example.
-// NUNCA rotar un secreto ya válido: eso invalida cookies y provoca
-// JWTSessionError "no matching decryption secret".
 const secretMatch = env.match(/^AUTH_SECRET="?([^"\n]*)"?$/m);
 const currentSecret = secretMatch?.[1]?.trim() ?? "";
 const needsSecret =
@@ -62,13 +62,12 @@ const needsSecret =
   currentSecret.startsWith("genera-uno-con") ||
   currentSecret === "change-me";
 if (needsSecret) {
-  // Estable por máquina (IP), no Date.now(): reinicios no rompen sesiones.
   const secret = Buffer.from(`portal-empleado-dev-secret-${ip}`).toString("base64url");
   env = upsertEnv(env, "AUTH_SECRET", secret);
   console.log("OK — AUTH_SECRET de desarrollo fijado (estable)");
 }
 
 fs.writeFileSync(envPath, env, "utf8");
-console.log(`OK — AUTH_URL=${authUrl}`);
-console.log(`OK — AUTH_TRUST_HOST=true`);
-console.log("Abre esa misma URL en el navegador tras npm run dev.");
+console.log("OK — AUTH_TRUST_HOST=true");
+console.log("OK — AUTH_URL eliminado (Auth.js usa el host de la petición)");
+console.log(`Abre http://${ip}:3000  o  http://localhost:3000`);
