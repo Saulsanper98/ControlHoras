@@ -1,9 +1,10 @@
 /**
- * Prepara .env para acceso por IP LAN (obligatorio en este proyecto).
- * Fija AUTH_URL a http://<IP>:3000 — NO uses localhost en el navegador.
+ * Prepara .env para acceso por IP LAN.
+ * NO escribe AUTH_URL: con AUTH_TRUST_HOST Auth.js usa el Host de la petición.
+ * Si AUTH_URL=localhost y abres por IP (o al revés), la cookie no sirve y
+ * tras el login vuelves al login.
  *
- * Uso: node scripts/apply-lan-env.mjs
- *      node scripts/apply-lan-env.mjs 192.168.12.45
+ * Uso: node scripts/apply-lan-env.mjs 192.168.12.45
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -35,8 +36,11 @@ function upsertEnv(content, key, value) {
   return `${content.trimEnd()}\n${line}\n`;
 }
 
+function stripEnv(content, key) {
+  return content.replace(new RegExp(`^${key}=.*\\r?\\n?`, "m"), "");
+}
+
 const ip = detectLanIp();
-const authUrl = `http://${ip}:3000`;
 
 if (!fs.existsSync(envPath)) {
   if (fs.existsSync(examplePath)) {
@@ -48,7 +52,8 @@ if (!fs.existsSync(envPath)) {
 }
 
 let env = fs.readFileSync(envPath, "utf8");
-env = upsertEnv(env, "AUTH_URL", authUrl);
+env = stripEnv(env, "AUTH_URL");
+env = stripEnv(env, "NEXTAUTH_URL");
 env = upsertEnv(env, "AUTH_TRUST_HOST", "true");
 
 const secretMatch = env.match(/^AUTH_SECRET="?([^"\n]*)"?$/m);
@@ -64,8 +69,8 @@ if (needsSecret) {
 }
 
 fs.writeFileSync(envPath, env, "utf8");
-console.log(`OK — AUTH_URL=${authUrl}`);
 console.log("OK — AUTH_TRUST_HOST=true");
+console.log("OK — AUTH_URL eliminado (evita bucle login con IP)");
 console.log("");
-console.log(`Abre SIEMPRE la app por IP:  ${authUrl}`);
+console.log(`Abre SIEMPRE por IP:  http://${ip}:3000`);
 console.log("(No uses http://localhost:3000)");

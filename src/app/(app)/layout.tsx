@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 import { AppShell } from "@/components/layout/app-shell";
@@ -31,6 +31,20 @@ export default async function AppLayout({
   if (!session) redirect("/login");
 
   assertPrismaReady();
+
+  // Revalidación en vivo (antes estaba en el proxy y provocaba bucle login).
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { active: true, mustChangePassword: true },
+  });
+
+  if (!dbUser?.active) {
+    await signOut({ redirectTo: "/login" });
+  }
+
+  if (dbUser?.mustChangePassword) {
+    redirect("/cambiar-contrasena");
+  }
 
   const now = new Date();
   const month = now.getMonth() + 1;

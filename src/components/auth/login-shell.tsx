@@ -1,15 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
 import { LoginVideoBackground } from "@/components/auth/login-video-background";
 import { cn } from "@/lib/utils";
 
+/** Borra cookies Auth.js viejas en el cliente (Secure vs no-Secure / secret distinto). */
+function clearClientAuthCookies() {
+  if (typeof document === "undefined") return;
+  const names = document.cookie.split(";").map((c) => c.split("=")[0]?.trim());
+  for (const name of names) {
+    if (!name) continue;
+    if (
+      name.includes("authjs") ||
+      name.includes("next-auth") ||
+      name.includes("session-token")
+    ) {
+      document.cookie = `${name}=; Max-Age=0; path=/`;
+      document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+    }
+  }
+}
+
 /**
- * Login en el cliente contra el origen actual (localhost o IP LAN).
- * No usa Server Action: Next.js estaba enviando FormData vacío (`{}`) y
- * Auth.js con AUTH_URL=localhost rompía cookies al entrar por la IP.
+ * Login por IP LAN. Redirect solo a rutas relativas del mismo origen
+ * (nunca result.url absoluto: puede apuntar a localhost y perder la cookie).
  */
 export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +33,8 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
   const [showPassword, setShowPassword] = useState(false);
   const [formFocus, setFormFocus] = useState(false);
 
-  const target = callbackUrl.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : "/";
+  const target =
+    callbackUrl.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : "/";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +52,8 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
     }
 
     try {
+      clearClientAuthCookies();
+
       const result = await signIn("credentials", {
         email,
         password,
@@ -44,7 +63,6 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
 
       if (!result || result.error) {
         setPending(false);
-        // CallbackRouteError suele ser BD caída (p. ej. localhost:5433 apagado).
         const code = result?.error ?? "";
         if (
           code === "CallbackRouteError" ||
@@ -52,7 +70,7 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
           code === "AccessDenied"
         ) {
           setError(
-            "No se puede conectar con la base de datos. Arranca Postgres (Docker) y reinicia npm run dev."
+            "No se puede conectar con la base de datos. Ejecuta scripts\\reset-portal-db.cmd y reinicia."
           );
           return;
         }
@@ -60,7 +78,19 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
         return;
       }
 
-      window.location.assign(result.url || target);
+      // Confirmar cookie antes de navegar (evita el bucle login → / → login).
+      const session = await getSession();
+      if (!session?.user) {
+        setPending(false);
+        setError(
+          "La sesión no se guardó. Abre http://192.168.12.45:3000 (no localhost) en ventana de incógnito."
+        );
+        return;
+      }
+
+      // Seed: mustChangePassword → ir directo al cambio (evita un salto extra).
+      const dest = session.user.mustChangePassword ? "/cambiar-contrasena" : target;
+      window.location.assign(dest);
     } catch {
       setPending(false);
       setError("No se pudo iniciar sesión. Recarga la página e inténtalo de nuevo.");
