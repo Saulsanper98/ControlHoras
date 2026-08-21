@@ -11,9 +11,9 @@ services:
       POSTGRES_DB: portal_empleado
       TZ: Europe/Madrid
     ports:
-      # Solo accesible desde el propio host (p. ej. para "npm run dev" en
-      # local o depuración con psql), nunca expuesto a la red/internet.
-      - "127.0.0.1:5432:5432"
+      # Host 5433 → contenedor 5432. Evita chocar con un Postgres local
+      # que suele ocupar el 5432 en Windows (Authentication failed P1000).
+      - "127.0.0.1:5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

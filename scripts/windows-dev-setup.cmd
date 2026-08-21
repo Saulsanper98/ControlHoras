@@ -5,20 +5,28 @@ cd /d "%~dp0\.."
 echo === Portal Empleado: setup LAN Windows ===
 echo.
 
-echo [1/5] npm install
+echo [1/7] npm install
 call npm install
 if errorlevel 1 goto :fail
 
-echo [2/7] escribiendo .env para LAN ^(sin tocar AUTH_URL^)
+echo [2/7] escribiendo .env para LAN
 call node scripts\apply-lan-env.mjs %*
 if errorlevel 1 goto :fail
 
-echo [3/7] comprobar Postgres / puerto DATABASE_URL
+echo [3/7] DATABASE_URL -^> localhost:5433 ^(portal^)
 call node scripts\fix-db-url.mjs
 if errorlevel 1 (
+  echo.
   echo Intentando docker compose up -d db ...
   call docker compose up -d db
-  timeout /t 5 /nobreak >nul
+  if errorlevel 1 (
+    echo.
+    echo Docker no esta disponible. ABRE Docker Desktop, espera a que este listo,
+    echo y vuelve a ejecutar:  scripts\windows-dev-setup.cmd
+    goto :fail
+  )
+  echo Esperando a Postgres...
+  timeout /t 8 /nobreak >nul
   call node scripts\fix-db-url.mjs
   if errorlevel 1 goto :fail
 )
@@ -44,7 +52,10 @@ goto :eof
 
 :fail
 echo.
-echo ERROR: Postgres no esta disponible. Arranca Docker Desktop y:
-echo   docker compose up -d db
-echo Luego vuelve a ejecutar este script.
+echo ERROR. Pasos minimos:
+echo   1. Abre Docker Desktop ^(icono de ballena en la bandeja^)
+echo   2. docker compose up -d db
+echo   3. node scripts\fix-db-url.mjs
+echo   4. npx prisma migrate deploy ^&^& npm run db:seed
+echo   5. npm run dev
 exit /b 1
