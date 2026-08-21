@@ -44,6 +44,18 @@ export function LoginShell({ callbackUrl }: { callbackUrl: string }) {
 
       if (!result || result.error) {
         setPending(false);
+        // CallbackRouteError suele ser BD caída (p. ej. localhost:5433 apagado).
+        const code = result?.error ?? "";
+        if (
+          code === "CallbackRouteError" ||
+          code === "Configuration" ||
+          code === "AccessDenied"
+        ) {
+          setError(
+            "No se puede conectar con la base de datos. Arranca Postgres (Docker) y reinicia npm run dev."
+          );
+          return;
+        }
         setError("Usuario o contraseña incorrectos.");
         return;
       }
