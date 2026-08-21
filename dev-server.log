@@ -1,0 +1,3181 @@
+
+> portal-empleado@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.0 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.12.44:3000
+- Environments: .env
+✓ Ready in 1260ms
+✓ Running next.config.ts took 99ms
+
+ GET / 200 in 7.2s (next.js: 304ms, proxy.ts: 2.1s, application-code: 4.8s)
+ GET / 200 in 333ms (next.js: 12ms, proxy.ts: 37ms, application-code: 284ms)
+ GET / 200 in 318ms (next.js: 12ms, proxy.ts: 30ms, application-code: 276ms)
+ GET /control-horario 200 in 181ms (next.js: 78ms, proxy.ts: 24ms, application-code: 79ms)
+ GET /control-horario 200 in 4.5s (next.js: 11ms, proxy.ts: 2.1s, application-code: 2.4s)
+ GET / 200 in 2.2s (next.js: 11ms, proxy.ts: 27ms, application-code: 2.2s)
+ GET /control-horario 200 in 121ms (next.js: 11ms, proxy.ts: 30ms, application-code: 80ms)
+ GET /control-horario 200 in 272ms (next.js: 10ms, proxy.ts: 25ms, application-code: 238ms)
+ GET / 200 in 154ms (next.js: 11ms, proxy.ts: 23ms, application-code: 120ms)
+ GET / 200 in 6.5s (next.js: 10ms, proxy.ts: 2.1s, application-code: 4.4s)
+ GET / 200 in 330ms (next.js: 11ms, proxy.ts: 27ms, application-code: 291ms)
+ GET / 200 in 6.4s (next.js: 10ms, proxy.ts: 2.1s, application-code: 4.3s)
+ GET / 200 in 320ms (next.js: 10ms, proxy.ts: 35ms, application-code: 274ms)
+ GET / 200 in 6.5s (next.js: 9ms, proxy.ts: 2.1s, application-code: 4.4s)
+ GET / 200 in 360ms (next.js: 9ms, proxy.ts: 33ms, application-code: 318ms)
+ GET / 200 in 6.4s (next.js: 10ms, proxy.ts: 2.1s, application-code: 4.3s)
+ GET /control-horario 200 in 113ms (next.js: 11ms, proxy.ts: 28ms, application-code: 74ms)
+ GET / 200 in 124ms (next.js: 10ms, proxy.ts: 18ms, application-code: 96ms)
+ GET /control-horario 200 in 131ms (next.js: 13ms, proxy.ts: 24ms, application-code: 94ms)
+ GET /control-horario 200 in 296ms (next.js: 13ms, proxy.ts: 30ms, application-code: 253ms)
+ GET /control-horario 200 in 297ms (next.js: 11ms, proxy.ts: 23ms, application-code: 263ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 324ms (next.js: 71ms, proxy.ts: 19ms, application-code: 234ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 134ms (next.js: 11ms, proxy.ts: 18ms, application-code: 105ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 260ms (next.js: 10ms, proxy.ts: 22ms, application-code: 229ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 208ms (next.js: 11ms, proxy.ts: 25ms, application-code: 172ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET /login?callbackUrl=%2Fhorario 200 in 220ms (next.js: 110ms, proxy.ts: 9ms, application-code: 100ms)
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login?callbackUrl=%2Fhorario 200 in 245ms (next.js: 9ms, proxy.ts: 14ms, application-code: 221ms)
+  └─ ƒ loginAction({"error":null}, {}) in 189ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login?callbackUrl=%2Fhorario 200 in 188ms (next.js: 9ms, proxy.ts: 10ms, application-code: 169ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 151ms src/app/login/actions.ts
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 165ms (next.js: 13ms, proxy.ts: 22ms, application-code: 130ms)
+ POST /login?callbackUrl=%2Fhorario 200 in 410ms (next.js: 9ms, proxy.ts: 11ms, application-code: 390ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 179ms src/app/login/actions.ts
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 124ms (next.js: 10ms, proxy.ts: 19ms, application-code: 95ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 181ms (next.js: 10ms, proxy.ts: 19ms, application-code: 151ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET /login?callbackUrl=%2Fhorario 200 in 99ms (next.js: 10ms, proxy.ts: 11ms, application-code: 78ms)
+ GET /login?callbackUrl=%2Fhorario 200 in 90ms (next.js: 9ms, proxy.ts: 10ms, application-code: 70ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 149ms (next.js: 10ms, proxy.ts: 23ms, application-code: 115ms)
+ POST /login?callbackUrl=%2Fhorario 200 in 373ms (next.js: 11ms, proxy.ts: 11ms, application-code: 351ms)
+  └─ ƒ loginAction({"error":null}, {}) in 169ms src/app/login/actions.ts
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 2.2s (next.js: 10ms, proxy.ts: 2.1s, application-code: 164ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 177ms (next.js: 11ms, proxy.ts: 21ms, application-code: 145ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 205ms (next.js: 9ms, proxy.ts: 23ms, application-code: 172ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET / 200 in 4.3s (next.js: 10ms, proxy.ts: 2.1s, application-code: 2.3s)
+ GET /control-horario 200 in 95ms (next.js: 10ms, proxy.ts: 22ms, application-code: 63ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 91ms (next.js: 10ms, proxy.ts: 19ms, application-code: 62ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 201ms (next.js: 10ms, proxy.ts: 24ms, application-code: 167ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET / 200 in 277ms (next.js: 10ms, proxy.ts: 22ms, application-code: 246ms)
+ GET /control-horario 200 in 91ms (next.js: 10ms, proxy.ts: 23ms, application-code: 58ms)
+ GET /vacaciones 200 in 211ms (next.js: 104ms, proxy.ts: 24ms, application-code: 83ms)
+ GET /noticias 200 in 143ms (next.js: 69ms, proxy.ts: 21ms, application-code: 53ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 96ms (next.js: 11ms, proxy.ts: 21ms, application-code: 65ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET / 200 in 220ms (next.js: 9ms, proxy.ts: 19ms, application-code: 193ms)
+ GET /control-horario 200 in 97ms (next.js: 10ms, proxy.ts: 23ms, application-code: 63ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 104ms (next.js: 12ms, proxy.ts: 25ms, application-code: 68ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET / 200 in 248ms (next.js: 10ms, proxy.ts: 23ms, application-code: 215ms)
+ GET /api/auth/csrf 200 in 1570ms (next.js: 1512ms, application-code: 57ms)
+ GET /api/auth/csrf 200 in 46ms (next.js: 16ms, application-code: 31ms)
+ POST /api/auth/signout 200 in 67ms (next.js: 30ms, application-code: 37ms)
+ POST /api/auth/signout 200 in 45ms (next.js: 10ms, application-code: 35ms)
+ GET /login 200 in 94ms (next.js: 15ms, proxy.ts: 15ms, application-code: 65ms)
+ GET /login 200 in 108ms (next.js: 9ms, proxy.ts: 25ms, application-code: 74ms)
+ GET / 200 in 162ms (next.js: 11ms, proxy.ts: 19ms, application-code: 132ms)
+ POST /login 200 in 391ms (next.js: 8ms, proxy.ts: 11ms, application-code: 372ms)
+  └─ ƒ loginAction({"error":null}, {}) in 168ms src/app/login/actions.ts
+ GET /control-horario 200 in 94ms (next.js: 10ms, proxy.ts: 21ms, application-code: 63ms)
+ GET / 200 in 115ms (next.js: 10ms, proxy.ts: 19ms, application-code: 86ms)
+ GET / 200 in 275ms (next.js: 8ms, proxy.ts: 18ms, application-code: 248ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 99ms (next.js: 11ms, proxy.ts: 20ms, application-code: 68ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 88ms (next.js: 11ms, proxy.ts: 18ms, application-code: 59ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET /control-horario 200 in 86ms (next.js: 10ms, proxy.ts: 20ms, application-code: 57ms)
+ GET /control-horario 200 in 2.3s (next.js: 10ms, proxy.ts: 2.1s, application-code: 219ms)
+ GET / 200 in 4.3s (next.js: 11ms, proxy.ts: 2.1s, application-code: 2.2s)
+ GET / 200 in 2.2s (next.js: 10ms, proxy.ts: 2.1s, application-code: 99ms)
+ GET / 200 in 4.3s (next.js: 9ms, proxy.ts: 2.1s, application-code: 2.2s)
+ GET /control-horario 200 in 2.2s (next.js: 11ms, proxy.ts: 2.1s, application-code: 80ms)
+ GET /control-horario 200 in 131ms (next.js: 14ms, proxy.ts: 19ms, application-code: 98ms)
+ GET /control-horario 200 in 2.2s (next.js: 13ms, proxy.ts: 2.1s, application-code: 78ms)
+ GET /control-horario 200 in 2.3s (next.js: 10ms, proxy.ts: 2.1s, application-code: 251ms)
+ GET /control-horario 200 in 45ms (next.js: 10ms, proxy.ts: 22ms, application-code: 13ms)
+ GET /control-horario 200 in 100ms (next.js: 11ms, proxy.ts: 27ms, application-code: 62ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 90ms (next.js: 10ms, proxy.ts: 17ms, application-code: 63ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET /vacaciones 200 in 2.2s (next.js: 14ms, proxy.ts: 18ms, application-code: 2.1s)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, {imported module ./src/auth.ts}["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await {imported module ./src/lib/prisma.ts}["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at async HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, {
+  clientVersion: '6.19.3',
+  digest: '682888160'
+}
+ GET /horario 200 in 190ms (next.js: 10ms, proxy.ts: 24ms, application-code: 156ms)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+[browser] PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst()` invocation in
+C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__02wjzs4._.js:35:164
+
+  32 async function HorarioPage() {
+  33     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+  34     if (!session) return null;
+→ 35     const schedule = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].schedule.findFirst({
+           where: {
+             userId: "cmsejnoto00062714htrg9wi4",
+             ~~~~~~
+         ?   AND?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   OR?: ScheduleWhereInput[],
+         ?   NOT?: ScheduleWhereInput | ScheduleWhereInput[],
+         ?   id?: StringFilter | String,
+         ?   departmentId?: StringFilter | String,
+         ?   fileName?: StringFilter | String,
+         ?   filePath?: StringFilter | String,
+         ?   mimeType?: StringFilter | String,
+         ?   uploadedById?: StringFilter | String,
+         ?   validFrom?: DateTimeFilter | DateTime,
+         ?   createdAt?: DateTimeFilter | DateTime,
+         ?   department?: DepartmentScalarRelationFilter | DepartmentWhereInput,
+         ?   uploadedBy?: UserScalarRelationFilter | UserWhereInput
+           },
+           orderBy: {
+             createdAt: "desc"
+           },
+           include: {
+             uploadedBy: true
+           }
+         })
+
+Unknown argument `userId`. Available options are marked with ?.
+    at <unknown> (src\app\(app)\horario\page.tsx:14:42)
+    at  HorarioPage (src\app\(app)\horario\page.tsx:14:20)
+  12 |   if (!session) return null;
+  13 |
+> 14 |   const schedule = await prisma.schedule.findFirst({
+     |                                          ^
+  15 |     where: { userId: session.user.id },
+  16 |     orderBy: { createdAt: "desc" },
+  17 |     include: { uploadedBy: true }, (src/app/error.tsx:15:13)
+ GET /control-horario 200 in 90ms (next.js: 10ms, proxy.ts: 18ms, application-code: 62ms)
+ GET / 200 in 2.3s (next.js: 10ms, proxy.ts: 17ms, application-code: 2.3s)
+ GET /control-horario 200 in 2.3s (next.js: 49ms, proxy.ts: 2.1s, application-code: 98ms)
+ GET /control-horario 200 in 123ms (next.js: 11ms, proxy.ts: 22ms, application-code: 90ms)
+ GET /control-horario 200 in 117ms (next.js: 11ms, proxy.ts: 22ms, application-code: 84ms)
+ GET /control-horario 200 in 163ms (next.js: 14ms, proxy.ts: 28ms, application-code: 121ms)
+ GET /control-horario 200 in 134ms (next.js: 10ms, proxy.ts: 20ms, application-code: 104ms)
+ GET /control-horario 200 in 139ms (next.js: 11ms, proxy.ts: 20ms, application-code: 108ms)
+ GET /control-horario 200 in 2.4s (next.js: 10ms, proxy.ts: 2.1s, application-code: 291ms)
+ GET /horario 200 in 128ms (next.js: 30ms, proxy.ts: 18ms, application-code: 80ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 403 in 1713ms (next.js: 1644ms, application-code: 69ms)
+ GET /horario 200 in 139ms (next.js: 14ms, proxy.ts: 25ms, application-code: 100ms)
+ GET /horario 200 in 161ms (next.js: 19ms, proxy.ts: 28ms, application-code: 113ms)
+✓ Compiled in 228ms
+ GET /horario 200 in 293ms (next.js: 31ms, proxy.ts: 43ms, application-code: 219ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 161ms (next.js: 48ms, application-code: 113ms)
+✓ Compiled in 190ms
+ GET /horario 200 in 197ms (next.js: 17ms, proxy.ts: 42ms, application-code: 139ms)
+ GET /horario 200 in 230ms (next.js: 24ms, proxy.ts: 22ms, application-code: 183ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 91ms (next.js: 25ms, application-code: 66ms)
+ GET / 200 in 2.2s (next.js: 25ms, proxy.ts: 20ms, application-code: 2.2s)
+ GET /control-horario 200 in 141ms (next.js: 33ms, proxy.ts: 25ms, application-code: 82ms)
+ GET /horario 200 in 123ms (next.js: 11ms, proxy.ts: 27ms, application-code: 85ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 59ms (next.js: 20ms, application-code: 39ms)
+ GET / 200 in 126ms (next.js: 13ms, proxy.ts: 21ms, application-code: 91ms)
+ GET /control-horario 200 in 137ms (next.js: 12ms, proxy.ts: 31ms, application-code: 95ms)
+ GET /horario 200 in 116ms (next.js: 11ms, proxy.ts: 20ms, application-code: 85ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 53ms (next.js: 15ms, application-code: 38ms)
+ GET /control-horario 200 in 120ms (next.js: 19ms, proxy.ts: 35ms, application-code: 66ms)
+ GET /horario 200 in 98ms (next.js: 11ms, proxy.ts: 21ms, application-code: 66ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 51ms (next.js: 19ms, application-code: 32ms)
+ GET /vacaciones 200 in 128ms (next.js: 26ms, proxy.ts: 18ms, application-code: 84ms)
+ GET /control-horario 200 in 100ms (next.js: 13ms, proxy.ts: 23ms, application-code: 64ms)
+ GET /horario 200 in 114ms (next.js: 10ms, proxy.ts: 20ms, application-code: 83ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 60ms (next.js: 17ms, application-code: 43ms)
+ GET /vacaciones 200 in 115ms (next.js: 12ms, proxy.ts: 27ms, application-code: 76ms)
+ GET /noticias 200 in 112ms (next.js: 32ms, proxy.ts: 24ms, application-code: 56ms)
+ GET /api/auth/csrf 200 in 38ms (next.js: 22ms, application-code: 16ms)
+ POST /api/auth/signout 200 in 23ms (next.js: 4ms, application-code: 19ms)
+ GET /login 200 in 119ms (next.js: 23ms, proxy.ts: 11ms, application-code: 85ms)
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 205ms (next.js: 9ms, proxy.ts: 10ms, application-code: 187ms)
+  └─ ƒ loginAction({"error":null}, {}) in 163ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 188ms (next.js: 8ms, proxy.ts: 11ms, application-code: 169ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 154ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 184ms (next.js: 8ms, proxy.ts: 11ms, application-code: 164ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 150ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 191ms (next.js: 8ms, proxy.ts: 9ms, application-code: 174ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 158ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__0mi1uc3._.js:53:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 195ms (next.js: 7ms, proxy.ts: 9ms, application-code: 178ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 162ms src/app/login/actions.ts
+ POST /login 200 in 34ms (next.js: 9ms, proxy.ts: 9ms, application-code: 16ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 0ms src/app/login/actions.ts
+ POST /login 200 in 32ms (next.js: 9ms, proxy.ts: 9ms, application-code: 15ms)
+  └─ ƒ loginAction({"error":"Demasiados intentos fallidos. Inténtalo de nuevo en 14 minuto(s)."}, {}) in 0ms src/app/login/actions.ts
+ GET /login 200 in 99ms (next.js: 26ms, proxy.ts: 14ms, application-code: 59ms)
+✓ Compiled in 507ms
+✓ Compiled in 310ms
+ GET /login 200 in 213ms (next.js: 13ms, proxy.ts: 9ms, application-code: 191ms)
+✓ Compiled in 326ms
+ GET /login 200 in 98ms (next.js: 15ms, proxy.ts: 12ms, application-code: 70ms)
+ GET /login 200 in 75ms (next.js: 12ms, proxy.ts: 9ms, application-code: 55ms)
+ GET /login 200 in 96ms (next.js: 11ms, proxy.ts: 17ms, application-code: 68ms)
+✓ Compiled in 182ms
+ GET /login 200 in 98ms (next.js: 16ms, proxy.ts: 16ms, application-code: 66ms)
+✓ Compiled in 176ms
+ GET /login 200 in 87ms (next.js: 14ms, proxy.ts: 15ms, application-code: 59ms)
+ GET /login 200 in 96ms (next.js: 15ms, proxy.ts: 17ms, application-code: 64ms)
+ GET /login 200 in 99ms (next.js: 16ms, proxy.ts: 13ms, application-code: 71ms)
+ GET /login 200 in 94ms (next.js: 12ms, proxy.ts: 12ms, application-code: 70ms)
+✓ Compiled in 164ms
+ GET /login 200 in 88ms (next.js: 21ms, proxy.ts: 9ms, application-code: 58ms)
+ GET /login 200 in 93ms (next.js: 12ms, proxy.ts: 13ms, application-code: 68ms)
+✓ Compiled in 205ms
+ GET /login 200 in 197ms (next.js: 107ms, proxy.ts: 15ms, application-code: 75ms)
+ GET /login 200 in 96ms (next.js: 10ms, proxy.ts: 11ms, application-code: 76ms)
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (file:///C:/Saul%20Web/ControlHoras/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0dj9eqo._.js?id=%5Bproject%5D/src/app/login/actions.ts+%5Bapp-rsc%5D+(ecmascript):21:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 2.3s (next.js: 8ms, proxy.ts: 10ms, application-code: 2.2s)
+  └─ ƒ loginAction({"error":null}, {}) in 2220ms src/app/login/actions.ts
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (file:///C:/Saul%20Web/ControlHoras/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0dj9eqo._.js?id=%5Bproject%5D/src/app/login/actions.ts+%5Bapp-rsc%5D+(ecmascript):21:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 179ms (next.js: 7ms, proxy.ts: 9ms, application-code: 163ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 147ms src/app/login/actions.ts
+ GET / 200 in 2.3s (next.js: 21ms, proxy.ts: 27ms, application-code: 2.2s)
+ POST /login 200 in 2.5s (next.js: 8ms, proxy.ts: 8ms, application-code: 2.5s)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 175ms src/app/login/actions.ts
+ GET /control-horario 200 in 103ms (next.js: 20ms, proxy.ts: 24ms, application-code: 59ms)
+ GET /horario 200 in 113ms (next.js: 19ms, proxy.ts: 19ms, application-code: 75ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 58ms (next.js: 20ms, application-code: 39ms)
+ GET /vacaciones 200 in 109ms (next.js: 20ms, proxy.ts: 20ms, application-code: 68ms)
+ GET /noticias 200 in 78ms (next.js: 19ms, proxy.ts: 20ms, application-code: 40ms)
+ GET / 200 in 4.4s (next.js: 8ms, proxy.ts: 2.1s, application-code: 2.3s)
+ GET / 200 in 224ms (next.js: 8ms, proxy.ts: 24ms, application-code: 192ms)
+ GET /vacaciones 200 in 211ms (next.js: 9ms, proxy.ts: 28ms, application-code: 174ms)
+ GET /horario 200 in 233ms (next.js: 29ms, proxy.ts: 32ms, application-code: 172ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 64ms (next.js: 21ms, application-code: 43ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 44ms (next.js: 5ms, application-code: 40ms)
+ GET /api/auth/signout 200 in 40ms (next.js: 23ms, application-code: 18ms)
+ POST /api/auth/signout 302 in 41ms (next.js: 18ms, application-code: 23ms)
+ GET /login?callbackUrl=%2F 200 in 119ms (next.js: 9ms, proxy.ts: 12ms, application-code: 98ms)
+ GET /login 200 in 86ms (next.js: 7ms, proxy.ts: 9ms, application-code: 70ms)
+ GET /login 200 in 84ms (next.js: 8ms, proxy.ts: 8ms, application-code: 68ms)
+ GET /login?callbackUrl=%2Fnoticias 200 in 89ms (next.js: 9ms, proxy.ts: 8ms, application-code: 73ms)
+ GET /login 200 in 105ms (next.js: 10ms, proxy.ts: 13ms, application-code: 82ms)
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (file:///C:/Saul%20Web/ControlHoras/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0dj9eqo._.js?id=%5Bproject%5D/src/app/login/actions.ts+%5Bapp-rsc%5D+(ecmascript):21:9)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 2.3s (next.js: 11ms, proxy.ts: 9ms, application-code: 2.2s)
+  └─ ƒ loginAction({"error":null}, {}) in 2227ms src/app/login/actions.ts
+ GET / 200 in 2.2s (next.js: 13ms, proxy.ts: 21ms, application-code: 2.2s)
+ POST /login 200 in 2.4s (next.js: 11ms, proxy.ts: 8ms, application-code: 2.4s)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos."}, {}) in 153ms src/app/login/actions.ts
+ GET /control-horario 200 in 105ms (next.js: 16ms, proxy.ts: 21ms, application-code: 68ms)
+ GET / 200 in 111ms (next.js: 10ms, proxy.ts: 19ms, application-code: 82ms)
+ GET /control-horario 200 in 111ms (next.js: 12ms, proxy.ts: 30ms, application-code: 70ms)
+ GET /horario 200 in 99ms (next.js: 11ms, proxy.ts: 19ms, application-code: 69ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 64ms (next.js: 15ms, application-code: 49ms)
+ GET /vacaciones 200 in 118ms (next.js: 16ms, proxy.ts: 22ms, application-code: 80ms)
+ GET / 200 in 131ms (next.js: 8ms, proxy.ts: 20ms, application-code: 103ms)
+ GET /control-horario 200 in 99ms (next.js: 10ms, proxy.ts: 24ms, application-code: 65ms)
+ GET /horario 200 in 130ms (next.js: 15ms, proxy.ts: 29ms, application-code: 86ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 51ms (next.js: 15ms, application-code: 35ms)
+ GET / 200 in 121ms (next.js: 9ms, proxy.ts: 19ms, application-code: 93ms)
+ GET / 200 in 40ms (next.js: 9ms, proxy.ts: 20ms, application-code: 12ms)
+ GET / 200 in 110ms (next.js: 9ms, proxy.ts: 18ms, application-code: 82ms)
+ GET /control-horario 200 in 93ms (next.js: 11ms, proxy.ts: 21ms, application-code: 61ms)
+ GET / 200 in 4.5s (next.js: 8ms, proxy.ts: 2.1s, application-code: 2.4s)
+ GET / 200 in 4.2s (next.js: 11ms, proxy.ts: 2.1s, application-code: 2.2s)
+ GET / 200 in 310ms (next.js: 9ms, proxy.ts: 29ms, application-code: 273ms)
+ GET / 200 in 238ms (next.js: 8ms, proxy.ts: 27ms, application-code: 202ms)
+ GET / 200 in 231ms (next.js: 9ms, proxy.ts: 20ms, application-code: 203ms)
+✓ Compiled in 301ms
+✓ Compiled in 273ms
+ GET / 307 in 154ms (proxy.ts: 134ms)
+ GET / 200 in 207ms (next.js: 14ms, proxy.ts: 41ms, application-code: 152ms)
+ GET / 200 in 261ms (next.js: 19ms, proxy.ts: 77ms, application-code: 165ms)
+ GET / 200 in 267ms (next.js: 12ms, proxy.ts: 117ms, application-code: 139ms)
+ GET /control-horario 200 in 281ms (next.js: 31ms, proxy.ts: 26ms, application-code: 225ms)
+ GET / 200 in 244ms (next.js: 14ms, proxy.ts: 19ms, application-code: 211ms)
+ GET / 200 in 264ms (next.js: 9ms, proxy.ts: 24ms, application-code: 232ms)
+ GET /api/auth/csrf 200 in 32ms (next.js: 17ms, application-code: 15ms)
+ POST /api/auth/signout 200 in 22ms (next.js: 5ms, application-code: 17ms)
+ GET /login 200 in 121ms (next.js: 22ms, proxy.ts: 12ms, application-code: 87ms)
+ GET /login?callbackUrl=%2Fcontrol-horario 200 in 91ms (next.js: 9ms, proxy.ts: 8ms, application-code: 74ms)
+ GET /login?callbackUrl=%2F 200 in 84ms (next.js: 8ms, proxy.ts: 8ms, application-code: 68ms)
+ GET / 200 in 2.2s (next.js: 9ms, proxy.ts: 21ms, application-code: 2.2s)
+ POST /login 200 in 4.5s (next.js: 9ms, proxy.ts: 11ms, application-code: 4.5s)
+  └─ ƒ loginAction({"error":null}, {}) in 2238ms src/app/login/actions.ts
+ POST / 200 in 86ms (next.js: 8ms, proxy.ts: 24ms, application-code: 54ms)
+[browser] Error: An unexpected response was received from the server. (src/app/error.tsx:15:13)
+[browser] Error: An unexpected response was received from the server. (src/app/error.tsx:15:13)
+ GET /control-horario 200 in 264ms (next.js: 9ms, proxy.ts: 20ms, application-code: 235ms)
+ GET / 200 in 265ms (next.js: 9ms, proxy.ts: 22ms, application-code: 233ms)
+✓ Compiled in 348ms
+ GET / 200 in 228ms (next.js: 13ms, proxy.ts: 29ms, application-code: 187ms)
+ GET /control-horario 200 in 221ms (next.js: 17ms, proxy.ts: 37ms, application-code: 168ms)
+✓ Compiled in 430ms
+ GET /control-horario 200 in 234ms (next.js: 55ms, proxy.ts: 28ms, application-code: 151ms)
+ GET / 200 in 238ms (next.js: 16ms, proxy.ts: 30ms, application-code: 193ms)
+✓ Compiled in 516ms
+ GET /control-horario 200 in 315ms (next.js: 11ms, proxy.ts: 25ms, application-code: 279ms)
+ GET / 200 in 238ms (next.js: 10ms, proxy.ts: 25ms, application-code: 203ms)
+✓ Compiled in 134ms
+ GET / 200 in 172ms (next.js: 10ms, proxy.ts: 17ms, application-code: 145ms)
+✓ Compiled in 131ms
+ GET / 200 in 331ms (next.js: 68ms, proxy.ts: 73ms, application-code: 190ms)
+ GET / 200 in 275ms (next.js: 10ms, proxy.ts: 134ms, application-code: 132ms)
+ GET / 200 in 195ms (next.js: 10ms, proxy.ts: 79ms, application-code: 106ms)
+ GET /api/auth/csrf 200 in 35ms (next.js: 16ms, application-code: 19ms)
+ POST /api/auth/signout 200 in 25ms (next.js: 5ms, application-code: 20ms)
+ GET /login 200 in 123ms (next.js: 20ms, proxy.ts: 9ms, application-code: 95ms)
+ GET /login 200 in 89ms (next.js: 9ms, proxy.ts: 9ms, application-code: 71ms)
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:1188:30)
+    at async AuthInternal (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:2517:24)
+    at async Auth (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:356:34)
+    at async signIn (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\[root-of-the-server]__1-qed-9._.js:10658:17)
+    at async loginAction (file:///C:/Saul%20Web/ControlHoras/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0dj9eqo._.js?id=%5Bproject%5D/src/app/login/actions.ts+%5Bapp-rsc%5D+(ecmascript):22:24)
+    at async executeActionAndPrepareForRender (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:5395)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:168:2018
+    at async handleAction (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:166:27863)
+    at async renderToHTMLOrFlightImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:173:2883)
+    at async doRender (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1157:32)
+    at async AppPageRouteModule.handleResponse (C:\Saul Web\ControlHoras\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js:216:75826)
+    at async handleResponse (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1524:36)
+    at async Module.handler (C:\Saul Web\ControlHoras\.next\dev\server\chunks\ssr\node_modules_1146yy6._.js:1995:24)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1537:9)
+    at async DevServer.renderPageComponent (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1589:24)
+    at async DevServer.renderToResponseImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1639:32)
+    at async DevServer.pipeImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:1088:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\next-server.js:338:17)
+    at async DevServer.handleRequestImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\base-server.js:979:17)
+    at async C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:426:20
+    at async Span.traceAsyncFn (C:\Saul Web\ControlHoras\node_modules\next\dist\trace\trace.js:164:20)
+    at async DevServer.handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\dev\next-dev-server.js:422:24)
+    at async invokeRender (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:306:21)
+    at async handleRequest (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:508:24)
+    at async requestHandlerImpl (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\router-server.js:565:13)
+    at async Server.requestListener (C:\Saul Web\ControlHoras\node_modules\next\dist\server\lib\start-server.js:225:13)
+ POST /login 200 in 2.3s (next.js: 8ms, proxy.ts: 11ms, application-code: 2.2s)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 2220ms src/app/login/actions.ts
+ POST /login 200 in 233ms (next.js: 8ms, proxy.ts: 9ms, application-code: 216ms)
+  └─ ƒ loginAction({"error":"Usuario o contraseña incorrectos.","redirectTo":null}, {}) in 167ms src/app/login/actions.ts
+ GET / 200 in 2.2s (next.js: 10ms, proxy.ts: 22ms, application-code: 2.2s)
+ GET / 200 in 2.2s (next.js: 10ms, proxy.ts: 55ms, application-code: 2.2s)
+ GET /api/auth/csrf 200 in 30ms (next.js: 16ms, application-code: 14ms)
+ POST /api/auth/signout 200 in 19ms (next.js: 4ms, application-code: 15ms)
+ GET /login 200 in 90ms (next.js: 10ms, proxy.ts: 10ms, application-code: 71ms)
+ POST /login 200 in 284ms (next.js: 12ms, proxy.ts: 16ms, application-code: 256ms)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 196ms src/app/login/actions.ts
+ GET / 200 in 240ms (next.js: 12ms, proxy.ts: 30ms, application-code: 198ms)
+ GET / 200 in 201ms (next.js: 18ms, proxy.ts: 53ms, application-code: 131ms)
+✓ Compiled in 152ms
+ GET / 200 in 155ms (next.js: 10ms, proxy.ts: 23ms, application-code: 121ms)
+ GET / 200 in 193ms (next.js: 10ms, proxy.ts: 62ms, application-code: 121ms)
+✓ Compiled in 201ms
+ GET / 200 in 158ms (next.js: 13ms, proxy.ts: 25ms, application-code: 121ms)
+ GET / 200 in 182ms (next.js: 9ms, proxy.ts: 72ms, application-code: 102ms)
+✓ Compiled in 186ms
+✓ Compiled in 152ms
+ GET / 200 in 210ms (next.js: 13ms, proxy.ts: 36ms, application-code: 160ms)
+ GET / 200 in 181ms (next.js: 11ms, proxy.ts: 65ms, application-code: 105ms)
+ GET /api/auth/csrf 200 in 28ms (next.js: 15ms, application-code: 13ms)
+ POST /api/auth/signout 200 in 20ms (next.js: 5ms, application-code: 15ms)
+ GET /login 200 in 99ms (next.js: 17ms, proxy.ts: 12ms, application-code: 70ms)
+ POST /login 200 in 224ms (next.js: 8ms, proxy.ts: 12ms, application-code: 204ms)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 157ms src/app/login/actions.ts
+ GET / 200 in 197ms (next.js: 10ms, proxy.ts: 21ms, application-code: 166ms)
+ GET / 200 in 244ms (next.js: 13ms, proxy.ts: 87ms, application-code: 144ms)
+ GET /api/auth/csrf 200 in 26ms (next.js: 14ms, application-code: 12ms)
+ POST /api/auth/signout 200 in 20ms (next.js: 4ms, application-code: 17ms)
+ GET /login 200 in 99ms (next.js: 8ms, proxy.ts: 12ms, application-code: 79ms)
+ GET /login 200 in 122ms (next.js: 9ms, proxy.ts: 9ms, application-code: 103ms)
+✓ Compiled in 161ms
+ GET /login 200 in 91ms (next.js: 24ms, proxy.ts: 12ms, application-code: 54ms)
+✓ Compiled in 131ms
+ GET /login 200 in 117ms (next.js: 17ms, proxy.ts: 15ms, application-code: 85ms)
+✓ Compiled in 162ms
+ GET /login 200 in 73ms (next.js: 17ms, proxy.ts: 9ms, application-code: 47ms)
+ GET /login 200 in 118ms (next.js: 9ms, proxy.ts: 9ms, application-code: 100ms)
+✓ Compiled in 127ms
+ GET /login 200 in 68ms (next.js: 16ms, proxy.ts: 9ms, application-code: 43ms)
+✓ Compiled in 126ms
+ GET /login 200 in 67ms (next.js: 14ms, proxy.ts: 8ms, application-code: 44ms)
+ POST /login 200 in 2.3s (next.js: 9ms, proxy.ts: 11ms, application-code: 2.3s)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 2231ms src/app/login/actions.ts
+ GET / 200 in 2.2s (next.js: 6ms, proxy.ts: 18ms, application-code: 2.2s)
+ GET / 200 in 2.2s (next.js: 14ms, proxy.ts: 2.1s, application-code: 72ms)
+✓ Compiled in 214ms
+✓ Compiled in 167ms
+✓ Compiled in 121ms
+ GET / 200 in 158ms (next.js: 10ms, proxy.ts: 22ms, application-code: 126ms)
+✓ Compiled in 157ms
+ GET / 200 in 184ms (next.js: 10ms, proxy.ts: 22ms, application-code: 151ms)
+✓ Compiled in 207ms
+✓ Compiled in 124ms
+ GET / 200 in 149ms (next.js: 10ms, proxy.ts: 28ms, application-code: 111ms)
+✓ Compiled in 106ms
+ GET / 200 in 141ms (next.js: 10ms, proxy.ts: 19ms, application-code: 112ms)
+ GET /api/auth/csrf 200 in 34ms (next.js: 16ms, application-code: 18ms)
+ POST /api/auth/signout 200 in 21ms (next.js: 4ms, application-code: 17ms)
+ GET /login 200 in 95ms (next.js: 14ms, proxy.ts: 10ms, application-code: 70ms)
+ POST /login 200 in 2.3s (next.js: 10ms, proxy.ts: 9ms, application-code: 2.3s)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 2229ms src/app/login/actions.ts
+ GET / 200 in 2.2s (next.js: 10ms, proxy.ts: 30ms, application-code: 2.2s)
+ GET / 200 in 2.2s (next.js: 11ms, proxy.ts: 53ms, application-code: 2.2s)
+ GET / 200 in 274ms (next.js: 10ms, proxy.ts: 25ms, application-code: 239ms)
+ GET /api/auth/csrf 200 in 33ms (next.js: 18ms, application-code: 15ms)
+ POST /api/auth/signout 200 in 25ms (next.js: 5ms, application-code: 20ms)
+ GET /login 200 in 125ms (next.js: 11ms, proxy.ts: 18ms, application-code: 96ms)
+ POST /login 200 in 274ms (next.js: 10ms, proxy.ts: 16ms, application-code: 248ms)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 186ms src/app/login/actions.ts
+ GET / 200 in 255ms (next.js: 10ms, proxy.ts: 22ms, application-code: 223ms)
+ GET / 200 in 229ms (next.js: 19ms, proxy.ts: 56ms, application-code: 155ms)
+ GET /control-horario 200 in 106ms (next.js: 11ms, proxy.ts: 24ms, application-code: 71ms)
+✓ Compiled in 123ms
+ GET /control-horario 200 in 111ms (next.js: 8ms, proxy.ts: 18ms, application-code: 85ms)
+✓ Compiled in 152ms
+ GET /control-horario 200 in 127ms (next.js: 9ms, proxy.ts: 23ms, application-code: 96ms)
+ GET /control-horario 200 in 2.5s (next.js: 13ms, proxy.ts: 2.1s, application-code: 336ms)
+ GET /api/auth/csrf 200 in 33ms (next.js: 17ms, application-code: 17ms)
+ POST /api/auth/signout 200 in 26ms (next.js: 5ms, application-code: 20ms)
+ GET /login 200 in 129ms (next.js: 18ms, proxy.ts: 13ms, application-code: 98ms)
+ GET /login?callbackUrl=%2F 200 in 202ms (next.js: 13ms, proxy.ts: 25ms, application-code: 164ms)
+ POST /login?callbackUrl=%2F 200 in 293ms (next.js: 13ms, proxy.ts: 16ms, application-code: 264ms)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 192ms src/app/login/actions.ts
+ GET / 200 in 2.4s (next.js: 14ms, proxy.ts: 53ms, application-code: 2.4s)
+ GET /api/auth/csrf 200 in 37ms (next.js: 17ms, application-code: 20ms)
+ POST /api/auth/signout 200 in 33ms (next.js: 7ms, application-code: 26ms)
+ GET /login 200 in 158ms (next.js: 14ms, proxy.ts: 33ms, application-code: 111ms)
+ POST /login 200 in 282ms (next.js: 13ms, proxy.ts: 14ms, application-code: 255ms)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 195ms src/app/login/actions.ts
+ GET / 200 in 421ms (next.js: 13ms, proxy.ts: 32ms, application-code: 376ms)
+ GET /control-horario 200 in 179ms (next.js: 16ms, proxy.ts: 54ms, application-code: 109ms)
+ GET /horario 200 in 124ms (next.js: 14ms, proxy.ts: 24ms, application-code: 86ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 99ms (next.js: 37ms, application-code: 62ms)
+ GET / 200 in 146ms (next.js: 11ms, proxy.ts: 24ms, application-code: 111ms)
+✓ Compiled in 313ms
+✓ Compiled in 205ms
+ GET /login 200 in 126ms (next.js: 25ms, proxy.ts: 19ms, application-code: 82ms)
+ GET / 200 in 2.4s (next.js: 29ms, proxy.ts: 154ms, application-code: 2.2s)
+✓ Compiled in 301ms
+ GET /login 200 in 130ms (next.js: 23ms, proxy.ts: 27ms, application-code: 79ms)
+ GET / 200 in 357ms (next.js: 15ms, proxy.ts: 146ms, application-code: 197ms)
+ GET /login 200 in 143ms (next.js: 11ms, proxy.ts: 14ms, application-code: 118ms)
+ POST /login 200 in 2.4s (next.js: 12ms, proxy.ts: 13ms, application-code: 2.4s)
+  └─ ƒ loginAction({"error":null,"redirectTo":null}, {}) in 2296ms src/app/login/actions.ts
+ GET / 200 in 2.4s (next.js: 14ms, proxy.ts: 39ms, application-code: 2.3s)
+ GET /control-horario 200 in 152ms (next.js: 12ms, proxy.ts: 27ms, application-code: 113ms)
+ GET /horario 200 in 146ms (next.js: 12ms, proxy.ts: 25ms, application-code: 108ms)
+ GET /api/uploads/schedules/cmseel3in000227k8azl3h2jb/46266ca0-b097-4a6f-80c3-fd5d3015e9fd.pdf 200 in 74ms (next.js: 22ms, application-code: 52ms)
+ GET /vacaciones 200 in 2.2s (next.js: 20ms, proxy.ts: 26ms, application-code: 2.2s)
+ GET /control-horario 200 in 161ms (next.js: 15ms, proxy.ts: 44ms, application-code: 102ms)
+ GET / 200 in 160ms (next.js: 14ms, proxy.ts: 26ms, application-code: 121ms)
+ GET /control-horario 200 in 153ms (next.js: 14ms, proxy.ts: 24ms, application-code: 115ms)

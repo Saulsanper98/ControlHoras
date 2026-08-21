@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+const JEFA_EMAIL = "responsableom@movilidadgc.org";
+const LEGACY_JEFA_EMAIL = "responsableoperaciones@movilidadgc.org";
+
 const DEFAULT_PASSWORD = "Cambiar123!";
 
 type SeedUser = {
@@ -11,11 +14,12 @@ type SeedUser = {
   role?: Role; // por defecto EMPLEADO
 };
 
-// Roster real de la empresa, agrupado por departamento. Saúl es ADMIN (permisos
-// de jefa + su propio control horario como empleado de Sistemas).
+// Roster real de la empresa, agrupado por departamento. Saúl es el
+// propietario/desarrollador de la app, pero de cara al portal es un empleado
+// más de Sistemas: NO debe ver las opciones de gestión de la jefa.
 const ROSTER: Record<string, SeedUser[]> = {
   Sistemas: [
-    { email: "Saul@movilidadgc.org", name: "Saúl", role: "ADMIN" },
+    { email: "Saul@movilidadgc.org", name: "Saúl" },
     { email: "Sergio@movilidadgc.org", name: "Sergio" },
     { email: "Clemente@movilidadgc.org", name: "Clemente" },
     { email: "Mendoza@movilidadgc.org", name: "Mendoza" },
@@ -75,18 +79,31 @@ async function main() {
   );
   const departmentIdByName = new Map(departments.map((d) => [d.name, d.id]));
 
-  // La jefa (responsable) sigue teniendo su propia cuenta genérica, ya que no
-  // se ha proporcionado un email real para ella.
+  // La jefa (responsable de operaciones) tiene su propia cuenta real, sin
+  // departamento asignado y sin control horario propio.
+  const legacyJefa = await prisma.user.findUnique({
+    where: { email: LEGACY_JEFA_EMAIL },
+  });
+  if (legacyJefa) {
+    await prisma.user.update({
+      where: { email: LEGACY_JEFA_EMAIL },
+      data: { email: JEFA_EMAIL },
+    });
+  }
+
   await prisma.user.upsert({
-    where: { email: "jefa@portal.local" },
-    update: {},
+    where: { email: JEFA_EMAIL },
+    update: {
+      name: "Responsable de Operaciones",
+      role: "JEFA",
+      passwordHash,
+      active: true,
+    },
     create: {
-      name: "Jefa de Personal",
-      email: "jefa@portal.local",
+      name: "Responsable de Operaciones",
+      email: JEFA_EMAIL,
       passwordHash,
       role: "JEFA",
-      // Solo en creación: no queremos forzar el cambio de contraseña de
-      // nuevo a una cuenta que ya lo hizo, cada vez que se re-ejecuta el seed.
       mustChangePassword: true,
     },
   });
@@ -103,6 +120,10 @@ async function main() {
           role: u.role ?? "EMPLEADO",
           departmentId,
           active: true,
+          // En desarrollo el roster debe poder entrar siempre con la clave
+          // temporal; si no se actualiza el hash, un usuario ya creado queda
+          // con una contraseña antigua y el login falla.
+          passwordHash,
         },
         create: {
           name: u.name,
@@ -110,7 +131,6 @@ async function main() {
           passwordHash,
           role: u.role ?? "EMPLEADO",
           departmentId,
-          // Solo en creación, por el mismo motivo que arriba.
           mustChangePassword: true,
         },
       });
@@ -124,10 +144,24 @@ async function main() {
     data: { active: false },
   });
 
+  // Saldos de vacaciones anuales por defecto (22 días laborables).
+  const vacationYear = new Date().getFullYear();
+  const employees = await prisma.user.findMany({
+    where: { role: "EMPLEADO", active: true },
+    select: { id: true },
+  });
+  for (const emp of employees) {
+    await prisma.vacationBalance.upsert({
+      where: { userId_year: { userId: emp.id, year: vacationYear } },
+      update: {},
+      create: { userId: emp.id, year: vacationYear, totalDays: 22 },
+    });
+  }
+
   console.log("Seed completada. Contraseña temporal para todos los usuarios nuevos: %s", DEFAULT_PASSWORD);
-  console.log("  jefa@portal.local (JEFA)");
+  console.log("  %s (JEFA)", JEFA_EMAIL);
   console.log(`  ${created} cuentas creadas/actualizadas a partir del roster real.`);
-  console.log("  Saul@movilidadgc.org -> ADMIN (Sistemas)");
+  console.log("  Saul@movilidadgc.org -> EMPLEADO (Sistemas), sin acceso a las opciones de la jefa.");
   console.log(`  Cuentas antiguas desactivadas: ${LEGACY_EMPLOYEE_EMAILS.join(", ")}`);
 }
 

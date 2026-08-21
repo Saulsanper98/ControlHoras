@@ -1,4 +1,13 @@
-import { Document, Page, View, Text, Image, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
+
+const STATUS_PDF_STYLE: Record<string, { backgroundColor: string; color: string }> = {
+  BORRADOR: { backgroundColor: "#f1f5f9", color: "#475569" },
+  FIRMADO_EMPLEADO: { backgroundColor: "#fef3c7", color: "#92400e" },
+  FIRMADO_RESPONSABLE: { backgroundColor: "#d1fae5", color: "#065f46" },
+  RECHAZADO: { backgroundColor: "#fee2e2", color: "#991b1b" },
+  SIN_CONTROL: { backgroundColor: "#f8fafc", color: "#64748b" },
+};
 
 const MONTH_NAMES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -127,13 +136,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Pendiente de firma",
-  FIRMADO_RESPONSABLE: "Firmado",
-  RECHAZADO: "Rechazado",
-};
-
 export type TimeSheetPdfEntry = {
   day: number;
   checkIn: string | null;
@@ -164,7 +166,12 @@ export type TimeSheetPdfProps = {
 };
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Intl.DateTimeFormat("es-ES", {
+    timeZone: "Atlantic/Canary",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
 }
 
 export function TimeSheetPdf({
@@ -213,7 +220,14 @@ export function TimeSheetPdf({
               </Text>
             </View>
           </View>
-          <Text style={styles.statusBadge}>{STATUS_LABEL[status] ?? status}</Text>
+          <Text
+            style={[
+              styles.statusBadge,
+              STATUS_PDF_STYLE[status] ?? { backgroundColor: "#f1f5f9", color: "#475569" },
+            ]}
+          >
+            {TIMESHEET_STATUS_LABEL[status] ?? status}
+          </Text>
         </View>
 
         <View style={styles.table}>

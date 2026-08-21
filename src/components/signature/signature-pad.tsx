@@ -1,8 +1,21 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { X } from "lucide-react";
+import { Alert } from "@/components/ui/alert";
+import { Modal } from "@/components/ui/modal";
+
+function setupHiDpiCanvas(pad: SignatureCanvas) {
+  const canvas = pad.getCanvas();
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.scale(ratio, ratio);
+  }
+}
 
 export function SignatureModal({
   title,
@@ -16,67 +29,77 @@ export function SignatureModal({
   onConfirm: (dataUrl: string) => void;
 }) {
   const padRef = useRef<SignatureCanvas>(null);
-  const [empty, setEmpty] = useState(true);
+  const [emptyWarning, setEmptyWarning] = useState(false);
+
+  useLayoutEffect(() => {
+    const pad = padRef.current;
+    if (!pad) return;
+
+    function resize() {
+      if (padRef.current) setupHiDpiCanvas(padRef.current);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
 
   function handleClear() {
     padRef.current?.clear();
-    setEmpty(true);
+    setEmptyWarning(false);
   }
 
   function handleConfirm() {
-    if (!padRef.current || padRef.current.isEmpty()) return;
+    if (!padRef.current || padRef.current.isEmpty()) {
+      setEmptyWarning(true);
+      return;
+    }
+    setEmptyWarning(false);
     const dataUrl = padRef.current.getTrimmedCanvas().toDataURL("image/png");
     onConfirm(dataUrl);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-brand-navy">{title}</h3>
-          <button onClick={onCancel} className="text-slate-400 hover:text-slate-600">
-            <X className="h-5 w-5" />
+    <Modal open onClose={onCancel} title={title} className="max-w-lg">
+      <p className="mb-2 text-sm text-slate-500">Firma en el recuadro con el ratón o el dedo.</p>
+
+      <div className="rounded-lg border border-dashed border-brand-navy/18 bg-brand-navy/[0.03]">
+        <SignatureCanvas
+          ref={padRef}
+          penColor="#0a2240"
+          canvasProps={{
+            className: "w-full min-h-40 h-[min(40vw,12rem)] sm:h-48 rounded-lg touch-none",
+            "aria-label": "Área de firma",
+          }}
+          onBegin={() => setEmptyWarning(false)}
+        />
+      </div>
+
+      {emptyWarning && (
+        <Alert variant="warning" className="mt-2 border-x-0">
+          <p>Dibuja tu firma antes de confirmar.</p>
+        </Alert>
+      )}
+
+      <div className="mt-4 flex items-center justify-between">
+        <button type="button" onClick={handleClear} className="btn-ghost">
+          Limpiar
+        </button>
+        <div className="flex gap-2">
+          <button type="button" onClick={onCancel} className="btn-ghost">
+            Cancelar
           </button>
-        </div>
-
-        <p className="mb-2 text-sm text-slate-500">Firma en el recuadro con el ratón o el dedo.</p>
-
-        <div className="rounded-md border-2 border-dashed border-slate-300 bg-slate-50">
-          <SignatureCanvas
-            ref={padRef}
-            penColor="#0a2240"
-            canvasProps={{ className: "w-full h-48 rounded-md" }}
-            onBegin={() => setEmpty(false)}
-          />
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
           <button
             type="button"
-            onClick={handleClear}
-            className="text-sm font-medium text-slate-500 hover:text-slate-700"
+            disabled={pending}
+            onClick={handleConfirm}
+            className="btn-primary"
+            aria-busy={pending}
           >
-            Limpiar
+            {pending ? "Firmando…" : "Firmar"}
           </button>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              disabled={empty || pending}
-              onClick={handleConfirm}
-              className="rounded-md bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-60"
-            >
-              {pending ? "Firmando..." : "Firmar"}
-            </button>
-          </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -1,19 +1,19 @@
-import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/ui/page-header";
+import { Stagger } from "@/components/ui/stagger";
+import { requireEmployeeSession } from "@/lib/auth-helpers";
 import { TimeSheetForm } from "@/components/control-horario/timesheet-form";
-
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
+import { MONTH_NAMES_ES } from "@/lib/format-date";
+import { TIMESHEET_STATUS_DESCRIPTION } from "@/lib/labels";
 
 export default async function ControlHorarioPage({
   searchParams,
 }: {
   searchParams: Promise<{ month?: string; year?: string }>;
 }) {
-  const session = await auth();
-  if (!session) return null;
+  const session = await requireEmployeeSession();
+  if (!session) redirect("/");
 
   const now = new Date();
   const params = await searchParams;
@@ -29,22 +29,25 @@ export default async function ControlHorarioPage({
     },
   });
 
+  const status = timeSheet?.status ?? "SIN_CONTROL";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Control horario</h1>
-        <p className="text-slate-500">
-          {MONTH_NAMES[month - 1]} de {year}
-        </p>
-      </div>
+      <Stagger>
+        <PageHeader
+          title="Control horario"
+          description={`${MONTH_NAMES_ES[month - 1]} ${year} · ${TIMESHEET_STATUS_DESCRIPTION[status] ?? status}`}
+        />
+      </Stagger>
 
       <TimeSheetForm
         timeSheetId={timeSheet?.id ?? null}
         month={month}
         year={year}
-        monthNames={MONTH_NAMES}
-        status={timeSheet?.status ?? "BORRADOR"}
+        monthNames={[...MONTH_NAMES_ES]}
+        status={status}
         notes={timeSheet?.notes ?? ""}
+        rejectionReason={timeSheet?.rejectionReason}
         entries={
           timeSheet?.entries.map((e) => ({
             day: e.day,
@@ -63,8 +66,16 @@ export default async function ControlHorarioPage({
         employeeSignaturePath={
           timeSheet?.signatures.find((s) => s.signerRole === "EMPLEADO")?.imagePath ?? null
         }
+        employeeSignedAt={
+          timeSheet?.signatures.find((s) => s.signerRole === "EMPLEADO")?.signedAt?.toISOString() ??
+          null
+        }
         responsableSignaturePath={
           timeSheet?.signatures.find((s) => s.signerRole === "RESPONSABLE")?.imagePath ?? null
+        }
+        responsableSignedAt={
+          timeSheet?.signatures.find((s) => s.signerRole === "RESPONSABLE")?.signedAt?.toISOString() ??
+          null
         }
       />
     </div>

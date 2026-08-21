@@ -6,6 +6,8 @@ import { saveSignatureImage } from "@/lib/signatures";
 import { deleteUploadedFile } from "@/lib/uploads";
 import { requireManagerSession } from "@/lib/auth-helpers";
 import { clientIp } from "@/lib/request-ip";
+import { createNotification } from "@/lib/notifications";
+import { writeAuditLog } from "@/lib/audit";
 
 export async function signAsResponsableAction(
   timeSheetId: string,
@@ -49,8 +51,23 @@ export async function signAsResponsableAction(
     await deleteUploadedFile(previousSignature.imagePath);
   }
 
+  await createNotification({
+    userId: timeSheet.userId,
+    title: "Control horario firmado",
+    body: `Tu control de ${timeSheet.month}/${timeSheet.year} ha sido firmado por la responsable.`,
+    href: "/control-horario",
+  });
+  await writeAuditLog({
+    actorId: session.user.id,
+    action: "TIMESHEET_SIGNED",
+    entityType: "TimeSheet",
+    entityId: timeSheet.id,
+    detail: `Firmado control ${timeSheet.month}/${timeSheet.year}`,
+  });
+
   revalidatePath("/jefa/controles");
   revalidatePath(`/jefa/controles/${timeSheetId}`);
+  revalidatePath("/control-horario");
   return { ok: true };
 }
 
@@ -67,15 +84,47 @@ export async function rejectTimeSheetAction(
     return { ok: false, error: "Este control horario no está pendiente de firma." };
   }
 
-  await prisma.timeSheet.update({
-    where: { id: timeSheet.id },
-    data: {
-      status: "RECHAZADO",
-      notes: reason ? `Rechazado: ${reason}` : "Rechazado por la responsable.",
-    },
+  const finalReason = reason.trim() || "Rechazado por la responsable.";
+
+  await prisma.$transaction(async (tx) => {
+    const employeeSignature = await tx.signature.findUnique({
+      where: { timeSheetId_signerRole: { timeSheetId: timeSheet.id, signerRole: "EMPLEADO" } },
+    });
+
+    await tx.timeSheet.update({
+      where: { id: timeSheet.id },
+      data: {
+        status: "RECHAZADO",
+        rejectionReason: finalReason,
+        rejectedAt: new Date(),
+        rejectedById: session.user.id,
+        submittedAt: null,
+      },
+    });
+
+    if (employeeSignature) {
+      await tx.signature.delete({
+        where: { timeSheetId_signerRole: { timeSheetId: timeSheet.id, signerRole: "EMPLEADO" } },
+      });
+      await deleteUploadedFile(employeeSignature.imagePath);
+    }
   });
 
-  revalidatePath("/jefa/controles");
+  await createNotification({
+    userId: timeSheet.userId,
+    title: "Control horario rechazado",
+    body: finalReason,
+    href: `/control-horario?month=${timeSheet.month}&year=${timeSheet.year}`,
+  });
+  await writeAuditLog({
+    actorId: session.user.id,
+    action: "TIMESHEET_REJECTED",
+    entityType: "TimeSheet",
+    entityId: timeSheet.id,
+    detail: finalReason,
+  });
+
+  revalidatePath("/control-horario");
   revalidatePath(`/jefa/controles/${timeSheetId}`);
   return { ok: true };
 }

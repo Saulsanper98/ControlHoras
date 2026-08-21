@@ -12,7 +12,6 @@ datasource db {
 enum Role {
   EMPLEADO
   JEFA
-  ADMIN
 }
 
 enum EstadoControlHorario {
@@ -27,12 +26,31 @@ enum RolFirmante {
   RESPONSABLE
 }
 
+enum VacationRequestStatus {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  CANCELADA
+}
+
+enum LeaveType {
+  VACACIONES
+  ASUNTOS_PROPIOS
+  MEDIO_DIA
+}
+
+enum NewsStatus {
+  BORRADOR
+  PUBLICADA
+}
+
 model Department {
   id        String   @id @default(cuid())
   name      String   @unique
   createdAt DateTime @default(now())
 
   users     User[]
+  schedules Schedule[]
 
   @@map("departments")
 }
@@ -54,12 +72,16 @@ model User {
   timeSheets        TimeSheet[]        @relation("EmployeeTimeSheets")
   signatures        Signature[]
   attachments       Attachment[]
-  schedulesReceived Schedule[]         @relation("EmployeeSchedules")
   schedulesUploaded Schedule[]         @relation("UploadedSchedules")
   vacationBalances  VacationBalance[]
+  vacationRequests  VacationRequest[]  @relation("EmployeeVacationRequests")
+  reviewedVacationRequests VacationRequest[] @relation("ReviewedVacationRequests")
   hourAdjustments   HourAdjustment[]   @relation("EmployeeHourAdjustments")
   hourAdjustmentsCreated HourAdjustment[] @relation("CreatedHourAdjustments")
+  rejectedTimeSheets TimeSheet[]         @relation("RejectedTimeSheets")
   newsPublished     News[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
@@ -76,6 +98,10 @@ model TimeSheet {
   updatedAt DateTime             @updatedAt
   submittedAt DateTime?
   approvedAt  DateTime?
+  rejectionReason String?
+  rejectedAt      DateTime?
+  rejectedById    String?
+  rejectedBy      User?    @relation("RejectedTimeSheets", fields: [rejectedById], references: [id])
 
   entries     TimeEntry[]
   signatures  Signature[]
@@ -135,19 +161,21 @@ model Attachment {
   @@map("attachments")
 }
 
+// El horario asignado es por departamento (Sistemas, Redes, Sala, Operadores),
+// no personal: todos los empleados de un departamento ven el mismo horario.
 model Schedule {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation("EmployeeSchedules", fields: [userId], references: [id])
+  id           String     @id @default(cuid())
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
   fileName     String
   filePath     String
   mimeType     String
   uploadedById String
-  uploadedBy   User     @relation("UploadedSchedules", fields: [uploadedById], references: [id])
-  validFrom    DateTime @default(now())
-  createdAt    DateTime @default(now())
+  uploadedBy   User       @relation("UploadedSchedules", fields: [uploadedById], references: [id])
+  validFrom    DateTime   @default(now())
+  createdAt    DateTime   @default(now())
 
-  @@index([userId, createdAt])
+  @@index([departmentId, createdAt])
   @@map("schedules")
 }
 
@@ -165,31 +193,88 @@ model VacationBalance {
   @@map("vacation_balances")
 }
 
+model VacationRequest {
+  id              String                @id @default(cuid())
+  userId          String
+  user            User                  @relation("EmployeeVacationRequests", fields: [userId], references: [id])
+  year            Int
+  leaveType       LeaveType             @default(VACACIONES)
+  startDate       DateTime              @db.Date
+  endDate         DateTime              @db.Date
+  days            Decimal               @db.Decimal(5, 2)
+  status          VacationRequestStatus @default(PENDIENTE)
+  employeeNotes   String?
+  rejectionReason String?
+  reviewedAt      DateTime?
+  reviewedById    String?
+  reviewedBy      User?                 @relation("ReviewedVacationRequests", fields: [reviewedById], references: [id])
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([userId, year])
+  @@index([status])
+  @@index([leaveType])
+  @@map("vacation_requests")
+}
+
 model HourAdjustment {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation("EmployeeHourAdjustments", fields: [userId], references: [id])
+  year        Int      @default(2026)
   hours       Decimal  @db.Decimal(6, 2)
   reason      String
   createdById String
   createdBy   User     @relation("CreatedHourAdjustments", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 
-  @@index([userId])
+  @@index([userId, year])
   @@map("hour_adjustments")
 }
 
 model News {
-  id            String   @id @default(cuid())
+  id            String     @id @default(cuid())
   title         String
   body          String
   imagePath     String?
-  pinned        Boolean  @default(false)
+  pinned        Boolean    @default(false)
+  status        NewsStatus @default(PUBLICADA)
   publishedById String
-  publishedBy   User     @relation(fields: [publishedById], references: [id])
-  publishedAt   DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  publishedBy   User       @relation(fields: [publishedById], references: [id])
+  publishedAt   DateTime   @default(now())
+  scheduledAt   DateTime?
+  updatedAt     DateTime   @updatedAt
 
-  @@index([pinned, publishedAt])
+  @@index([status, pinned, publishedAt])
   @@map("news")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([actorId])
+  @@map("audit_logs")
 }

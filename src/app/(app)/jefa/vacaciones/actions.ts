@@ -11,6 +11,17 @@ function revalidateAll(userId: string) {
   revalidatePath("/");
 }
 
+async function requireActiveEmployee(userId: string) {
+  const employee = await prisma.user.findUnique({ where: { id: userId } });
+  if (!employee || employee.role !== "EMPLEADO") {
+    return { ok: false as const, error: "Empleado no encontrado." };
+  }
+  if (!employee.active) {
+    return { ok: false as const, error: "El empleado está inactivo." };
+  }
+  return { ok: true as const, employee };
+}
+
 export async function saveVacationBalanceAction(
   userId: string,
   year: number,
@@ -27,8 +38,8 @@ export async function saveVacationBalanceAction(
     return { ok: false, error: "Los días usados no pueden superar los días totales." };
   }
 
-  const employee = await prisma.user.findUnique({ where: { id: userId } });
-  if (!employee) return { ok: false, error: "Empleado no encontrado." };
+  const target = await requireActiveEmployee(userId);
+  if (!target.ok) return target;
 
   await prisma.vacationBalance.upsert({
     where: { userId_year: { userId, year } },
@@ -43,7 +54,8 @@ export async function saveVacationBalanceAction(
 export async function addHourAdjustmentAction(
   userId: string,
   hours: number,
-  reason: string
+  reason: string,
+  year: number
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
@@ -51,12 +63,21 @@ export async function addHourAdjustmentAction(
     return { ok: false, error: "Indica un número de horas distinto de cero." };
   }
   if (!reason.trim()) return { ok: false, error: "Indica un motivo." };
+  if (!Number.isFinite(year) || year < 2000 || year > 2100) {
+    return { ok: false, error: "Año no válido." };
+  }
 
-  const employee = await prisma.user.findUnique({ where: { id: userId } });
-  if (!employee) return { ok: false, error: "Empleado no encontrado." };
+  const target = await requireActiveEmployee(userId);
+  if (!target.ok) return target;
 
   await prisma.hourAdjustment.create({
-    data: { userId, hours, reason: reason.trim(), createdById: session.user.id },
+    data: {
+      userId,
+      year,
+      hours,
+      reason: reason.trim(),
+      createdById: session.user.id,
+    },
   });
 
   revalidateAll(userId);
@@ -69,6 +90,11 @@ export async function deleteHourAdjustmentAction(
 ): Promise<{ ok: boolean; error?: string }> {
   const session = await requireManagerSession();
   if (!session) return { ok: false, error: "No autorizado." };
+
+  const existing = await prisma.hourAdjustment.findUnique({ where: { id } });
+  if (!existing || existing.userId !== userId) {
+    return { ok: false, error: "No se pudo eliminar el ajuste." };
+  }
 
   try {
     await prisma.hourAdjustment.delete({ where: { id } });

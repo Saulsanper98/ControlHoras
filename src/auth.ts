@@ -1,40 +1,81 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import type { NextAuthConfig } from "next-auth";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-// Hash "señuelo" usado para normalizar el tiempo de respuesta cuando el
-// usuario no existe o está inactivo. Sin esto, saltarse el bcrypt.compare()
-// en ese camino hace la respuesta perceptiblemente más rápida que cuando la
-// contraseña es simplemente incorrecta, permitiendo enumerar emails válidos
-// por temporización. El valor no corresponde a ninguna contraseña real.
 const DUMMY_HASH = "$2b$10$CwTycUXWue0Thq9StjUM0uJ8Q0f6a6b8I8/6t3aRMdT8FRZ5uT.Nm";
 
+const authSecret =
+  process.env.AUTH_SECRET ??
+  (process.env.NODE_ENV === "production"
+    ? undefined
+    : "dev-only-insecure-auth-secret-change-me");
+
+const isProd = process.env.NODE_ENV === "production";
+
+function credString(value: unknown): string {
+  if (typeof value === "string") return value.trim();
+  if (Array.isArray(value) && typeof value[0] === "string") return value[0].trim();
+  return "";
+}
+
+/** Cookies HTTP-friendly para IP LAN (sin Secure / sin __Secure-). */
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  path: "/",
+  secure: isProd,
+};
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: { strategy: "jwt" },
+  secret: authSecret,
+  trustHost: true,
+  useSecureCookies: isProd,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: isProd ? "__Secure-authjs.session-token" : "authjs.session-token",
+      options: cookieOptions,
+    },
+    callbackUrl: {
+      name: isProd ? "__Secure-authjs.callback-url" : "authjs.callback-url",
+      options: { ...cookieOptions, httpOnly: false },
+    },
+    csrfToken: {
+      name: isProd ? "__Host-authjs.csrf-token" : "authjs.csrf-token",
+      options: { ...cookieOptions, httpOnly: false },
+    },
+  },
   pages: {
     signIn: "/login",
   },
   providers: [
     Credentials({
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const email = credentials?.email as string | undefined;
-        const password = credentials?.password as string | undefined;
+        const email = credString(credentials?.email).toLowerCase();
+        const password = credString(credentials?.password);
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase().trim() },
-          include: { department: true },
-        });
+        let user;
+        try {
+          user = await prisma.user.findUnique({
+            where: { email },
+            include: { department: true },
+          });
+        } catch (error) {
+          console.error("[auth] Error al consultar usuario:", error);
+          throw error;
+        }
 
         if (!user || !user.active) {
-          // Comparación señuelo: mantiene el tiempo de respuesta similar al
-          // camino de "contraseña incorrecta" para no filtrar por temporización
-          // si un email existe o está activo.
           await bcrypt.compare(password, DUMMY_HASH);
           return null;
         }
@@ -49,6 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           departmentId: user.departmentId,
           departmentName: user.department?.name ?? null,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -60,17 +102,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.departmentId = user.departmentId;
         token.departmentName = user.departmentName;
         token.id = user.id;
+        token.sub = user.id;
+        token.mustChangePassword = Boolean(user.mustChangePassword);
       }
       return token;
     },
     session: async ({ session, token }) => {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as "EMPLEADO" | "JEFA" | "ADMIN";
+        session.user.id = (token.id as string) || (token.sub as string);
+        session.user.role = token.role as "EMPLEADO" | "JEFA";
         session.user.departmentId = token.departmentId as string | null;
         session.user.departmentName = token.departmentName as string | null;
+        session.user.mustChangePassword = Boolean(token.mustChangePassword);
       }
       return session;
     },
   },
-});
+} satisfies NextAuthConfig);

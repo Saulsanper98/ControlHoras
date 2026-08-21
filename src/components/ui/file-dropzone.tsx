@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ export function FileDropzone({
   onFile: (file: File) => void;
   className?: string;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
   const [dragOver, setDragOver] = useState(false);
 
   function handleFiles(files: FileList | null) {
@@ -30,16 +30,8 @@ export function FileDropzone({
   }
 
   return (
-    <div
-      role="button"
-      tabIndex={disabled ? -1 : 0}
-      onClick={() => !disabled && inputRef.current?.click()}
-      onKeyDown={(e) => {
-        if (!disabled && (e.key === "Enter" || e.key === " ")) {
-          e.preventDefault();
-          inputRef.current?.click();
-        }
-      }}
+    <label
+      htmlFor={inputId}
       onDragOver={(e) => {
         e.preventDefault();
         if (!disabled) setDragOver(true);
@@ -51,27 +43,27 @@ export function FileDropzone({
         if (!disabled) handleFiles(e.dataTransfer.files);
       }}
       className={cn(
-        "flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed px-3 py-2.5 text-center text-xs font-medium text-slate-500 transition-colors",
+        "flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2.5 text-center text-xs font-medium text-brand-navy/55 transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-blue/30",
         dragOver
-          ? "border-brand-blue bg-brand-blue/5 text-brand-blue"
-          : "border-slate-300 hover:border-brand-blue/60 hover:bg-slate-50",
-        disabled && "cursor-not-allowed opacity-60 hover:border-slate-300 hover:bg-transparent",
+          ? "border-brand-blue bg-brand-blue/10 text-brand-blue"
+          : "border-brand-navy/18 bg-brand-navy/[0.03] hover:border-brand-blue/45 hover:bg-brand-navy/[0.055]",
+        disabled && "pointer-events-none cursor-not-allowed opacity-60",
         className
       )}
     >
-      <UploadCloud className="h-4 w-4 shrink-0" />
+      <UploadCloud className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span>{pending ? "Subiendo…" : label}</span>
       <input
-        ref={inputRef}
+        id={inputId}
         type="file"
         accept={accept}
-        className="hidden"
+        className="sr-only"
         disabled={disabled}
         onChange={(e) => {
           handleFiles(e.target.files);
           e.target.value = "";
         }}
       />
-    </div>
+    </label>
   );
 }

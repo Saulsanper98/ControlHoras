@@ -1,27 +1,30 @@
 import Link from "next/link";
-import { ClipboardList, Umbrella, Clock, Users, Newspaper } from "lucide-react";
+import { ClipboardList, Umbrella, Clock, Users, Newspaper, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Card, StatCard } from "@/components/ui/card";
+import { Alert } from "@/components/ui/alert";
+import { StatCard } from "@/components/ui/stat-card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Stagger } from "@/components/ui/stagger";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { SectionTitle } from "@/components/ui/section-title";
+import { ListSurface } from "@/components/ui/list-surface";
+import { NewsCard } from "@/components/noticias/news-card";
+import { MONTH_NAMES_ES, APP_TIMEZONE } from "@/lib/format-date";
+import { TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 import { canManage, hasOwnEmployeeData } from "@/lib/roles";
 
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Enviado, pendiente de la responsable",
-  FIRMADO_RESPONSABLE: "Firmado y cerrado",
-  RECHAZADO: "Rechazado",
-};
-
 function greeting(date: Date): string {
-  const h = date.getHours();
-  if (h < 6) return "Buenas noches";
-  if (h < 13) return "Buenos días";
-  if (h < 20) return "Buenas tardes";
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: APP_TIMEZONE,
+      hour: "numeric",
+      hour12: false,
+    }).format(date)
+  );
+  if (hour < 6) return "Buenas noches";
+  if (hour < 13) return "Buenos días";
+  if (hour < 20) return "Buenas tardes";
   return "Buenas noches";
 }
 
@@ -34,19 +37,32 @@ export default async function DashboardPage() {
   const year = now.getFullYear();
 
   const news = await prisma.news.findMany({
+    where: {
+      status: "PUBLICADA",
+      OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }],
+    },
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
     take: 3,
+    select: {
+      id: true,
+      title: true,
+      body: true,
+      pinned: true,
+      publishedAt: true,
+      imagePath: true,
+    },
   });
 
   const role = session.user.role;
   const showManagement = canManage(role);
   const showPersonal = hasOwnEmployeeData(role);
 
-  const [managementStats, personalStats] = await Promise.all([
+  const [managementStats, personalStats, nextPending, pendingVacations, nextVacationRequests] =
+    await Promise.all([
     showManagement
       ? Promise.all([
           prisma.timeSheet.count({ where: { status: "FIRMADO_EMPLEADO" } }),
-          prisma.user.count({ where: { role: { in: ["EMPLEADO", "ADMIN"] }, active: true } }),
+          prisma.user.count({ where: { role: "EMPLEADO", active: true } }),
           prisma.timeSheet.count({ where: { month, year } }),
         ])
       : null,
@@ -59,11 +75,29 @@ export default async function DashboardPage() {
             where: { userId_year: { userId: session.user.id, year } },
           }),
           prisma.hourAdjustment.aggregate({
-            where: { userId: session.user.id },
+            where: { userId: session.user.id, year },
             _sum: { hours: true },
           }),
         ])
       : null,
+    showManagement
+      ? prisma.timeSheet.findFirst({
+          where: { status: "FIRMADO_EMPLEADO" },
+          orderBy: { submittedAt: "asc" },
+          include: { user: { include: { department: true } } },
+        })
+      : null,
+    showManagement
+      ? prisma.vacationRequest.count({ where: { status: "PENDIENTE" } })
+      : 0,
+    showManagement
+      ? prisma.vacationRequest.findMany({
+          where: { status: "PENDIENTE" },
+          include: { user: true },
+          orderBy: { createdAt: "asc" },
+          take: 3,
+        })
+      : [],
   ]);
 
   const [pendientes, empleados, controlesDelMes] = managementStats ?? [0, 0, 0];
@@ -77,45 +111,145 @@ export default async function DashboardPage() {
     ? Number(vacationBalance.totalDays) - Number(vacationBalance.usedDays)
     : null;
   const horasAcumuladas = Number(hourAdjustments._sum.hours ?? 0);
+  const timesheetStatus = timeSheet?.status ?? "SIN_CONTROL";
+  const timesheetStatusLabel =
+    TIMESHEET_STATUS_LABEL[timesheetStatus] ?? timesheetStatus;
+
+  const controlCta =
+    showPersonal && (!timeSheet || timeSheet.status === "BORRADOR")
+      ? !timeSheet
+        ? {
+            href: "/control-horario",
+            label: `Empieza tu control de ${MONTH_NAMES_ES[month - 1]}`,
+          }
+        : now.getDate() >= 25
+          ? {
+              href: "/control-horario",
+              label: `Recuerda enviar tu control de ${MONTH_NAMES_ES[month - 1]}`,
+            }
+          : null
+      : null;
 
   return (
     <div className="space-y-8">
-      <div className="animate-fade-slide-up">
-        <h1 className="text-2xl font-semibold text-brand-navy">
-          {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}{" "}
-          <span className="animate-wave" aria-hidden="true">
-            👋
-          </span>
-        </h1>
-        <p className="text-slate-500">
-          {role === "JEFA"
-            ? `Resumen de ${MONTH_NAMES[month - 1]} de ${year}`
-            : `${session.user.departmentName} · ${MONTH_NAMES[month - 1]} de ${year}`}
-        </p>
-      </div>
+      <Stagger>
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-brand-navy sm:text-3xl">
+            {greeting(now)}, {(session.user.name ?? "").split(" ")[0]}
+          </h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <p className="text-brand-navy/55">
+              {role === "JEFA"
+                ? `Resumen de ${MONTH_NAMES_ES[month - 1]} de ${year}`
+                : `${session.user.departmentName ?? "Sin departamento"} · ${MONTH_NAMES_ES[month - 1]} de ${year}`}
+            </p>
+            {showPersonal && (
+              <StatusBadge
+                status={timeSheet?.status ?? "SIN_CONTROL"}
+                preset="timesheet"
+              />
+            )}
+          </div>
+        </div>
+      </Stagger>
 
+      {controlCta && (
+        <Alert
+          variant="warning"
+          action={
+            <Link
+              href={controlCta.href}
+              className="inline-flex items-center gap-1 font-semibold text-brand-blue hover:underline"
+            >
+              Ir al control <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
+        >
+          <p>{controlCta.label}</p>
+        </Alert>
+      )}
+
+      {showPersonal && timeSheet?.status === "RECHAZADO" && (
+        <Alert
+          variant="danger"
+          title="Tu control horario fue rechazado"
+          action={
+            <Link
+              href="/control-horario"
+              className="inline-flex items-center gap-1 font-semibold text-brand-blue hover:underline"
+            >
+              Ir a corregir <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
+        >
+          <p>{timeSheet.rejectionReason ?? "Revisa el motivo y vuelve a enviarlo firmado."}</p>
+        </Alert>
+      )}
       {showManagement && (
-        <div className="animate-fade-slide-up" style={{ animationDelay: "90ms" }}>
-          {showPersonal && (
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Resumen de gestión
-            </h2>
+        <div className="animate-fade-slide-up space-y-5" style={{ animationDelay: "90ms" }}>
+          {(nextPending || nextVacationRequests.length > 0) && (
+            <div className="divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)]">
+              {nextPending && (
+                <Link
+                  href={`/jefa/controles/${nextPending.id}`}
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.03]"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-brand-blue">Siguiente control pendiente</p>
+                    <p className="font-semibold text-brand-navy">
+                      {nextPending.user.name} · {MONTH_NAMES_ES[nextPending.month - 1]} de{" "}
+                      {nextPending.year}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {nextPending.user.department?.name ?? "—"}
+                      {pendingVacations > 0 &&
+                        ` · ${pendingVacations} solicitud${pendingVacations === 1 ? "" : "es"} de vacaciones pendiente${pendingVacations === 1 ? "" : "s"}`}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-brand-blue" />
+                </Link>
+              )}
+              {nextVacationRequests.map((r) => (
+                <Link
+                  key={r.id}
+                  href="/jefa/vacaciones"
+                  className="flex items-center justify-between gap-3 py-3.5 transition hover:bg-brand-navy/[0.03]"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Vacaciones pendientes</p>
+                    <p className="font-semibold text-brand-navy">
+                      {r.user.name} · {Number(r.days)} días
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-amber-700" />
+                </Link>
+              ))}
+            </div>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
             <StatCard
               label="Controles pendientes de firmar"
               value={String(pendientes)}
               icon={ClipboardList}
+              href="/jefa/controles"
+            />
+            <StatCard
+              label="Vacaciones pendientes"
+              value={String(pendingVacations)}
+              icon={Umbrella}
+              href="/jefa/vacaciones"
             />
             <StatCard
               label="Empleados activos"
               value={String(empleados)}
               icon={Users}
+              href="/jefa/empleados"
             />
             <StatCard
               label="Controles horarios este mes"
               value={String(controlesDelMes)}
               icon={Clock}
+              href={`/jefa/controles?month=${month}&year=${year}`}
             />
           </div>
         </div>
@@ -124,27 +258,30 @@ export default async function DashboardPage() {
       {showPersonal && (
         <div className="animate-fade-slide-up" style={{ animationDelay: "170ms" }}>
           {showManagement && (
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-brand-navy/45">
               Mi resumen personal
             </h2>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 divide-y divide-[color:var(--surface-divider)] border-y border-[color:var(--surface-divider)] sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:border-x-0">
             <StatCard
               label="Control horario de este mes"
-              value={timeSheet ? STATUS_LABEL[timeSheet.status] : "Sin empezar"}
+              value={timesheetStatusLabel}
               icon={ClipboardList}
+              href="/control-horario"
             />
             <StatCard
               label="Vacaciones restantes"
               value={diasRestantes !== null ? `${diasRestantes} días` : "Sin datos"}
               hint={year.toString()}
               icon={Umbrella}
+              href="/vacaciones"
             />
             <StatCard
               label="Bolsa de horas"
               value={`${horasAcumuladas.toFixed(1)} h`}
               hint="Ajustes acumulados"
               icon={Clock}
+              href="/vacaciones"
             />
           </div>
         </div>
@@ -161,37 +298,48 @@ function NewsSection({
   news,
   viewAllHref,
 }: {
-  news: { id: string; title: string; body: string; publishedAt: Date }[];
+  news: {
+    id: string;
+    title: string;
+    body: string;
+    pinned: boolean;
+    publishedAt: Date;
+    imagePath: string | null;
+  }[];
   viewAllHref: string;
 }) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Newspaper className="h-4 w-4 text-brand-blue" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Últimas noticias
-          </h2>
-        </div>
+        <SectionTitle>Últimas noticias</SectionTitle>
         <Link href={viewAllHref} className="text-sm font-medium text-brand-blue hover:underline">
           Ver todas
         </Link>
       </div>
       {news.length === 0 ? (
-        <Card className="text-sm text-slate-400">
-          Todavía no hay noticias publicadas.
-        </Card>
+        <EmptyState
+          icon={Newspaper}
+          title="Sin noticias todavía"
+          description="Cuando la responsable publique novedades, aparecerán aquí."
+        />
       ) : (
-        <div className="space-y-3">
+        <ListSurface>
           {news.map((item) => (
-            <Card key={item.id}>
-              <p className="font-medium text-brand-navy">{item.title}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-500">
-                {item.body}
-              </p>
-            </Card>
+            <NewsCard
+              key={item.id}
+              variant="compact"
+              href={`/noticias/${item.id}`}
+              news={{
+                id: item.id,
+                title: item.title,
+                body: item.body,
+                pinned: item.pinned,
+                publishedAt: item.publishedAt,
+                imagePath: item.imagePath,
+              }}
+            />
           ))}
-        </div>
+        </ListSurface>
       )}
     </div>
   );

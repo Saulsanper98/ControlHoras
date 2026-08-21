@@ -1,33 +1,33 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ClipboardList } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
+import { PageHeader } from "@/components/ui/page-header";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { Stagger } from "@/components/ui/stagger";
+import { EmptyState } from "@/components/ui/empty-state";
+import { InlineEmpty } from "@/components/ui/inline-empty";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { SectionEyebrow } from "@/components/ui/section-title";
+import { ListSurface, ListRow, SectionBlock } from "@/components/ui/list-surface";
 import { requireManagerSession } from "@/lib/auth-helpers";
+import { MONTH_NAMES_ES } from "@/lib/format-date";
+import { TIMESHEET_STATUS_DESCRIPTION, TIMESHEET_STATUS_LABEL } from "@/lib/labels";
 
-const MONTH_NAMES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-];
-
-const STATUS_LABEL: Record<string, string> = {
-  BORRADOR: "Borrador",
-  FIRMADO_EMPLEADO: "Pendiente de firma",
-  FIRMADO_RESPONSABLE: "Firmado",
-  RECHAZADO: "Rechazado",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  BORRADOR: "bg-slate-100 text-slate-600",
-  FIRMADO_EMPLEADO: "bg-amber-100 text-amber-700",
-  FIRMADO_RESPONSABLE: "bg-emerald-100 text-emerald-700",
-  RECHAZADO: "bg-red-100 text-red-700",
-};
+const PAGE_SIZE = 20;
+const DRAFTS_TAKE = 30;
 
 export default async function ControlesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ department?: string; month?: string; year?: string }>;
+  searchParams: Promise<{
+    department?: string;
+    month?: string;
+    year?: string;
+    page?: string;
+    drafts?: string;
+  }>;
 }) {
   const session = await requireManagerSession();
   if (!session) redirect("/");
@@ -36,8 +36,10 @@ export default async function ControlesPage({
   const departmentId = params.department || undefined;
   const month = params.month ? Number(params.month) : undefined;
   const year = params.year ? Number(params.year) : undefined;
+  const page = Math.max(1, Number(params.page) || 1);
+  const showAllDrafts = params.drafts === "all";
 
-  const HISTORY_LIMIT = 100;
+  const historySkip = (page - 1) * PAGE_SIZE;
 
   const baseWhere = {
     ...(departmentId ? { user: { departmentId } } : {}),
@@ -45,17 +47,30 @@ export default async function ControlesPage({
     ...(year ? { year } : {}),
   };
 
-  const [pending, others, departments, years] = await Promise.all([
+  const [pending, drafts, draftsTotal, others, othersTotal, departments, years] = await Promise.all([
     prisma.timeSheet.findMany({
       where: { status: "FIRMADO_EMPLEADO", ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
     }),
     prisma.timeSheet.findMany({
+      where: { status: "BORRADOR", ...baseWhere },
+      include: { user: { include: { department: true } } },
+      orderBy: [{ year: "desc" }, { month: "desc" }],
+      ...(showAllDrafts ? {} : { take: DRAFTS_TAKE }),
+    }),
+    prisma.timeSheet.count({
+      where: { status: "BORRADOR", ...baseWhere },
+    }),
+    prisma.timeSheet.findMany({
       where: { status: { in: ["FIRMADO_RESPONSABLE", "RECHAZADO"] }, ...baseWhere },
       include: { user: { include: { department: true } } },
       orderBy: [{ year: "desc" }, { month: "desc" }],
-      take: HISTORY_LIMIT,
+      take: PAGE_SIZE,
+      skip: historySkip,
+    }),
+    prisma.timeSheet.count({
+      where: { status: { in: ["FIRMADO_RESPONSABLE", "RECHAZADO"] }, ...baseWhere },
     }),
     prisma.department.findMany({ orderBy: { name: "asc" } }),
     prisma.timeSheet.findMany({
@@ -66,15 +81,46 @@ export default async function ControlesPage({
   ]);
 
   const hasFilters = Boolean(departmentId || month || year);
+  const isFullyEmpty = pending.length === 0 && draftsTotal === 0 && othersTotal === 0;
+  const totalPages = Math.max(1, Math.ceil(othersTotal / PAGE_SIZE));
+
+  const queryBase = new URLSearchParams();
+  if (departmentId) queryBase.set("department", departmentId);
+  if (month) queryBase.set("month", String(month));
+  if (year) queryBase.set("year", String(year));
+
+  function pageHref(p: number) {
+    const q = new URLSearchParams(queryBase);
+    if (p > 1) q.set("page", String(p));
+    if (showAllDrafts) q.set("drafts", "all");
+    const s = q.toString();
+    return s ? `/jefa/controles?${s}` : "/jefa/controles";
+  }
+
+  function detailHref(id: string) {
+    const q = new URLSearchParams(queryBase);
+    if (showAllDrafts) q.set("drafts", "all");
+    const s = q.toString();
+    return s ? `/jefa/controles/${id}?${s}` : `/jefa/controles/${id}`;
+  }
+
+  function draftsAllHref() {
+    const q = new URLSearchParams(queryBase);
+    q.set("drafts", "all");
+    return `/jefa/controles?${q.toString()}`;
+  }
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-navy">Controles horarios</h1>
-        <p className="text-slate-500">Revisa, firma y descarga los controles horarios de los empleados.</p>
-      </div>
+      <Breadcrumbs />
+      <Stagger>
+        <PageHeader
+          title="Controles horarios"
+          description="Revisa, firma y descarga los controles horarios de los empleados."
+        />
+      </Stagger>
 
-      <Card>
+      <SectionBlock>
         <form className="flex flex-wrap items-end gap-3" method="get">
           <div className="w-40">
             <label htmlFor="filter-department" className="mb-1 block text-xs font-medium text-slate-500">
@@ -95,7 +141,7 @@ export default async function ControlesPage({
             </label>
             <Select id="filter-month" name="month" defaultValue={month ?? ""}>
               <option value="">Todos</option>
-              {MONTH_NAMES.map((name, i) => (
+              {MONTH_NAMES_ES.map((name, i) => (
                 <option key={name} value={i + 1}>
                   {name}
                 </option>
@@ -115,54 +161,110 @@ export default async function ControlesPage({
               ))}
             </Select>
           </div>
-          <button
-            type="submit"
-            className="rounded-md bg-brand-blue px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue-dark"
-          >
+          <button type="submit" className="btn-primary">
             Filtrar
           </button>
           {hasFilters && (
-            <Link
-              href="/jefa/controles"
-              className="text-sm font-medium text-slate-500 hover:text-brand-navy"
-            >
+            <Link href="/jefa/controles" className="btn-ghost">
               Limpiar filtros
             </Link>
           )}
         </form>
-      </Card>
+      </SectionBlock>
 
+      {isFullyEmpty ? (
+        <EmptyState
+          icon={ClipboardList}
+          title={
+            hasFilters ? "Ningún control coincide con los filtros" : "No hay controles horarios"
+          }
+          description={
+            hasFilters
+              ? "Prueba con otros criterios o quita los filtros para ver todos los controles."
+              : "Cuando un empleado cree o envíe un control, aparecerá aquí."
+          }
+          action={
+            hasFilters ? (
+              <Link href="/jefa/controles" className="btn-primary">
+                Limpiar filtros
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : (
+        <>
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Pendientes de firma ({pending.length})
-        </h2>
+        <SectionEyebrow>Pendientes de firma ({pending.length})</SectionEyebrow>
         {pending.length === 0 ? (
-          <Card className="text-sm text-slate-400">No hay controles pendientes.</Card>
+          <InlineEmpty>
+            No hay controles con estado «{TIMESHEET_STATUS_LABEL.FIRMADO_EMPLEADO}».
+          </InlineEmpty>
         ) : (
-          <div className="space-y-2">
+          <ListSurface>
             {pending.map((t) => (
-              <TimeSheetRow key={t.id} t={t} />
+              <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
             ))}
-          </div>
+          </ListSurface>
         )}
       </section>
 
-      {others.length > 0 && (
+      {(drafts.length > 0 || draftsTotal > 0) && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Historial
-          </h2>
-          {others.length === HISTORY_LIMIT && (
-            <p className="mb-3 text-xs text-slate-400">
-              Mostrando los {HISTORY_LIMIT} más recientes. Usa los filtros para acotar la búsqueda.
+          <SectionEyebrow>
+            {TIMESHEET_STATUS_DESCRIPTION.BORRADOR} ({draftsTotal})
+          </SectionEyebrow>
+          {draftsTotal > DRAFTS_TAKE && !showAllDrafts && (
+            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className="text-xs text-slate-500">
+                Mostrando {drafts.length} de {draftsTotal}
+              </p>
+              <Link href={draftsAllHref()} className="btn-sm btn-ghost">
+                Mostrar todos
+              </Link>
+            </div>
+          )}
+          <ListSurface>
+            {drafts.map((t) => (
+              <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
+            ))}
+          </ListSurface>
+        </section>
+      )}
+
+      {othersTotal > 0 && (
+        <section>
+          <SectionEyebrow>Historial</SectionEyebrow>
+          {totalPages > 1 && (
+            <p className="mb-3 text-xs text-slate-500">
+              Página {page} de {totalPages} · {othersTotal} registros en total
             </p>
           )}
-          <div className="space-y-2">
-            {others.map((t) => (
-              <TimeSheetRow key={t.id} t={t} />
-            ))}
-          </div>
+          {others.length === 0 ? (
+            <InlineEmpty>No hay registros en esta página.</InlineEmpty>
+          ) : (
+            <ListSurface>
+              {others.map((t) => (
+                <TimeSheetRow key={t.id} t={t} href={detailHref(t.id)} />
+              ))}
+            </ListSurface>
+          )}
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center gap-2">
+              {page > 1 && (
+                <Link href={pageHref(page - 1)} className="btn-sm btn-ghost">
+                  ← Anterior
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link href={pageHref(page + 1)} className="btn-sm btn-ghost">
+                  Siguiente →
+                </Link>
+              )}
+            </div>
+          )}
         </section>
+      )}
+        </>
       )}
     </div>
   );
@@ -170,6 +272,7 @@ export default async function ControlesPage({
 
 function TimeSheetRow({
   t,
+  href,
 }: {
   t: {
     id: string;
@@ -178,20 +281,22 @@ function TimeSheetRow({
     status: string;
     user: { name: string; department: { name: string } | null };
   };
+  href: string;
 }) {
   return (
-    <Link href={`/jefa/controles/${t.id}`}>
-      <Card className="flex items-center justify-between transition hover:border-brand-blue">
-        <div>
-          <p className="font-medium text-brand-navy">{t.user.name}</p>
-          <p className="text-sm text-slate-500">
-            {t.user.department?.name ?? "—"} · {MONTH_NAMES[t.month - 1]} de {t.year}
-          </p>
-        </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLOR[t.status]}`}>
-          {STATUS_LABEL[t.status]}
-        </span>
-      </Card>
-    </Link>
+    <ListRow className="!py-0">
+      <Link
+        href={href}
+        className="flex items-center justify-between gap-3 py-3"
+      >
+      <div>
+        <p className="font-medium text-brand-navy">{t.user.name}</p>
+        <p className="text-sm text-slate-500">
+          {t.user.department?.name ?? "—"} · {MONTH_NAMES_ES[t.month - 1]} de {t.year}
+        </p>
+      </div>
+      <StatusBadge status={t.status} />
+      </Link>
+    </ListRow>
   );
 }

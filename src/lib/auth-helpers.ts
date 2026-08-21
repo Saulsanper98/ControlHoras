@@ -8,14 +8,14 @@ export async function verifiedSession() {
   return session;
 }
 
-/** Sesión de un usuario con permisos de gestión (JEFA/ADMIN). */
+/** Sesión de un usuario con permisos de gestión (JEFA). */
 export async function requireManagerSession() {
   const session = await auth();
   if (!session || !canManage(session.user.role)) return null;
   return session;
 }
 
-/** Sesión de un usuario con datos propios de empleado (EMPLEADO/ADMIN). */
+/** Sesión de un usuario con datos propios de empleado (EMPLEADO). */
 export async function requireEmployeeSession() {
   const session = await auth();
   if (!session || !hasOwnEmployeeData(session.user.role)) return null;

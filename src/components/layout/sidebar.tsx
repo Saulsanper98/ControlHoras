@@ -2,32 +2,46 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { employeeNav, jefaNav, adminNavSections, type NavItem } from "@/lib/nav";
+import { employeeNav, jefaNavGroups, type NavItem } from "@/lib/nav";
+import type { AppRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 function NavLink({
   item,
   active,
   onNavigate,
+  badge,
 }: {
   item: NavItem;
   active: boolean;
   onNavigate?: () => void;
+  badge?: number;
 }) {
   const Icon = item.icon;
   return (
     <Link
       href={item.href}
+      prefetch
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "relative flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
         active
-          ? "bg-brand-yellow text-brand-navy"
+          ? "bg-brand-yellow text-brand-navy shadow-sm"
           : "text-slate-200 hover:bg-brand-navy-light hover:text-white"
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
-      {item.label}
+      <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 2} />
+      <span className="flex-1">{item.label}</span>
+      {badge != null && badge > 0 && (
+        <span
+          className={cn(
+            "min-w-5 rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold tabular-nums",
+            active ? "bg-brand-navy/15 text-brand-navy" : "bg-red-500/90 text-white"
+          )}
+        >
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
     </Link>
   );
 }
@@ -35,31 +49,55 @@ function NavLink({
 export function Sidebar({
   role,
   onNavigate,
+  pendingSignatures,
+  pendingVacations,
+  employeeRejectedTimesheet,
+  employeePendingVacations,
 }: {
-  role: "EMPLEADO" | "JEFA" | "ADMIN";
+  role: AppRole;
   onNavigate?: () => void;
+  pendingSignatures?: number | null;
+  pendingVacations?: number;
+  employeeRejectedTimesheet?: number;
+  employeePendingVacations?: number;
 }) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  if (role === "ADMIN") {
+  function badgeFor(href: string): number | undefined {
+    if (role === "JEFA") {
+      if (href === "/jefa/controles") return pendingSignatures ?? undefined;
+      if (href === "/jefa/vacaciones") return pendingVacations;
+      return undefined;
+    }
+    if (href === "/control-horario" && employeeRejectedTimesheet) {
+      return employeeRejectedTimesheet;
+    }
+    if (href === "/vacaciones" && employeePendingVacations) {
+      return employeePendingVacations;
+    }
+    return undefined;
+  }
+
+  if (role === "JEFA") {
     return (
-      <nav className="flex flex-1 flex-col gap-4 px-3 py-4">
-        {adminNavSections.map((section, idx) => (
-          <div key={section.title ?? idx} className="flex flex-col gap-1">
-            {section.title && (
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                {section.title}
+      <nav className="flex flex-col gap-4 px-2 py-3" aria-label="Navegación principal">
+        {jefaNavGroups.map((group) => (
+          <div key={group.id} className="flex flex-col gap-1.5">
+            {group.label && (
+              <p className="px-3.5 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                {group.label}
               </p>
             )}
-            {section.items.map((item) => (
+            {group.items.map((item) => (
               <NavLink
                 key={item.href}
                 item={item}
                 active={isActive(item.href)}
                 onNavigate={onNavigate}
+                badge={badgeFor(item.href)}
               />
             ))}
           </div>
@@ -68,16 +106,15 @@ export function Sidebar({
     );
   }
 
-  const items = role === "JEFA" ? jefaNav : employeeNav;
-
   return (
-    <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-      {items.map((item) => (
+    <nav className="flex flex-col gap-1.5 px-2 py-3" aria-label="Navegación principal">
+      {employeeNav.map((item) => (
         <NavLink
           key={item.href}
           item={item}
           active={isActive(item.href)}
           onNavigate={onNavigate}
+          badge={badgeFor(item.href)}
         />
       ))}
     </nav>
