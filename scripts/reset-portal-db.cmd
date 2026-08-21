@@ -48,10 +48,12 @@ call node scripts\reset-dev-passwords.mjs
 if errorlevel 1 exit /b 1
 
 echo.
-echo [6/6] Listo. Ahora reinicia la app:
+echo [6/6] Listo. Reinicia la app y abre por IP:
 echo   taskkill /F /IM node.exe
+echo   node scripts\apply-lan-env.mjs 192.168.12.45
 echo   npm run dev
 echo.
+echo Abre: http://192.168.12.45:3000   ^(NO localhost^)
 echo Login: Saul@movilidadgc.org / Cambiar123!
 echo        responsableom@movilidadgc.org / Cambiar123!
 exit /b 0

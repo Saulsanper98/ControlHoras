@@ -45,7 +45,10 @@ if errorlevel 1 goto :fail
 call node scripts\reset-dev-passwords.mjs
 if errorlevel 1 goto :fail
 
-echo [7/7] arrancando servidor
+echo [7/7] arrancando servidor en 0.0.0.0:3000
+echo.
+echo Abre en el navegador: http://192.168.12.45:3000
+echo ^(NO uses localhost^)
 echo.
 call npm run dev
 goto :eof
